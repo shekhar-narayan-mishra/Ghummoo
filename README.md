@@ -1,6 +1,11 @@
 # Ghummoo - Local Guide Booking Platform
 *Your gateway to authentic local experiences. Streak maintained!*
 
+## 🚀 Recent Updates
+- Improved guide search functionality
+- Streamlined availability calendar
+- Added seamless onboarding for local experts
+
 ## 📌 Project Overview
 **Ghummoo** is a full-stack web application that enables travelers
 to discover and book **certified local guides**.  

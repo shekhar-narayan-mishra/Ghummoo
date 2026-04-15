@@ -1,7 +1,14 @@
 import axios from 'axios';
 
+// Build the base URL:
+// - In production, VITE_API_URL points to the backend origin (e.g. https://ghummoo-api.onrender.com)
+//   so we append /api to reach the correct route prefix.
+// - In local dev, the Vite proxy forwards /api to localhost:5000.
+const rawUrl = import.meta.env.VITE_API_URL || '';
+const baseURL = rawUrl ? `${rawUrl.replace(/\/+$/, '')}/api` : '/api';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });

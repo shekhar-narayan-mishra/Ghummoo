@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment files — never commit real secrets
+.env
+server/.env
+
+# Build outputs
+dist/
+build/
+client/dist/
+
+# SQLite legacy (old architecture)
+*.sqlite
+*.sqlite3
+*.db
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+
+# Temp uploads
+/tmp/

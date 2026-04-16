@@ -1,0 +1,27 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Custom colors for the design system */
+:root {
+  --teal: #1D9E75;
+  --teal-light: #E1F5EE;
+  --teal-dark: #0F6E56;
+  --purple-light: #EEEDFE;
+  --purple: #534AB7;
+  --purple-dark: #3C3489;
+  --amber-light: #FAEEDA;
+  --amber: #BA7517;
+  --green-light: #EAF3DE;
+  --green: #3B6D11;
+  --red-light: #FCEBEB;
+  --red: #A32D2D;
+  --blue-light: #E6F1FB;
+  --blue: #185FA5;
+}

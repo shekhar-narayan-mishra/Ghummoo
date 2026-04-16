@@ -22,7 +22,7 @@ import NotificationsPage from './pages/NotificationsPage';
 // Route guards
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-muted)' }}>Loading…</div>;
+  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#9B9B9B' }}>Loading…</div>;
   if (!user) return <Navigate to="/login" replace />;
   return children;
 }
@@ -82,14 +82,16 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             position="top-right"
             toastOptions={{
               style: {
-                background: '#1a2233',
-                color: '#f9fafb',
-                border: '1px solid #1f2937',
-                borderRadius: '10px',
+                background: 'rgba(255,255,255,0.90)',
+                backdropFilter: 'blur(16px)',
+                color: '#1A1A1A',
+                border: '1px solid rgba(242,101,34,0.12)',
+                borderRadius: '12px',
                 fontSize: '0.88rem',
+                boxShadow: '0 8px 32px rgba(242,101,34,0.10)',
               },
-              success: { iconTheme: { primary: '#10b981', secondary: '#fff' } },
-              error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+              success: { iconTheme: { primary: '#1D9E75', secondary: '#fff' } },
+              error: { iconTheme: { primary: '#DC3545', secondary: '#fff' } },
             }}
           />
         </NotificationProvider>

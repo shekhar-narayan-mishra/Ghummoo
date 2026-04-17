@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { MapPin, Calendar, CalendarDays, Zap, Mail } from 'lucide-react';
 import StatusPill from './StatusPill';
 
 export default function BookingCard({ booking, onCancel, onReview, onConfirm, onReject, isGuide }) {
@@ -15,37 +16,39 @@ export default function BookingCard({ booking, onCancel, onReview, onConfirm, on
       {/* Avatar */}
       <div style={{
         width: 48, height: 48, borderRadius: 12, flexShrink: 0,
-        background: 'linear-gradient(135deg, #6366f133, #6366f166)',
-        border: '2px solid #6366f144',
+        background: 'linear-gradient(135deg, rgba(242,101,34,0.15), rgba(242,101,34,0.35))',
+        border: '2px solid rgba(242,101,34,0.20)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontWeight: 700, color: '#818cf8', fontSize: '0.95rem'
+        fontWeight: 700, color: '#F26522', fontSize: '0.95rem'
       }}>{initials}</div>
 
       {/* Body */}
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
           <div>
-            <div style={{ fontWeight: 700 }}>{isGuide ? travelerName : guideName}</div>
-            {!isGuide && <div style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>📍 {guideCity}</div>}
+            <div style={{ fontWeight: 700, color: '#1A1A1A' }}>{isGuide ? travelerName : guideName}</div>
+            {!isGuide && <div style={{ color: '#9B9B9B', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={14} /> {guideCity}</div>}
           </div>
           <StatusPill status={booking.status} />
         </div>
 
         <div style={{ display: 'flex', gap: 24, marginTop: 10, flexWrap: 'wrap' }}>
-          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-            📅 {dayjs(booking.startDate).format('MMM D')} – {dayjs(booking.endDate).format('MMM D, YYYY')}
+          <div style={{ fontSize: '0.82rem', color: '#6B6B6B', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Calendar size={14} /> {dayjs(booking.startDate).format('MMM D')} – {dayjs(booking.endDate).format('MMM D, YYYY')}
           </div>
-          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-            🗓 {booking.totalDays} day{booking.totalDays !== 1 ? 's' : ''}
+          <div style={{ fontSize: '0.82rem', color: '#6B6B6B', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <CalendarDays size={14} /> {booking.totalDays} day{booking.totalDays !== 1 ? 's' : ''}
           </div>
-          <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f9fafb' }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1A1A1A' }}>
             ₹{booking.totalAmount?.toLocaleString()}
           </div>
         </div>
 
         {booking.bookingMode && (
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
-            {booking.bookingMode === 'instant' ? '⚡ Instant Book' : '📩 Request to Book'}
+          <div style={{ fontSize: '0.75rem', color: '#9B9B9B', marginTop: 4 }}>
+            {booking.bookingMode === 'instant' 
+              ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Zap size={12} /> Instant Book</span> 
+              : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Mail size={12} /> Request to Book</span>}
           </div>
         )}
 

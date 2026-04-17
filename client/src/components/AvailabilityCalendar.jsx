@@ -82,17 +82,17 @@ export default function AvailabilityCalendar({ guideId, onRangeSelect, editable 
       justifyContent: 'center', fontSize: '0.82rem', fontWeight: 600,
       cursor: 'default', transition: 'all 0.15s', userSelect: 'none', position: 'relative'
     };
-    if (status === 'past') return { ...base, color: '#374151' };
-    if (status === 'booked') return { ...base, background: 'rgba(239,68,68,0.15)', color: '#ef4444' };
+    if (status === 'past') return { ...base, color: '#ccc' };
+    if (status === 'booked') return { ...base, background: 'rgba(220,53,69,0.12)', color: '#DC3545' };
     if (status === 'unavailable') return editable
-      ? { ...base, color: '#6b7280', cursor: 'pointer', '&:hover': { background: 'rgba(255,255,255,0.05)' } }
-      : { ...base, color: '#4b5563' };
+      ? { ...base, color: '#9B9B9B', cursor: 'pointer' }
+      : { ...base, color: '#bbb' };
     if (isSelected(dateStr)) return {
-      ...base, background: 'rgba(99,102,241,0.3)', color: '#818cf8',
-      border: '1px solid #6366f1', cursor: 'pointer'
+      ...base, background: 'rgba(242,101,34,0.18)', color: '#F26522',
+      border: '1px solid #F26522', cursor: 'pointer'
     };
     return {
-      ...base, background: 'rgba(16,185,129,0.12)', color: '#10b981',
+      ...base, background: 'rgba(29,158,117,0.10)', color: '#1D9E75',
       cursor: editable ? 'pointer' : 'pointer', border: '1px solid transparent'
     };
   };
@@ -104,20 +104,20 @@ export default function AvailabilityCalendar({ guideId, onRangeSelect, editable 
       {/* Month Navigation */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <button className="btn btn-outline btn-sm" onClick={() => setCurrentMonth(m => m.subtract(1, 'month'))}>←</button>
-        <span style={{ fontWeight: 700, fontSize: '1rem' }}>{currentMonth.format('MMMM YYYY')}</span>
+        <span style={{ fontWeight: 700, fontSize: '1rem', color: '#1A1A1A' }}>{currentMonth.format('MMMM YYYY')}</span>
         <button className="btn btn-outline btn-sm" onClick={() => setCurrentMonth(m => m.add(1, 'month'))}>→</button>
       </div>
 
       {/* Day Headers */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginBottom: 8 }}>
         {DAYS.map(d => (
-          <div key={d} style={{ textAlign: 'center', fontSize: '0.72rem', fontWeight: 700, color: '#6b7280', padding: '4px 0' }}>{d}</div>
+          <div key={d} style={{ textAlign: 'center', fontSize: '0.72rem', fontWeight: 700, color: '#9B9B9B', padding: '4px 0' }}>{d}</div>
         ))}
       </div>
 
       {/* Calendar Grid */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>Loading…</div>
+        <div style={{ textAlign: 'center', padding: '32px', color: '#9B9B9B' }}>Loading…</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
           {/* Empty cells for alignment */}
@@ -142,12 +142,12 @@ export default function AvailabilityCalendar({ guideId, onRangeSelect, editable 
       {/* Legend */}
       <div style={{ display: 'flex', gap: 16, marginTop: 16, flexWrap: 'wrap' }}>
         {[
-          { color: '#10b981', label: 'Available' },
-          { color: '#ef4444', label: 'Booked' },
-          { color: '#6366f1', label: 'Selected' },
-          { color: '#374151', label: 'Unavailable/Past' },
+          { color: '#1D9E75', label: 'Available' },
+          { color: '#DC3545', label: 'Booked' },
+          { color: '#F26522', label: 'Selected' },
+          { color: '#ccc', label: 'Unavailable/Past' },
         ].map(l => (
-          <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+          <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: '#6B6B6B' }}>
             <div style={{ width: 12, height: 12, borderRadius: 3, background: l.color }} />
             {l.label}
           </div>
@@ -156,8 +156,8 @@ export default function AvailabilityCalendar({ guideId, onRangeSelect, editable 
 
       {/* Selection Summary */}
       {rangeStart && rangeEnd && !editable && (
-        <div style={{ marginTop: 14, padding: '12px 16px', background: 'rgba(99,102,241,0.1)', borderRadius: 10, border: '1px solid #6366f133' }}>
-          <div style={{ fontSize: '0.85rem', color: '#818cf8', fontWeight: 600 }}>
+        <div style={{ marginTop: 14, padding: '12px 16px', background: 'rgba(242,101,34,0.08)', borderRadius: 10, border: '1px solid rgba(242,101,34,0.18)' }}>
+          <div style={{ fontSize: '0.85rem', color: '#F26522', fontWeight: 600 }}>
             Selected: {dayjs(rangeStart).format('MMM D')} – {dayjs(rangeEnd).format('MMM D, YYYY')} · {totalDays} day{totalDays !== 1 ? 's' : ''}
           </div>
         </div>

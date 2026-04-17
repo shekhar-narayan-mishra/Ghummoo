@@ -1,6 +1,6 @@
 export function CardSkeleton({ height = 200 }) {
   return (
-    <div className="skeleton" style={{ height, borderRadius: 16 }} />
+    <div className="skeleton" style={{ height, borderRadius: 14 }} />
   );
 }
 

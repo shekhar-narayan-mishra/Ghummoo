@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Star } from 'lucide-react';
 
 function StarRating({ rating, onRate, size = 24 }) {
   const [hovered, setHovered] = useState(0);
@@ -8,11 +9,11 @@ function StarRating({ rating, onRate, size = 24 }) {
       {[1, 2, 3, 4, 5].map(n => (
         <span
           key={n}
-          style={{ fontSize: size, cursor: onRate ? 'pointer' : 'default', color: n <= display ? '#f59e0b' : '#374151', transition: 'color 0.1s' }}
+          style={{ cursor: onRate ? 'pointer' : 'default', color: n <= display ? '#F26522' : '#ddd', transition: 'color 0.1s', display: 'flex', alignItems: 'center' }}
           onMouseEnter={() => onRate && setHovered(n)}
           onMouseLeave={() => onRate && setHovered(0)}
           onClick={() => onRate?.(n)}
-        >★</span>
+        ><Star size={size} fill={n <= display ? 'currentColor' : 'none'} /></span>
       ))}
     </div>
   );
@@ -24,21 +25,21 @@ export function ReviewCard({ review }) {
   const date = new Date(review.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
 
   return (
-    <div style={{ padding: '18px 0', borderBottom: '1px solid var(--border)' }}>
+    <div style={{ padding: '18px 0', borderBottom: '1px solid rgba(242,101,34,0.10)' }}>
       <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
         <div style={{
           width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
-          background: 'linear-gradient(135deg, #6366f133, #6366f166)',
+          background: 'linear-gradient(135deg, rgba(242,101,34,0.15), rgba(242,101,34,0.35))',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontWeight: 700, fontSize: '0.8rem', color: '#818cf8'
+          fontWeight: 700, fontSize: '0.8rem', color: '#F26522'
         }}>{initials}</div>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
-            <span style={{ fontWeight: 600 }}>{name}</span>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{date}</span>
+            <span style={{ fontWeight: 600, color: '#1A1A1A' }}>{name}</span>
+            <span style={{ color: '#9B9B9B', fontSize: '0.78rem' }}>{date}</span>
           </div>
           <StarRating rating={review.rating} size={16} />
-          {review.comment && <p style={{ marginTop: 6, color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.55 }}>{review.comment}</p>}
+          {review.comment && <p style={{ marginTop: 6, color: '#6B6B6B', fontSize: '0.9rem', lineHeight: 1.55 }}>{review.comment}</p>}
         </div>
       </div>
     </div>

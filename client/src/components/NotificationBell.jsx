@@ -8,7 +8,7 @@ export default function NotificationBell() {
     <Link
       to="/notifications"
       title="Notifications"
-      style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', color: '#9ca3af' }}
+      style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', color: '#6B6B6B' }}
     >
       {/* Bell SVG icon */}
       <svg
@@ -21,7 +21,7 @@ export default function NotificationBell() {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        style={{ transition: 'color 0.2s', color: unreadCount > 0 ? '#818cf8' : '#9ca3af' }}
+        style={{ transition: 'color 0.2s', color: unreadCount > 0 ? '#F26522' : '#6B6B6B' }}
       >
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
         <path d="M13.73 21a2 2 0 0 1-3.46 0" />
@@ -34,7 +34,7 @@ export default function NotificationBell() {
             position: 'absolute',
             top: -6,
             right: -6,
-            background: '#6366f1',
+            background: '#F26522',
             color: 'white',
             borderRadius: '999px',
             fontSize: '0.62rem',
@@ -43,7 +43,7 @@ export default function NotificationBell() {
             minWidth: 16,
             textAlign: 'center',
             lineHeight: '1.4',
-            border: '1.5px solid #0a0f1e',
+            border: '1.5px solid white',
           }}
         >
           {unreadCount > 9 ? '9+' : unreadCount}

@@ -7,8 +7,9 @@ import { useAuth } from '../context/AuthContext';
 import AvailabilityCalendar from '../components/AvailabilityCalendar';
 import { ReviewCard } from '../components/ReviewCard';
 import { GuideCardSkeleton } from '../components/LoadingSkeleton';
+import { Award, MapPin, Star, Home, Zap, Mail, Calendar } from 'lucide-react';
 
-const TIER_BADGE = { gold: '🥇 Gold', silver: '🥈 Silver', bronze: '🥉 Bronze' };
+const TIER_BADGE = { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' };
 
 function PricingBreakdown({ guide, totalDays }) {
   if (!guide || !totalDays) return null;
@@ -19,20 +20,20 @@ function PricingBreakdown({ guide, totalDays }) {
   const total = base + serviceFee + priorityFee;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16, padding: 14, background: 'rgba(99,102,241,0.08)', borderRadius: 10, border: '1px solid rgba(99,102,241,0.2)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16, padding: 14, background: 'rgba(242,101,34,0.06)', borderRadius: 10, border: '1px solid rgba(242,101,34,0.15)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#6B6B6B' }}>
         <span>₹{guide.pricePerDay?.toLocaleString()} × {totalDays} days</span>
         <span>₹{base.toLocaleString()}</span>
       </div>
-      {serviceFee > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+      {serviceFee > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#6B6B6B' }}>
         <span>Service fee ({guide.pricingType === 'luxury' ? '25%' : '15%'})</span>
         <span>₹{serviceFee.toLocaleString()}</span>
       </div>}
-      {priorityFee > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+      {priorityFee > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#6B6B6B' }}>
         <span>Priority support</span><span>₹{priorityFee}</span>
       </div>}
       <div className="divider" style={{ margin: '4px 0' }} />
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '1.05rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '1.05rem', color: '#1A1A1A' }}>
         <span>Total</span><span>₹{total.toLocaleString()}</span>
       </div>
     </div>
@@ -77,7 +78,7 @@ export default function GuideProfilePage() {
     setBooking(true);
     try {
       await api.post('/bookings', { guideId: id, ...selectedRange });
-      toast.success(guide.instantBook ? '⚡ Booking confirmed instantly!' : '📩 Booking request sent to guide!');
+      toast.success(guide.instantBook ? 'Booking confirmed instantly!' : 'Booking request sent to guide!');
       navigate('/bookings');
     } catch (err) {
       toast.error(err.message);
@@ -85,7 +86,7 @@ export default function GuideProfilePage() {
   };
 
   if (loading) return <div style={{ maxWidth: 1100, margin: '40px auto', padding: '0 24px' }}><GuideCardSkeleton /></div>;
-  if (!guide) return <div style={{ textAlign: 'center', padding: 80 }}>Guide not found</div>;
+  if (!guide) return <div style={{ textAlign: 'center', padding: 80, color: '#9B9B9B' }}>Guide not found</div>;
 
   const totalDays = selectedRange
     ? dayjs(selectedRange.endDate).diff(dayjs(selectedRange.startDate), 'day') + 1
@@ -99,43 +100,43 @@ export default function GuideProfilePage() {
         <aside>
           <div className="card" style={{ padding: 24, textAlign: 'center', position: 'sticky', top: 80 }}>
             {/* Avatar */}
-            <div style={{ width: 80, height: 80, borderRadius: 20, background: 'linear-gradient(135deg, #6366f133,#6366f166)', border: '2px solid #6366f144', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900, color: '#818cf8', margin: '0 auto 16px' }}>
+            <div style={{ width: 80, height: 80, borderRadius: 20, background: 'linear-gradient(135deg, rgba(242,101,34,0.15), rgba(242,101,34,0.35))', border: '2px solid rgba(242,101,34,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900, color: '#F26522', margin: '0 auto 16px' }}>
               {guide.userId?.name?.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()}
             </div>
-            <h1 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: 4 }}>{guide.userId?.name}</h1>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: 16 }}>📍 {guide.city}</div>
+            <h1 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: 4, color: '#1A1A1A' }}>{guide.userId?.name}</h1>
+            <div style={{ color: '#9B9B9B', fontSize: '0.85rem', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}><MapPin size={16} /> {guide.city}</div>
 
             {/* Badges */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center', marginBottom: 16 }}>
               {guide.certificationStatus === 'approved' && guide.certificationTier &&
-                <span className={`badge badge-${guide.certificationTier}`}>{TIER_BADGE[guide.certificationTier]}</span>}
-              {guide.isTopRated && <span className="badge badge-indigo">⭐ Top Rated</span>}
-              {guide.isLocalExpert && <span className="badge badge-green">🏠 Local Expert</span>}
-              {guide.instantBook && <span className="badge badge-amber">⚡ Instant Book</span>}
+                <span className={`badge badge-${guide.certificationTier}`} style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Award size={12} /> {TIER_BADGE[guide.certificationTier]}</span>}
+              {guide.isTopRated && <span className="badge badge-indigo" style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Star size={12} fill="currentColor" /> Top Rated</span>}
+              {guide.isLocalExpert && <span className="badge badge-green" style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Home size={12} /> Local Expert</span>}
+              {guide.instantBook && <span className="badge badge-amber" style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Zap size={12} /> Instant Book</span>}
             </div>
 
             <div className="divider" />
 
             {/* Rating */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 4, alignItems: 'center', marginBottom: 16 }}>
-              <span style={{ color: '#f59e0b', fontSize: '1.2rem' }}>★</span>
-              <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>{guide.avgRating?.toFixed(1)}</span>
-              <span style={{ color: 'var(--text-muted)' }}>({guide.totalReviews} reviews)</span>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, alignItems: 'center', marginBottom: 16 }}>
+              <span style={{ color: '#F26522', display: 'flex', alignItems: 'center' }}><Star size={18} fill="currentColor" strokeWidth={0} /></span>
+              <span style={{ fontWeight: 800, fontSize: '1.1rem', color: '#1A1A1A' }}>{guide.avgRating?.toFixed(1)}</span>
+              <span style={{ color: '#9B9B9B' }}>({guide.totalReviews} reviews)</span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, textAlign: 'left' }}>
               <div style={{ fontSize: '0.85rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Price: </span>
-                <span style={{ fontWeight: 700 }}>₹{guide.pricePerDay?.toLocaleString()}/day</span>
+                <span style={{ color: '#9B9B9B' }}>Price: </span>
+                <span style={{ fontWeight: 700, color: '#1A1A1A' }}>₹{guide.pricePerDay?.toLocaleString()}/day</span>
               </div>
               <div style={{ fontSize: '0.85rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Tier: </span>
-                <span style={{ fontWeight: 600, textTransform: 'capitalize' }}>{guide.pricingType}</span>
+                <span style={{ color: '#9B9B9B' }}>Tier: </span>
+                <span style={{ fontWeight: 600, textTransform: 'capitalize', color: '#1A1A1A' }}>{guide.pricingType}</span>
               </div>
               {guide.languages?.length > 0 && (
                 <div style={{ fontSize: '0.85rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Speaks: </span>
-                  <span>{guide.languages.join(', ')}</span>
+                  <span style={{ color: '#9B9B9B' }}>Speaks: </span>
+                  <span style={{ color: '#1A1A1A' }}>{guide.languages.join(', ')}</span>
                 </div>
               )}
             </div>
@@ -143,7 +144,7 @@ export default function GuideProfilePage() {
             {guide.bio && (
               <>
                 <div className="divider" />
-                <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', lineHeight: 1.6, textAlign: 'left' }}>{guide.bio}</p>
+                <p style={{ fontSize: '0.84rem', color: '#6B6B6B', lineHeight: 1.6, textAlign: 'left' }}>{guide.bio}</p>
               </>
             )}
           </div>
@@ -152,20 +153,20 @@ export default function GuideProfilePage() {
         {/* CENTER: Calendar + Reviews */}
         <div>
           <div className="card" style={{ marginBottom: 24 }}>
-            <h2 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: 20 }}>Availability</h2>
+            <h2 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: 20, color: '#1A1A1A' }}>Availability</h2>
             <AvailabilityCalendar guideId={guide._id} onRangeSelect={setSelectedRange} />
           </div>
 
           <div className="card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-              <h2 style={{ fontWeight: 700, fontSize: '1.1rem' }}>Reviews</h2>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ color: '#f59e0b' }}>★</span>
-                <span style={{ fontWeight: 700 }}>{guide.avgRating?.toFixed(1)}</span>
+              <h2 style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1A1A1A' }}>Reviews</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ color: '#F26522', display: 'flex', alignItems: 'center' }}><Star size={16} fill="currentColor" strokeWidth={0} /></span>
+                <span style={{ fontWeight: 700, color: '#1A1A1A' }}>{guide.avgRating?.toFixed(1)}</span>
               </div>
             </div>
             {reviews.length === 0
-              ? <div style={{ color: 'var(--text-muted)', padding: '20px 0' }}>No reviews yet</div>
+              ? <div style={{ color: '#9B9B9B', padding: '20px 0' }}>No reviews yet</div>
               : reviews.map(r => <ReviewCard key={r._id} review={r} />)
             }
             {hasMoreReviews && (
@@ -177,23 +178,23 @@ export default function GuideProfilePage() {
         {/* RIGHT: Booking Panel */}
         <aside>
           <div className="card" style={{ position: 'sticky', top: 80 }}>
-            <h2 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: 4 }}>Book This Guide</h2>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: 16 }}>
-              {guide.instantBook ? '⚡ Instant confirmation' : '📩 Guide approves within 24h'}
+            <h2 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: 4, color: '#1A1A1A' }}>Book This Guide</h2>
+            <div style={{ color: '#9B9B9B', fontSize: '0.8rem', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+              {guide.instantBook ? <><Zap size={14} /> Instant confirmation</> : <><Mail size={14} /> Guide approves within 24h</>}
             </div>
 
             {selectedRange ? (
               <>
-                <div style={{ padding: '10px 14px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 10, fontSize: '0.85rem', marginBottom: 4 }}>
-                  📅 {dayjs(selectedRange.startDate).format('MMM D')} – {dayjs(selectedRange.endDate).format('MMM D, YYYY')}
+                <div style={{ padding: '10px 14px', background: 'rgba(29,158,117,0.08)', border: '1px solid rgba(29,158,117,0.18)', borderRadius: 10, fontSize: '0.85rem', marginBottom: 4, color: '#1D9E75', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Calendar size={14} /> {dayjs(selectedRange.startDate).format('MMM D')} – {dayjs(selectedRange.endDate).format('MMM D, YYYY')}
                 </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 12 }}>
+                <div style={{ fontSize: '0.8rem', color: '#9B9B9B', marginBottom: 12 }}>
                   {totalDays} day{totalDays !== 1 ? 's' : ''}
                 </div>
                 <PricingBreakdown guide={guide} totalDays={totalDays} />
               </>
             ) : (
-              <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', border: '1px dashed var(--border)', borderRadius: 10, marginBottom: 8 }}>
+              <div style={{ padding: '20px', textAlign: 'center', color: '#9B9B9B', fontSize: '0.85rem', border: '1px dashed rgba(242,101,34,0.18)', borderRadius: 10, marginBottom: 8 }}>
                 Select dates on the calendar to see pricing
               </div>
             )}
@@ -204,9 +205,9 @@ export default function GuideProfilePage() {
               onClick={handleBook}
               disabled={!selectedRange || booking}
             >
-              {booking ? 'Booking…' : guide.instantBook ? '⚡ Book Instantly' : '📩 Request to Book'}
+              {booking ? 'Booking…' : guide.instantBook ? <><Zap size={16} /> Book Instantly</> : <><Mail size={16} /> Request to Book</>}
             </button>
-            {!user && <div style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 8 }}>You must be logged in to book</div>}
+            {!user && <div style={{ textAlign: 'center', fontSize: '0.78rem', color: '#9B9B9B', marginTop: 8 }}>You must be logged in to book</div>}
           </div>
         </aside>
 

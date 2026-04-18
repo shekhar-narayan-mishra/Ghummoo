@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Map, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import BookingCard from '../components/BookingCard';
@@ -62,11 +63,11 @@ export default function BookingsPage() {
 
       {/* Review Modal */}
       {reviewTarget && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}>
-          <div className="card" style={{ maxWidth: 480, width: '100%' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}>
+          <div className="card" style={{ maxWidth: 480, width: '100%', background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h2 style={{ fontWeight: 700, fontSize: '1.1rem' }}>Leave a Review</h2>
-              <button className="btn btn-outline btn-sm" onClick={() => setReviewTarget(null)}>✕</button>
+              <h2 style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1A1A1A' }}>Leave a Review</h2>
+              <button className="btn btn-outline btn-sm" onClick={() => setReviewTarget(null)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={14} /></button>
             </div>
             <ReviewForm onSubmit={handleReviewSubmit} loading={submittingReview} />
           </div>
@@ -78,8 +79,8 @@ export default function BookingsPage() {
         {loading
           ? Array.from({ length: 3 }).map((_, i) => <CardSkeleton key={i} height={130} />)
           : bookings.length === 0
-            ? <div className="card" style={{ textAlign: 'center', padding: '60px 24px', color: 'var(--text-muted)' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🗺</div>
+            ? <div className="card" style={{ textAlign: 'center', padding: '60px 24px', color: '#9B9B9B', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ marginBottom: 12, color: '#F26522' }}><Map size={48} strokeWidth={1.5} /></div>
                 No {tab !== 'All' ? tab.toLowerCase() : ''} bookings found
               </div>
             : bookings.map(b => (

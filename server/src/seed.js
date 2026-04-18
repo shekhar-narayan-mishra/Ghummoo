@@ -31,7 +31,7 @@ async function seed() {
   const password = await bcrypt.hash('Password@123', 12);
 
   // ── Users ─────────────────────────────────────────────────────────────────
-  const [priyaUser, arjunUser, meeraUser, rohanUser, rahulUser, ananyaUser, adminUser] =
+  const [priyaUser, arjunUser, meeraUser, rohanUser, rahulUser, ananyaUser, adminUser, snehaUser] =
     await User.insertMany([
       { name: 'Priya Sharma',    email: 'priya@ghummoo.com',  passwordHash: password, role: 'guide' },
       { name: 'Arjun Mehta',     email: 'arjun@ghummoo.com',  passwordHash: password, role: 'guide' },
@@ -40,11 +40,12 @@ async function seed() {
       { name: 'Rahul Verma',     email: 'rahul@ghummoo.com',  passwordHash: password, role: 'traveler' },
       { name: 'Ananya Singh',    email: 'ananya@ghummoo.com', passwordHash: password, role: 'traveler' },
       { name: 'Platform Admin',  email: 'admin@ghummoo.com',  passwordHash: password, role: 'admin' },
+      { name: 'Sneha Kulkarni',  email: 'sneha@ghummoo.com',  passwordHash: password, role: 'guide' },
     ]);
-  console.log('✅ Created 7 users');
+  console.log('✅ Created 8 users');
 
   // ── Guide Profiles ─────────────────────────────────────────────────────────
-  const [priyaGuide, arjunGuide, meeraGuide, rohanGuide] = await Guide.insertMany([
+  const [priyaGuide, arjunGuide, meeraGuide, rohanGuide, snehaGuide] = await Guide.insertMany([
     {
       userId: priyaUser._id,
       bio: "Born and raised in the Pink City. I've been leading heritage walks through Jaipur's old city for 8 years. I know every haveli, every chai stall, and every hidden courtyard.",
@@ -105,11 +106,26 @@ async function seed() {
       totalReviews: 39,
       totalCompletedBookings: 37,
     },
+    {
+      userId: snehaUser._id,
+      bio: 'Food is the best way to understand Mumbai. From hidden Vada Pav stalls to the best Parsi cafes, I will take you on a culinary journey through the city.',
+      city: 'Mumbai',
+      languages: ['Marathi', 'Hindi', 'English'],
+      specialties: ['food'],
+      certificationStatus: 'approved',
+      certificationTier: 'silver',
+      instantBook: true,
+      pricePerDay: 1600,
+      pricingType: 'standard',
+      avgRating: 4.7,
+      totalReviews: 89,
+      totalCompletedBookings: 85,
+    },
   ]);
-  console.log('✅ Created 4 guide profiles');
+  console.log('✅ Created 5 guide profiles');
 
   // ── Availability Slots ────────────────────────────────────────────────────
-  const guides = [priyaGuide, arjunGuide, meeraGuide, rohanGuide];
+  const guides = [priyaGuide, arjunGuide, meeraGuide, rohanGuide, snehaGuide];
   const slotDocs = [];
 
   const today = dayjs();
@@ -229,7 +245,7 @@ async function seed() {
 
   await mongoose.disconnect();
   console.log('\n🎉 Seeding complete! You can now run: npm run dev');
-  console.log('   Login as: admin@ghummoo.com / priya@ghummoo.com / rahul@ghummoo.com');
+  console.log('   Login as: admin@ghummoo.com / priya@ghummoo.com / sneha@ghummoo.com / rahul@ghummoo.com');
   console.log('   Password for all: Password@123');
 }
 

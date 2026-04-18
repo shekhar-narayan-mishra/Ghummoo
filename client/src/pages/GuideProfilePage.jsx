@@ -101,7 +101,7 @@ export default function GuideProfilePage() {
           <div className="card" style={{ padding: 24, textAlign: 'center', position: 'sticky', top: 80 }}>
             {/* Avatar */}
             <div style={{ width: 80, height: 80, borderRadius: 20, background: 'linear-gradient(135deg, rgba(242,101,34,0.15), rgba(242,101,34,0.35))', border: '2px solid rgba(242,101,34,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900, color: '#F26522', margin: '0 auto 16px' }}>
-              {guide.userId?.name?.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()}
+              {(guide.userId?.name || 'Guide').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()}
             </div>
             <h1 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: 4, color: '#1A1A1A' }}>{guide.userId?.name}</h1>
             <div style={{ color: '#9B9B9B', fontSize: '0.85rem', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}><MapPin size={16} /> {guide.city}</div>

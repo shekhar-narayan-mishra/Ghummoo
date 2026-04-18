@@ -16,7 +16,8 @@ export default function GuideCard({ guide }) {
   const g = guide;
   const primarySpecialty = g.specialties?.[0] || 'heritage';
   const color = SPECIALTY_COLORS[primarySpecialty] || '#F26522';
-  const initials = g.userId?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '??';
+  const guideName = g.userId?.name || 'Guide';
+  const initials = guideName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
   return (
     <Link to={`/guides/${g._id}`} style={{ textDecoration: 'none' }}>

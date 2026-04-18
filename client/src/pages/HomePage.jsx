@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Shield, Landmark, Mountain, Utensils, Church, Palette, Star, Lock, Phone, Heart } from 'lucide-react';
 import api from '../services/api';
 import GuideCard from '../components/GuideCard';
 import { GuideCardSkeleton } from '../components/LoadingSkeleton';
@@ -8,14 +9,29 @@ const STATS = [
   { value: '200+', label: 'Certified Guides' },
   { value: '50+', label: 'Cities Covered' },
   { value: '10,000+', label: 'Trips Completed' },
+  { value: <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>4.9 <Star size={18} fill="currentColor" strokeWidth={0} /></span>, label: 'Average Rating' },
 ];
 
 const SPECIALTIES = [
-  { id: 'heritage', emoji: '🏛', label: 'Heritage' },
-  { id: 'adventure', emoji: '🧗', label: 'Adventure' },
-  { id: 'food', emoji: '🍛', label: 'Food' },
-  { id: 'spiritual', emoji: '🕌', label: 'Spiritual' },
-  { id: 'cultural', emoji: '🎭', label: 'Cultural' },
+  { id: 'heritage', icon: Landmark, label: 'Heritage' },
+  { id: 'adventure', icon: Mountain, label: 'Adventure' },
+  { id: 'food', icon: Utensils, label: 'Food' },
+  { id: 'spiritual', icon: Church, label: 'Spiritual' },
+  { id: 'cultural', icon: Palette, label: 'Cultural' },
+];
+
+const HOW_STEPS = [
+  { num: '1', title: 'Search & Filter', desc: 'Find certified guides by city, specialty, language, and price range.' },
+  { num: '2', title: 'Book Instantly', desc: 'Pick dates from the availability calendar and book with one click.' },
+  { num: '3', title: 'Explore with Trust', desc: 'Meet your verified guide and enjoy authentic, expert-led experiences.' },
+];
+
+const placeholderGuides = [
+  { _id:'p1', userId:{name:'Arjun Mehta'}, city:'Jaipur', avgRating:4.9, totalReviews:47, specialties:['heritage'], pricePerDay:1800, certificationStatus:'approved', certificationTier:'gold', isTopRated:true, _gradient:'135deg,#F26522,#FF8C55' },
+  { _id:'p2', userId:{name:'Priya Nair'}, city:'Kerala Backwaters', avgRating:4.8, totalReviews:62, specialties:['spiritual'], pricePerDay:2200, certificationStatus:'approved', certificationTier:'silver', isLocalExpert:true, _gradient:'135deg,#0F6E56,#5DCAA5' },
+  { _id:'p3', userId:{name:'Rajan Sharma'}, city:'Varanasi', avgRating:5.0, totalReviews:31, specialties:['spiritual','cultural'], pricePerDay:1500, certificationStatus:'approved', certificationTier:'gold', isTopRated:true, _gradient:'135deg,#534AB7,#AFA9EC' },
+  { _id:'p4', userId:{name:'Sneha Kulkarni'}, city:'Mumbai', avgRating:4.7, totalReviews:89, specialties:['food'], pricePerDay:1600, certificationStatus:'approved', certificationTier:'silver', instantBook:true, _gradient:'135deg,#993556,#ED93B1' },
+  { _id:'p5', userId:{name:'Vikram Das'}, city:'Leh-Ladakh', avgRating:4.9, totalReviews:54, specialties:['adventure','trekking'], pricePerDay:2500, certificationStatus:'approved', certificationTier:'gold', isTopRated:true, _gradient:'135deg,#185FA5,#85B7EB' },
 ];
 
 export default function HomePage() {
@@ -27,7 +43,7 @@ export default function HomePage() {
 
   useEffect(() => {
     api.get('/guides?limit=6&minRating=4.5')
-      .then(res => setFeatured(res.data?.docs || []))
+      .then(res => setFeatured(res.data?.docs || res?.docs || []))
       .catch(() => setFeatured([]))
       .finally(() => setLoading(false));
   }, []);
@@ -40,49 +56,76 @@ export default function HomePage() {
     navigate(`/guides?${params}`);
   };
 
+  const displayGuides = featured.length > 0 ? featured : placeholderGuides;
+
   return (
     <div>
-      {/* Hero */}
-      <section style={{ position: 'relative', padding: '100px 32px 80px', textAlign: 'center', overflow: 'hidden' }}>
-        {/* Background glows */}
-        <div style={{ position: 'absolute', top: '-10%', left: '20%', width: 500, height: 400, background: 'radial-gradient(ellipse, rgba(99,102,241,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', top: '20%', right: '10%', width: 400, height: 300, background: 'radial-gradient(ellipse, rgba(16,185,129,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      {/* ══════ HERO ══════ */}
+      <section className="hero">
+        {/* Pill */}
+        <div className="hero-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <Shield size={14} /> Trust Through Certification
+        </div>
 
-        <div style={{ position: 'relative' }}>
-          <span style={{ display: 'inline-block', padding: '4px 16px', background: 'rgba(99,102,241,0.15)', color: '#818cf8', borderRadius: 999, fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 24, border: '1px solid rgba(99,102,241,0.3)' }}>
-            Trust Through Certification
-          </span>
-          <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', fontWeight: 900, lineHeight: 1.1, marginBottom: 20, maxWidth: 700, margin: '0 auto 20px' }}>
-            Discover Certified<br />
-            <span className="gradient-text">Local Guides</span> Across India
-          </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: 560, margin: '0 auto 40px', lineHeight: 1.65 }}>
-            Every guide on Ghummoo is verified, certified, and trusted. No generic tours — authentic, expert-led experiences.
-          </p>
+        {/* Headline */}
+        <h1>
+          Discover Certified<br />
+          <span>Local Guides</span> Across India
+        </h1>
 
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: 12, maxWidth: 580, margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <input value={city} onChange={e => setCity(e.target.value)} placeholder="Where do you want to go?" style={{ flex: '1 1 200px', minWidth: 0 }} />
-            <select value={specialty} onChange={e => setSpecialty(e.target.value)} style={{ flex: '0 0 160px' }}>
-              <option value="">Any specialty</option>
-              {SPECIALTIES.map(s => <option key={s.id} value={s.id}>{s.emoji} {s.label}</option>)}
+        {/* Subtext */}
+        <p>
+          Every guide on Ghummoo is verified, certified, and trusted.
+          No generic tours — authentic, expert-led experiences.
+        </p>
+
+        {/* Glass Search Bar */}
+        <form onSubmit={handleSearch} className="search-bar">
+          <div className="search-field">
+            <label>Where</label>
+            <input
+              value={city}
+              onChange={e => setCity(e.target.value)}
+              placeholder="City or destination"
+              style={{ border: 'none', background: 'transparent', padding: 0, boxShadow: 'none' }}
+            />
+          </div>
+          <div className="search-field">
+            <label>Specialty</label>
+            <select
+              value={specialty}
+              onChange={e => setSpecialty(e.target.value)}
+              style={{ border: 'none', background: 'transparent', padding: 0, boxShadow: 'none' }}
+            >
+              <option value="">Any type</option>
+              {SPECIALTIES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
             </select>
-            <button type="submit" className="btn btn-primary" style={{ flex: '0 0 auto' }}>Search Guides</button>
-          </form>
+          </div>
+          <button type="submit" className="search-btn">Search Guides</button>
+        </form>
+
+        {/* Trust Stats Strip */}
+        <div className="trust-strip">
+          {STATS.map((s, i) => (
+            <div key={s.label} className="trust-item">
+              <span className="trust-number">{s.value}</span>
+              <span className="trust-label">{s.label}</span>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Specialty Cards */}
-      <section style={{ padding: '0 32px 64px' }}>
+      {/* ══════ SPECIALTY CARDS ══════ */}
+      <section style={{ padding: '0 32px 48px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             {SPECIALTIES.map(s => (
               <Link key={s.id} to={`/guides?specialty=${s.id}`} style={{ textDecoration: 'none' }}>
-                <div style={{ padding: '12px 22px', borderRadius: 14, border: '1px solid var(--border)', background: 'var(--bg-card)', display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)', transition: 'all 0.2s', cursor: 'pointer' }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.color = '#818cf8'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
-                >
-                  <span>{s.emoji}</span> {s.label}
+                <div className="card" style={{
+                  padding: '12px 22px', display: 'flex', gap: 8, alignItems: 'center',
+                  fontSize: '0.9rem', fontWeight: 600, color: '#6B6B6B', cursor: 'pointer'
+                }}>
+                  <s.icon size={18} /> {s.label}
                 </div>
               </Link>
             ))}
@@ -90,37 +133,91 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section style={{ padding: '24px 32px 64px' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', display: 'flex', justifyContent: 'center', gap: 48, flexWrap: 'wrap' }}>
-          {STATS.map(s => (
-            <div key={s.label} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '2rem', fontWeight: 900, color: '#818cf8' }}>{s.value}</div>
-              <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{s.label}</div>
+      {/* ══════ HOW IT WORKS ══════ */}
+      <section className="how-section">
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1A1A1A', marginBottom: 6 }}>How It Works</h2>
+          <p style={{ color: '#9B9B9B', fontSize: '0.9rem' }}>Three simple steps to your next adventure</p>
+        </div>
+        <div className="how-grid">
+          {HOW_STEPS.map(step => (
+            <div key={step.num} className="card how-card">
+              <div className="how-number">{step.num}</div>
+              <div className="how-title">{step.title}</div>
+              <div className="how-desc">{step.desc}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Featured Guides */}
-      <section style={{ padding: '0 32px 80px' }}>
+      {/* ══════ FEATURED GUIDES ══════ */}
+      <section style={{ padding: '0 32px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 28 }}>
+          <div className="section-header" style={{ padding: 0, marginBottom: 24 }}>
             <div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Top Rated Guides</h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>Handpicked certified guides loved by travelers</p>
+              <h2 className="section-title">Top Rated Guides</h2>
+              <p style={{ color: '#9B9B9B', fontSize: '0.88rem', marginTop: 2 }}>Handpicked certified guides loved by travelers</p>
             </div>
-            <Link to="/guides" style={{ color: '#818cf8', fontWeight: 600, fontSize: '0.88rem' }}>See all →</Link>
+            <Link to="/guides" className="section-link">See all →</Link>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
             {loading
               ? Array.from({ length: 6 }).map((_, i) => <GuideCardSkeleton key={i} />)
-              : featured.map(g => <GuideCard key={g._id} guide={g} />)
+              : displayGuides.map(g => <GuideCard key={g._id} guide={g} />)
             }
           </div>
         </div>
       </section>
+
+      {/* ══════ FOOTER ══════ */}
+      <footer>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 40, marginBottom: 32 }}>
+            {/* Brand */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: '#F26522', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 14, fontWeight: 800 }}>G</div>
+                <span style={{ color: '#F26522', fontSize: 18, fontWeight: 700 }}>Ghummoo</span>
+              </div>
+              <p style={{ color: '#666', fontSize: '0.85rem', lineHeight: 1.6 }}>
+                India's trusted platform for certified local guides. Authentic experiences, verified experts.
+              </p>
+            </div>
+            {/* Links */}
+            <div>
+              <div style={{ color: '#aaa', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Explore</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <Link to="/guides" style={{ color: '#888', fontSize: '0.85rem' }}>Find Guides</Link>
+                <Link to="/register" style={{ color: '#888', fontSize: '0.85rem' }}>Become a Guide</Link>
+                <Link to="/login" style={{ color: '#888', fontSize: '0.85rem' }}>Sign In</Link>
+              </div>
+            </div>
+            {/* More Links */}
+            <div>
+              <div style={{ color: '#aaa', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Specialties</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {SPECIALTIES.map(s => (
+                  <Link key={s.id} to={`/guides?specialty=${s.id}`} style={{ color: '#888', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 6 }}><s.icon size={14} /> {s.label}</Link>
+                ))}
+              </div>
+            </div>
+            {/* Trust */}
+            <div>
+              <div style={{ color: '#aaa', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Trust & Safety</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, color: '#888', fontSize: '0.85rem' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Shield size={14} /> All guides certified</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Star size={14} /> Verified reviews only</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Lock size={14} /> Secure bookings</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Phone size={14} /> 24/7 support</span>
+              </div>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            © {new Date().getFullYear()} Ghummoo. All rights reserved. Built with <Heart size={12} fill="currentColor" style={{ display: 'inline', color: '#F26522', margin: '0 2px' }} /> for travelers.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

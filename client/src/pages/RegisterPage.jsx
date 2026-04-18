@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Briefcase, Compass } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const SPECIALTIES = ['heritage', 'adventure', 'food', 'spiritual', 'cultural', 'trekking'];
@@ -42,13 +43,13 @@ export default function RegisterPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ position: 'fixed', top: '-20%', left: '50%', transform: 'translateX(-50%)', width: 600, height: 400, background: 'radial-gradient(ellipse, rgba(99,102,241,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', top: '-20%', left: '50%', transform: 'translateX(-50%)', width: 600, height: 400, background: 'radial-gradient(ellipse, rgba(242,101,34,0.10) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
       <div style={{ width: '100%', maxWidth: 500 }}>
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{ display: 'inline-flex', width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(135deg, #6366f1, #4f46e5)', alignItems: 'center', justifyContent: 'center', fontSize: 28, fontWeight: 900, color: 'white', marginBottom: 16 }}>G</div>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: 6 }}>Join Ghummoo</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Create your account and start exploring</p>
+          <div style={{ display: 'inline-flex', width: 56, height: 56, borderRadius: 16, background: '#F26522', alignItems: 'center', justifyContent: 'center', fontSize: 28, fontWeight: 900, color: 'white', marginBottom: 16 }}>G</div>
+          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: 6, color: '#1A1A1A' }}>Join Ghummoo</h1>
+          <p style={{ color: '#6B6B6B' }}>Create your account and start exploring</p>
         </div>
 
         <div className="card">
@@ -59,11 +60,12 @@ export default function RegisterPage() {
               <div style={{ display: 'flex', gap: 10 }}>
                 {['traveler', 'guide'].map(r => (
                   <button key={r} type="button" onClick={() => setForm(f => ({ ...f, role: r }))} style={{
-                    flex: 1, padding: '12px', borderRadius: 10, border: `2px solid ${form.role === r ? '#6366f1' : '#1f2937'}`,
-                    background: form.role === r ? 'rgba(99,102,241,0.12)' : 'transparent',
-                    color: form.role === r ? '#818cf8' : 'var(--text-secondary)', fontWeight: 600, textTransform: 'capitalize', transition: 'all 0.2s'
+                    flex: 1, padding: '12px', borderRadius: 10, border: `2px solid ${form.role === r ? '#F26522' : 'rgba(242,101,34,0.18)'}`,
+                    background: form.role === r ? 'rgba(242,101,34,0.08)' : 'transparent',
+                    color: form.role === r ? '#F26522' : '#6B6B6B', fontWeight: 600, textTransform: 'capitalize', transition: 'all 0.2s',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
                   }}>
-                    {r === 'traveler' ? '🧳 Traveler' : '🧭 Guide'}
+                    {r === 'traveler' ? <><Briefcase size={16} /> Traveler</> : <><Compass size={16} /> Guide</>}
                   </button>
                 ))}
               </div>
@@ -88,7 +90,7 @@ export default function RegisterPage() {
             {form.role === 'guide' && (
               <>
                 <div className="divider" style={{ margin: '4px 0' }} />
-                <div style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', fontWeight: 600 }}>Guide Profile</div>
+                <div style={{ color: '#6B6B6B', fontSize: '0.82rem', fontWeight: 600 }}>Guide Profile</div>
 
                 <div className="form-group">
                   <label className="form-label">City</label>
@@ -105,9 +107,9 @@ export default function RegisterPage() {
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {SPECIALTIES.map(s => (
                       <button key={s} type="button" onClick={() => toggleSpecialty(s)} style={{
-                        padding: '5px 14px', borderRadius: 999, border: `1px solid ${form.specialties.includes(s) ? '#6366f1' : '#374151'}`,
-                        background: form.specialties.includes(s) ? 'rgba(99,102,241,0.15)' : 'transparent',
-                        color: form.specialties.includes(s) ? '#818cf8' : 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'capitalize', transition: 'all 0.2s'
+                        padding: '5px 14px', borderRadius: 999, border: `1px solid ${form.specialties.includes(s) ? '#F26522' : 'rgba(242,101,34,0.18)'}`,
+                        background: form.specialties.includes(s) ? 'rgba(242,101,34,0.10)' : 'transparent',
+                        color: form.specialties.includes(s) ? '#F26522' : '#9B9B9B', fontSize: '0.8rem', fontWeight: 600, textTransform: 'capitalize', transition: 'all 0.2s'
                       }}>{s}</button>
                     ))}
                   </div>
@@ -140,8 +142,8 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p style={{ textAlign: 'center', marginTop: 20, color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-            Already have an account? <Link to="/login" style={{ color: 'var(--accent-light)', fontWeight: 600 }}>Sign in</Link>
+          <p style={{ textAlign: 'center', marginTop: 20, color: '#6B6B6B', fontSize: '0.88rem' }}>
+            Already have an account? <Link to="/login" style={{ color: '#F26522', fontWeight: 600 }}>Sign in</Link>
           </p>
         </div>
       </div>

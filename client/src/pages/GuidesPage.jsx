@@ -47,7 +47,7 @@ export default function GuidesPage() {
 
   const FilterSection = ({ label, children }) => (
     <div style={{ marginBottom: 24 }}>
-      <div style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>{label}</div>
+      <div style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#9B9B9B', marginBottom: 10 }}>{label}</div>
       {children}
     </div>
   );
@@ -58,7 +58,7 @@ export default function GuidesPage() {
       <aside style={{ width: 260, flexShrink: 0, position: 'sticky', top: 80 }}>
         <div className="card" style={{ padding: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <span style={{ fontWeight: 700, fontSize: '1rem' }}>Filters</span>
+            <span style={{ fontWeight: 700, fontSize: '1rem', color: '#1A1A1A' }}>Filters</span>
             <button className="btn btn-outline btn-sm" onClick={clearFilters}>Clear</button>
           </div>
 
@@ -68,24 +68,24 @@ export default function GuidesPage() {
 
           <FilterSection label="Specialty">
             {SPECIALTIES.map(s => (
-              <label key={s} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, cursor: 'pointer', fontSize: '0.88rem', textTransform: 'capitalize', color: filters.specialty === s ? '#818cf8' : 'var(--text-secondary)' }}>
+              <label key={s} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, cursor: 'pointer', fontSize: '0.88rem', textTransform: 'capitalize', color: filters.specialty === s ? '#F26522' : '#6B6B6B' }}>
                 <input type="radio" name="specialty" value={s} checked={filters.specialty === s} onChange={() => setFilters(f => ({ ...f, specialty: s }))}
-                  style={{ width: 'auto', borderRadius: 0, background: 'transparent', border: 'none', padding: 0 }} />
+                  style={{ width: 'auto', borderRadius: 0, background: 'transparent', border: 'none', padding: 0, accentColor: '#F26522' }} />
                 {s}
               </label>
             ))}
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, cursor: 'pointer', fontSize: '0.88rem', color: !filters.specialty ? '#818cf8' : 'var(--text-secondary)' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, cursor: 'pointer', fontSize: '0.88rem', color: !filters.specialty ? '#F26522' : '#6B6B6B' }}>
               <input type="radio" name="specialty" value="" checked={!filters.specialty} onChange={() => setFilters(f => ({ ...f, specialty: '' }))}
-                style={{ width: 'auto', borderRadius: 0, background: 'transparent', border: 'none', padding: 0 }} />
+                style={{ width: 'auto', borderRadius: 0, background: 'transparent', border: 'none', padding: 0, accentColor: '#F26522' }} />
               All
             </label>
           </FilterSection>
 
           <FilterSection label="Language">
             {LANGUAGES.map(l => (
-              <label key={l} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, cursor: 'pointer', fontSize: '0.88rem', color: filters.language === l ? '#818cf8' : 'var(--text-secondary)' }}>
+              <label key={l} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, cursor: 'pointer', fontSize: '0.88rem', color: filters.language === l ? '#F26522' : '#6B6B6B' }}>
                 <input type="radio" name="language" value={l} checked={filters.language === l} onChange={() => setFilters(f => ({ ...f, language: l }))}
-                  style={{ width: 'auto', borderRadius: 0, background: 'transparent', border: 'none', padding: 0 }} />
+                  style={{ width: 'auto', borderRadius: 0, background: 'transparent', border: 'none', padding: 0, accentColor: '#F26522' }} />
                 {l}
               </label>
             ))}
@@ -100,9 +100,9 @@ export default function GuidesPage() {
           </FilterSection>
 
           <FilterSection label="Instant Book">
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: '0.88rem', color: '#6B6B6B' }}>
               <input type="checkbox" checked={filters.instantBook} onChange={e => setFilters(f => ({ ...f, instantBook: e.target.checked }))}
-                style={{ width: 'auto', borderRadius: 0, background: 'transparent', border: 'none', padding: 0 }} />
+                style={{ width: 'auto', borderRadius: 0, background: 'transparent', border: 'none', padding: 0, accentColor: '#F26522' }} />
               Only Instant Book guides
             </label>
           </FilterSection>
@@ -115,8 +115,8 @@ export default function GuidesPage() {
       <main style={{ flex: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Find Your Guide</h1>
-            {!loading && <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: 2 }}>{pagination.total} certified guides found</p>}
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1A1A1A' }}>Find Your Guide</h1>
+            {!loading && <p style={{ color: '#6B6B6B', fontSize: '0.85rem', marginTop: 2 }}>{pagination.total} certified guides found</p>}
           </div>
         </div>
 
@@ -125,7 +125,7 @@ export default function GuidesPage() {
             ? Array.from({ length: 6 }).map((_, i) => <GuideCardSkeleton key={i} />)
             : guides.length > 0
               ? guides.map(g => <GuideCard key={g._id} guide={g} />)
-              : <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>No guides found matching your filters.</div>
+              : <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 60, color: '#9B9B9B' }}>No guides found matching your filters.</div>
           }
         </div>
 
@@ -134,9 +134,9 @@ export default function GuidesPage() {
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 40 }}>
             {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(p => (
               <button key={p} className="btn" onClick={() => changePage(p)} style={{
-                padding: '8px 14px', borderRadius: 8, border: `1px solid ${p === pagination.page ? '#6366f1' : 'var(--border)'}`,
-                background: p === pagination.page ? 'rgba(99,102,241,0.15)' : 'transparent',
-                color: p === pagination.page ? '#818cf8' : 'var(--text-secondary)', fontWeight: 600
+                padding: '8px 14px', borderRadius: 8, border: `1px solid ${p === pagination.page ? '#F26522' : 'rgba(242,101,34,0.18)'}`,
+                background: p === pagination.page ? 'rgba(242,101,34,0.10)' : 'transparent',
+                color: p === pagination.page ? '#F26522' : '#6B6B6B', fontWeight: 600
               }}>{p}</button>
             ))}
           </div>

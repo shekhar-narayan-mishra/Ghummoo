@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { Award, Clock, AlertCircle, Star } from 'lucide-react';
 import api from '../services/api';
 import BookingCard from '../components/BookingCard';
 import AvailabilityCalendar from '../components/AvailabilityCalendar';
@@ -75,7 +76,7 @@ export default function GuideDashboardPage() {
     { label: 'Total Bookings', value: bookings.length },
     { label: 'Confirmed', value: bookings.filter(b => ['confirmed', 'in_progress'].includes(b.status)).length },
     { label: 'Completed', value: guide?.totalCompletedBookings || 0 },
-    { label: 'Avg Rating', value: guide ? `${guide.avgRating?.toFixed(1)} ★` : '–' },
+    { label: 'Avg Rating', value: guide ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{guide.avgRating?.toFixed(1)} <Star size={14} fill="currentColor" strokeWidth={0} /></span> : '–' },
   ];
 
   if (loading) return (
@@ -96,8 +97,8 @@ export default function GuideDashboardPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 28 }}>
         {stats.map(s => (
           <div key={s.label} className="card" style={{ padding: 20, textAlign: 'center' }}>
-            <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#818cf8' }}>{s.value}</div>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', marginTop: 4 }}>{s.label}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#F26522' }}>{s.value}</div>
+            <div style={{ color: '#6B6B6B', fontSize: '0.82rem', marginTop: 4 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -106,39 +107,39 @@ export default function GuideDashboardPage() {
 
         {/* Availability Manager */}
         <div className="card">
-          <h2 style={{ fontWeight: 700, marginBottom: 16 }}>Manage Availability</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', marginBottom: 16 }}>Click days to toggle available / unavailable. Red = already booked (locked).</p>
+          <h2 style={{ fontWeight: 700, marginBottom: 16, color: '#1A1A1A' }}>Manage Availability</h2>
+          <p style={{ color: '#6B6B6B', fontSize: '0.82rem', marginBottom: 16 }}>Click days to toggle available / unavailable. Red = already booked (locked).</p>
           {guide && <AvailabilityCalendar guideId={guide._id} editable={true} />}
         </div>
 
         {/* Certification Section */}
         <div className="card">
-          <h2 style={{ fontWeight: 700, marginBottom: 16 }}>Certification</h2>
+          <h2 style={{ fontWeight: 700, marginBottom: 16, color: '#1A1A1A' }}>Certification</h2>
           {guide?.certificationStatus === 'approved' ? (
             <div style={{ textAlign: 'center', padding: '16px 0' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>
-                {guide.certificationTier === 'gold' ? '🥇' : guide.certificationTier === 'silver' ? '🥈' : '🥉'}
+              <div style={{ marginBottom: 8, color: '#F26522', display: 'flex', justifyContent: 'center' }}>
+                <Award size={48} strokeWidth={1.5} />
               </div>
-              <div style={{ fontWeight: 700, marginBottom: 4 }}>
+              <div style={{ fontWeight: 700, marginBottom: 4, color: '#1A1A1A' }}>
                 {guide.certificationTier?.charAt(0).toUpperCase() + guide.certificationTier?.slice(1)} Certified Guide
               </div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+              <div style={{ color: '#9B9B9B', fontSize: '0.82rem' }}>
                 Approved on {cert?.reviewedAt ? new Date(cert.reviewedAt).toLocaleDateString() : '–'}
               </div>
             </div>
           ) : guide?.certificationStatus === 'pending' ? (
-            <div style={{ padding: '20px', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 10 }}>
-              <div style={{ color: '#f59e0b', fontWeight: 600, marginBottom: 6 }}>⏳ Application Under Review</div>
-              <div style={{ color: 'var(--text-secondary)', fontSize: '0.83rem' }}>
+            <div style={{ padding: '20px', background: 'rgba(242,101,34,0.06)', border: '1px solid rgba(242,101,34,0.18)', borderRadius: 10 }}>
+              <div style={{ color: '#F26522', fontWeight: 600, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}><Clock size={16} /> Application Under Review</div>
+              <div style={{ color: '#6B6B6B', fontSize: '0.83rem' }}>
                 Submitted: {cert?.createdAt ? new Date(cert.createdAt).toLocaleDateString() : '–'}<br />
                 Our team will review within 48 hours.
               </div>
             </div>
           ) : guide?.certificationStatus === 'rejected' ? (
             <>
-              <div style={{ padding: 14, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, marginBottom: 16 }}>
-                <div style={{ color: '#ef4444', fontWeight: 600, marginBottom: 4 }}>❌ Application Rejected</div>
-                <div style={{ color: 'var(--text-secondary)', fontSize: '0.83rem' }}>{cert?.adminNotes || 'No reason provided'}</div>
+              <div style={{ padding: 14, background: 'rgba(220,53,69,0.06)', border: '1px solid rgba(220,53,69,0.18)', borderRadius: 10, marginBottom: 16 }}>
+                <div style={{ color: '#DC3545', fontWeight: 600, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}><AlertCircle size={16} /> Application Rejected</div>
+                <div style={{ color: '#6B6B6B', fontSize: '0.83rem' }}>{cert?.adminNotes || 'No reason provided'}</div>
               </div>
               <form onSubmit={handleApplyCert} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div className="form-group">
@@ -152,7 +153,7 @@ export default function GuideDashboardPage() {
             </>
           ) : (
             <>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: 16 }}>
+              <p style={{ color: '#6B6B6B', fontSize: '0.85rem', marginBottom: 16 }}>
                 Get certified to unlock bookings. You'll need your bio, city, specialties, and a price filled in.
               </p>
               <form onSubmit={handleApplyCert} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -172,7 +173,7 @@ export default function GuideDashboardPage() {
       {/* Incoming Bookings */}
       <div className="card" style={{ marginTop: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontWeight: 700 }}>Incoming Bookings</h2>
+          <h2 style={{ fontWeight: 700, color: '#1A1A1A' }}>Incoming Bookings</h2>
           <div style={{ display: 'flex', gap: 4 }}>
             {['All', 'Pending', 'Confirmed', 'Completed'].map(t => (
               <button key={t} className={`tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>{t}</button>
@@ -181,7 +182,7 @@ export default function GuideDashboardPage() {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {bookings.length === 0
-            ? <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>No {tab !== 'All' ? tab.toLowerCase() : ''} bookings</div>
+            ? <div style={{ textAlign: 'center', padding: '40px', color: '#9B9B9B' }}>No {tab !== 'All' ? tab.toLowerCase() : ''} bookings</div>
             : bookings.map(b => (
                 <BookingCard key={b._id} booking={b} isGuide={true} onConfirm={handleConfirm} onReject={handleReject} />
               ))

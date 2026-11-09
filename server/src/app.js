@@ -5,9 +5,14 @@ const helmet = require('helmet');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
+const { requestLog } = require('./middleware/requestLog');
 
 const app = express();
 app.set('trust proxy', 1);
+
+// First middleware in: every response gets an X-Request-Id and one JSON log line records
+// the request (requestLog runs before the database 503 gate, so that path gets an id too).
+app.use(requestLog());
 
 app.use(helmet({
   contentSecurityPolicy: {

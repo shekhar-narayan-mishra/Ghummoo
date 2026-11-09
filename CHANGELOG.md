@@ -31,6 +31,7 @@ All notable changes are recorded here. The format follows [Keep a Changelog](htt
 - Project, security, open-source and licensing documents in `docs/`, plus contributor issue drafts in `docs/github-issues/`.
 - `server/test/hardening.test.js`.
 - `.nvmrc` (Node 22).
+- `Dockerfile` and `docker-compose.yml` with MongoDB.
 
 ## History before this changelog
 

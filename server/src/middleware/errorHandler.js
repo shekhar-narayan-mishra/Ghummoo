@@ -23,7 +23,16 @@ const errorHandler = (err, req, res, next) => { // eslint-disable-line no-unused
   const statusCode = err.statusCode || 500;
   if (statusCode >= 500 && statusCode !== 503) {
     // The id is what a user can quote from the client, so the log line carries it with the error.
-    console.error(`[error] requestId=${req.id || '-'} path=${req.path} status=${statusCode}`, err);
+    // The format argument stays a constant (user values never sit in Node's format position) and
+    // JSON.stringify escapes newlines and control characters, so log entries can't be forged.
+    console.error('[error]', JSON.stringify({
+      time: new Date().toISOString(),
+      level: 'error',
+      requestId: req.id || null,
+      method: req.method,
+      path: req.path,
+      status: statusCode,
+    }), err);
   }
   return res.status(statusCode).json({
     success: false,

@@ -82,6 +82,19 @@ test('AI grounding: a number counts only when it appears as a whole number in th
   assert.equal(ok.draft.capacity, 12);
 });
 
+test('AI grounding: clearing an ungrounded seat capacity produces a warning', () => {
+  const base = { departureDates: [], itinerary: [], inclusions: [], exclusions: [], warnings: [] };
+  const text = 'Spiti 7 days, ₹15,000 per person, 12 seats only';
+  const cleared = normalise({ ...base, capacity: 20 }, text);
+  assert.equal(cleared.draft.capacity, null);
+  assert.ok(cleared.warnings.includes('Seat capacity 20 could not be found in the text and was cleared'));
+  const kept = normalise({ ...base, capacity: 12 }, text);
+  assert.equal(kept.draft.capacity, 12);
+  assert.ok(!kept.warnings.some((w) => w.includes('Seat capacity')));
+  const none = normalise({ ...base, capacity: null }, text);
+  assert.ok(!none.warnings.some((w) => w.includes('Seat capacity')));
+});
+
 test('CSV export cells neutralise spreadsheet formulas, including tab and carriage-return prefixes', () => {
   assert.equal(csvCell('=HYPERLINK("x")'), '"\'=HYPERLINK(""x"")"');
   assert.equal(csvCell('+91 90000 11111'), '"\'+91 90000 11111"');

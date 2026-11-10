@@ -184,16 +184,19 @@ const PKG_FIELDS = [
 
 // Validates optional links to the India content directory. Departure cities must be cities.
 async function validatePlaceRefs(data) {
-  for (const [field, label, onlyCities] of [['destinationRefs', 'Destination', false], ['departureCityRefs', 'Departure city', true]]) {
-    if (data[field] === undefined) continue;
-    const ids = Array.isArray(data[field]) ? [...new Set(data[field].map(String))] : null;
-    if (!ids || ids.some((id) => !mongoose.isValidObjectId(id))) throw badRequest(`${label} links must be a list of place IDs`);
-    if (ids.length > 12) throw badRequest(`Link at most 12 places in ${label.toLowerCase()}s`);
-    const found = await Place.find({ _id: { $in: ids }, contentStatus: 'published' }, 'kind').lean();
-    if (found.length !== ids.length) throw badRequest(`${label}: one or more places were not found`);
-    if (onlyCities && found.some((p) => p.kind !== 'city')) throw badRequest('Departure cities must be cities');
-    data[field] = ids;
-  }
+  const fields = [['destinationRefs', 'Destination', false], ['departureCityRefs', 'Departure city', true]];
+  await Promise.all(
+    fields.map(async ([field, label, onlyCities]) => {
+      if (data[field] === undefined) return;
+      const ids = Array.isArray(data[field]) ? [...new Set(data[field].map(String))] : null;
+      if (!ids || ids.some((id) => !mongoose.isValidObjectId(id))) throw badRequest(`${label} links must be a list of place IDs`);
+      if (ids.length > 12) throw badRequest(`Link at most 12 places in ${label.toLowerCase()}s`);
+      const found = await Place.find({ _id: { $in: ids }, contentStatus: 'published' }, 'kind').lean();
+      if (found.length !== ids.length) throw badRequest(`${label}: one or more places were not found`);
+      if (onlyCities && found.some((p) => p.kind !== 'city')) throw badRequest('Departure cities must be cities');
+      data[field] = ids;
+    })
+  );
 }
 
 function cleanPackage(body) {

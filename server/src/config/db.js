@@ -31,7 +31,7 @@ async function waitForLockRelease(dbPath) {
       console.log(`[db] stopping orphaned embedded database (pid ${pid})`);
       try { process.kill(pid, 'SIGTERM'); } catch { /* already gone */ }
     }
-    // eslint-disable-next-line no-await-in-loop
+    // eslint-disable-next-line no-await-in-loop -- sequential polling retry waiting for lock release
     await new Promise((r) => setTimeout(r, 1000));
   }
 }

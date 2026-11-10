@@ -63,22 +63,26 @@ router.get('/mine', asyncHandler(async (req, res) => {
   const byDep = new Map(groups.map((g) => [String(g.departure), g]));
   const memberships = await GroupMember.find({ user: req.user._id, departure: { $in: deps.map((d) => d._id) } }).lean();
   const mm = new Map(memberships.map((m) => [String(m.departure), m]));
-  const items = [];
-  for (const d of deps) {
-    const g = byDep.get(String(d._id));
-    const m = mm.get(String(d._id));
-    if (m?.leftAt) continue;
-    const last = g ? await GroupMessage.findOne({ group: g._id, hidden: false }).sort({ createdAt: -1 }).select('createdAt kind').lean() : null;
-    items.push({
-      departureId: d._id,
-      trip: g?.package?.title || null,
-      startDate: d.startDate,
-      endDate: d.endDate,
-      unread: g ? await unreadFor(g._id, req.user._id, m?.lastReadAt) : 0,
-      muted: Boolean(m?.muted),
-      lastMessageAt: last?.createdAt || null,
-    });
-  }
+  const activeDeps = deps.filter((d) => !mm.get(String(d._id))?.leftAt);
+  const items = await Promise.all(
+    activeDeps.map(async (d) => {
+      const g = byDep.get(String(d._id));
+      const m = mm.get(String(d._id));
+      const [last, unread] = await Promise.all([
+        g ? GroupMessage.findOne({ group: g._id, hidden: false }).sort({ createdAt: -1 }).select('createdAt kind').lean() : null,
+        g ? unreadFor(g._id, req.user._id, m?.lastReadAt) : 0,
+      ]);
+      return {
+        departureId: d._id,
+        trip: g?.package?.title || null,
+        startDate: d.startDate,
+        endDate: d.endDate,
+        unread,
+        muted: Boolean(m?.muted),
+        lastMessageAt: last?.createdAt || null,
+      };
+    })
+  );
   items.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
   res.json({ success: true, data: { items, unreadTotal: items.filter((i) => !i.muted).reduce((n, i) => n + i.unread, 0) } });
 }));

@@ -15,7 +15,7 @@ async function uniqueSlug(Model, base, excludeId) {
   for (let i = 0; i < 20; i += 1) {
     const q = { slug: candidate };
     if (excludeId) q._id = { $ne: excludeId };
-    // eslint-disable-next-line no-await-in-loop
+    // eslint-disable-next-line no-await-in-loop -- sequential uniqueness check with early return on first available slug
     if (!(await Model.exists(q))) return candidate;
     candidate = `${root}-${crypto.randomBytes(2).toString('hex')}`;
   }

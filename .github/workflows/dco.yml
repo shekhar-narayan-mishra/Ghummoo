@@ -11,6 +11,11 @@ name: DCO
 on:
   pull_request:
     branches: [staging]
+    # "edited" catches a PR retargeted from main to staging: GitHub sends no other event then,
+    # so without it the required check would wait forever. The check also re-runs on title or
+    # description edits. It is deliberately not skipped then: a skipped run counts as passing
+    # and would replace an earlier failure on the same commit.
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read

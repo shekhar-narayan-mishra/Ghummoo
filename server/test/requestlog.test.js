@@ -222,10 +222,14 @@ test('A forced 500 returns requestId in the body and logs the same id with the e
     assert.equal(requestLine.status, 500);
     assert.equal(requestLine.requestId, requestId, 'the request line carries the same id');
 
-    assert.equal(capturedConsole.length, 1, 'one console.error line for the failure');
-    assert.ok(capturedConsole[0].includes('requestId=' + requestId), 'console.error includes the id');
+    assert.equal(capturedConsole.length, 1, 'one console.error call for the failure');
     assert.ok(capturedConsole[0].includes('[error]'));
-    assert.ok(capturedConsole[0].includes('path=/api/boom'), 'console.error includes the path without a query');
+    const payloadLine = capturedConsole[0].split('\n')[0];
+    const payload = JSON.parse(payloadLine.slice(payloadLine.indexOf('{'), payloadLine.lastIndexOf('}') + 1));
+    assert.equal(payload.requestId, requestId, 'the logged JSON line carries the same id');
+    assert.equal(payload.path, '/api/boom', 'the path without a query');
+    assert.equal(payload.status, 500);
+    assert.equal(payload.level, 'error');
   } finally {
     console.error = originalError;
     await close();

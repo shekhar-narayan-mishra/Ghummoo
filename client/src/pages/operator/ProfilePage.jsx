@@ -6,6 +6,7 @@ import api from '../../lib/api';
 import { date } from '../../lib/format';
 import { Button, Input, Textarea, Select, Field, Card, Notice, PageHeader, StatusBadge, SafeImage } from '../../components/ui';
 import Onboarding, { ORGANISER_TYPES } from './Onboarding';
+import { isPhone } from '../../lib/validation';
 
 const EMPTY = { businessName: '', organiserType: '', description: '', contactEmail: '', contactPhone: '', location: '', instagram: '', website: '', logoUrl: '', foundedYear: '' };
 
@@ -14,7 +15,7 @@ function validate(f) {
   if (f.businessName.trim().length < 2) e.businessName = 'Business name is required';
   if (f.description.trim().length < 30) e.description = `Tell travellers about your business (at least 30 characters, ${f.description.trim().length} so far)`;
   if (!/^\S+@\S+\.\S+$/.test(f.contactEmail.trim())) e.contactEmail = 'Enter a valid email address';
-  if (!/^[+\d][\d\s-]{7,16}$/.test(f.contactPhone.trim())) e.contactPhone = 'Enter a valid phone number';
+  if (!isPhone(f.contactPhone)) e.contactPhone = 'Enter a valid phone number';
   if (!f.location.trim()) e.location = 'Location is required';
   if (f.foundedYear) {
     const y = Number(f.foundedYear);

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { PHONE_MAX_LENGTH } = require('../utils/text');
 
 const userSchema = new mongoose.Schema(
   {
@@ -11,7 +12,7 @@ const userSchema = new mongoose.Schema(
     },
     passwordHash: { type: String, required: true, select: false },
     role: { type: String, enum: ['traveler', 'operator', 'admin'], default: 'traveler' },
-    phone: { type: String, default: null, trim: true },
+    phone: { type: String, default: null, trim: true, maxlength: [PHONE_MAX_LENGTH, 'Phone number is too long'] },
     isDemo: { type: Boolean, default: false },
     // Trips a traveller saved for later (V0.1). Only published listings are ever shown back.
     savedTrips: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TripPackage' }], default: [], select: false },

@@ -12,6 +12,7 @@ import api from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { Button, Input, Textarea, Select, Card, cx } from '../../components/ui';
 import { LogoPicker, REG_TYPES } from './ProfilePage';
+import { isPhone } from '../../lib/validation';
 
 export const ORGANISER_TYPES = [
   { value: 'independent', label: 'Independent organiser', hint: 'You lead or run trips yourself, often with a small team.', icon: UserRound },
@@ -36,7 +37,7 @@ function validateStep(step, f) {
   }
   if (step === 2) {
     if (!/^\S+@\S+\.\S+$/.test(f.contactEmail.trim())) e.contactEmail = 'Enter a valid email address';
-    if (!/^[+\d][\d\s-]{7,16}$/.test(f.contactPhone.trim())) e.contactPhone = 'Enter a phone number, e.g. +91 98765 43210';
+    if (!isPhone(f.contactPhone)) e.contactPhone = 'Enter a phone number, e.g. +91 98765 43210';
     if (f.location.trim().length < 2) e.location = 'Enter the city you operate from';
   }
   if (step === 3) {

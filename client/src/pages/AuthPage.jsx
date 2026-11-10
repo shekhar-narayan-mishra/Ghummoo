@@ -5,6 +5,7 @@ import { Mail, Lock, User, Phone, Compass, Briefcase } from 'lucide-react';
 import { useAuth, homeFor } from '../lib/auth';
 import { Button, Input, Notice, SafeImage, cx } from '../components/ui';
 import Logo from '../components/Logo';
+import { optionalPhoneError, PHONE_MAX_LENGTH } from '../lib/validation';
 
 const SIDE = 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200&q=72&auto=format&fit=crop';
 
@@ -29,6 +30,7 @@ export default function AuthPage({ mode }) {
     const errs = {};
     if (!isLogin && form.name.trim().length < 2) errs.name = 'Please enter your full name';
     if (!/^\S+@\S+\.\S+$/.test(form.email)) errs.email = 'Enter a valid email';
+    if (!isLogin && optionalPhoneError(form.phone)) errs.phone = optionalPhoneError(form.phone);
     if (isLogin ? !form.password : form.password.length < 8) errs.password = isLogin ? 'Enter your password' : 'Use at least 8 characters';
     setErrors(errs);
     if (Object.keys(errs).length) return;
@@ -65,7 +67,7 @@ export default function AuthPage({ mode }) {
             {serverError && <Notice tone="danger">{serverError}</Notice>}
             {!isLogin && <Input label={role === 'operator' ? 'Your name' : 'Full name'} icon={User} value={form.name} onChange={set('name')} error={errors.name} autoComplete="name" />}
             <Input label="Email" type="email" icon={Mail} value={form.email} onChange={set('email')} error={errors.email} autoComplete="email" />
-            {!isLogin && <Input label="Phone" type="tel" icon={Phone} value={form.phone} onChange={set('phone')} hint="Optional" autoComplete="tel" />}
+            {!isLogin && <Input label="Phone" type="tel" icon={Phone} value={form.phone} onChange={set('phone')} error={errors.phone} maxLength={PHONE_MAX_LENGTH} hint="Optional" autoComplete="tel" />}
             <Input label="Password" type="password" icon={Lock} value={form.password} onChange={set('password')} error={errors.password} autoComplete={isLogin ? 'current-password' : 'new-password'} hint={!isLogin ? 'At least 8 characters' : undefined} />
             <Button type="submit" size="lg" className="w-full" loading={busy}>{isLogin ? 'Log in' : role === 'operator' ? 'Create operator account' : 'Create account'}</Button>
           </form>

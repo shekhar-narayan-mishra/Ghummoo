@@ -57,4 +57,14 @@ const csvCell = (v) => {
   return `"${s.replace(/"/g, '""')}"`;
 };
 
-module.exports = { slugify, uniqueSlug, bookingReference, escapeRegex, toList, csvCell, isEmail, EMAIL_RE };
+// Phone numbers: an optional leading +, then 8-17 digits, spaces or hyphens. The same rule is
+// used for the booking contact, profile, sign-up and traveller phones (client: lib/validation.js).
+const PHONE_PATTERN = /^[+\d][\d\s-]{7,16}$/;
+const PHONE_MAX_LENGTH = 17; // the longest string PHONE_PATTERN accepts
+const EMERGENCY_CONTACT_MAX_LENGTH = 120;
+const isPhone = (v) => PHONE_PATTERN.test(String(v ?? '').trim());
+
+module.exports = {
+  slugify, uniqueSlug, bookingReference, escapeRegex, toList, csvCell, isEmail, EMAIL_RE,
+  PHONE_PATTERN, PHONE_MAX_LENGTH, EMERGENCY_CONTACT_MAX_LENGTH, isPhone,
+};

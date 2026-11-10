@@ -7,6 +7,7 @@ import useAsync from '../lib/useAsync';
 import { useAuth } from '../lib/auth';
 import { Button, Input, Select, Textarea, Notice, Spinner, EmptyState, SafeImage, cx } from '../components/ui';
 import { money, dateRange, durationLong } from '../lib/format';
+import { isPhone, optionalPhoneError, PHONE_MAX_LENGTH, EMERGENCY_CONTACT_MAX_LENGTH } from '../lib/validation';
 
 const STEPS = ['Departure', 'Travellers', 'Review'];
 const blankTraveller = () => ({ fullName: '', age: '', gender: 'prefer_not', phone: '', email: '', emergencyContact: '' });
@@ -18,6 +19,9 @@ function validateTravellers(list) {
     const age = Number(t.age);
     if (!Number.isInteger(age) || age < 1 || age > 110) e.age = 'Enter a valid age';
     if (t.email && !/^\S+@\S+\.\S+$/.test(t.email)) e.email = 'Email looks invalid';
+    const phoneError = optionalPhoneError(t.phone);
+    if (phoneError) e.phone = phoneError;
+    if (t.emergencyContact.trim().length > EMERGENCY_CONTACT_MAX_LENGTH) e.emergencyContact = `Keep it under ${EMERGENCY_CONTACT_MAX_LENGTH} characters`;
     return e;
   });
   return errs.some((e) => Object.keys(e).length) ? errs : null;
@@ -26,7 +30,7 @@ function validateContact(c) {
   const e = {};
   if (c.name.trim().length < 2) e.name = 'Required';
   if (!/^\S+@\S+\.\S+$/.test(c.email)) e.email = 'Enter a valid email';
-  if (!/^[+\d][\d\s-]{7,16}$/.test(c.phone.trim())) e.phone = 'Enter a valid phone number';
+  if (!isPhone(c.phone)) e.phone = 'Enter a valid phone number';
   return Object.keys(e).length ? e : null;
 }
 
@@ -158,9 +162,9 @@ export default function BookPage() {
                           <option value="prefer_not">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="other">Other</option>
                         </Select>
                       </div>
-                      <Input label="Phone" type="tel" value={t.phone} onChange={(ev) => updateT(i, { phone: ev.target.value })} hint="Optional" />
+                      <Input label="Phone" type="tel" value={t.phone} error={e.phone} maxLength={PHONE_MAX_LENGTH} onChange={(ev) => updateT(i, { phone: ev.target.value })} hint="Optional" />
                       <Input label="Email" type="email" value={t.email} error={e.email} onChange={(ev) => updateT(i, { email: ev.target.value })} hint="Optional" />
-                      <Input label="Emergency contact" className="sm:col-span-2" value={t.emergencyContact} onChange={(ev) => updateT(i, { emergencyContact: ev.target.value })} placeholder="Name and phone number" hint="Optional, but recommended" />
+                      <Input label="Emergency contact" className="sm:col-span-2" value={t.emergencyContact} error={e.emergencyContact} maxLength={EMERGENCY_CONTACT_MAX_LENGTH} onChange={(ev) => updateT(i, { emergencyContact: ev.target.value })} placeholder="Name and phone number" hint="Optional, but recommended" />
                     </div>
                   </section>
                 );
@@ -171,7 +175,7 @@ export default function BookPage() {
                 <div className="mt-4 grid gap-4 sm:grid-cols-3">
                   <Input label="Name" required value={contact.name} error={errors.contact?.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
                   <Input label="Email" required type="email" value={contact.email} error={errors.contact?.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
-                  <Input label="Phone" required type="tel" value={contact.phone} error={errors.contact?.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} placeholder="+91 98xxx xxxxx" />
+                  <Input label="Phone" required type="tel" value={contact.phone} error={errors.contact?.phone} maxLength={PHONE_MAX_LENGTH} onChange={(e) => setContact({ ...contact, phone: e.target.value })} placeholder="+91 98xxx xxxxx" />
                 </div>
                 <Textarea className="mt-4" label="Special requests" rows={3} value={special} onChange={(e) => setSpecial(e.target.value)} placeholder="Dietary needs, room sharing preferences, etc." hint="Optional" />
               </section>

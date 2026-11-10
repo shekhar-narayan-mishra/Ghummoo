@@ -7,6 +7,13 @@ const accounts = {
   admin: 'admin@ghumo.demo',
 };
 
+// The main pages the quality and accessibility sweeps visit. Shared so both specs
+// stay in step: PUBLIC needs no sign-in, TRAVELLER needs the traveller account and
+// ORGANISER needs the operator account (see apiLogin below).
+const PUBLIC = ['/', '/india', '/cities', '/places/jaipur', '/trips', '/trips/rishikesh-adventure-weekend', '/decide', '/compare?trips=rishikesh-adventure-weekend,nainital-lakes-weekend', '/partners', '/login'];
+const TRAVELLER = ['/me/trips'];
+const ORGANISER = ['/operator', '/operator/packages', '/operator/bookings', '/operator/insights', '/operator/studio'];
+
 // Signs in through the API; cookies are shared with the page's browser context.
 async function apiLogin(request, email, password = DEMO_PASSWORD) {
   const res = await request.post('/api/auth/login', { data: { email, password } });
@@ -29,4 +36,4 @@ async function horizontalOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 }
 
-module.exports = { DEMO_PASSWORD, accounts, apiLogin, uiLogin, horizontalOverflow };
+module.exports = { DEMO_PASSWORD, accounts, PUBLIC, TRAVELLER, ORGANISER, apiLogin, uiLogin, horizontalOverflow };

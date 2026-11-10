@@ -4,12 +4,9 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { accounts, apiLogin, horizontalOverflow } = require('./helpers');
+const { accounts, apiLogin, horizontalOverflow, PUBLIC, TRAVELLER, ORGANISER } = require('./helpers');
 
 const WIDTHS = [360, 390, 768, 1024, 1440];
-const PUBLIC = ['/', '/india', '/cities', '/places/jaipur', '/trips', '/trips/rishikesh-adventure-weekend', '/decide', '/compare?trips=rishikesh-adventure-weekend,nainital-lakes-weekend', '/partners', '/login'];
-const TRAVELLER = ['/me/trips'];
-const ORGANISER = ['/operator', '/operator/packages', '/operator/bookings', '/operator/insights', '/operator/studio'];
 const metrics = { overflow: [], consoleErrors: [], cls: {}, longTasks: {}, images: {}, reducedMotion: {} };
 
 test.afterAll(() => {

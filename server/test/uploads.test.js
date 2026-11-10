@@ -84,7 +84,7 @@ test('valid images are accepted and stored', async () => {
   }
 });
 
-test('a file whose bytes do not match its claimed type is rejected and deleted', async () => {
+test('a file whose bytes do not match its claimed type is rejected and never stored', async () => {
   const before = files().length;
 
   const text = await upload(Buffer.from('<html><body>not an image</body></html>'), 'image/png');
@@ -99,6 +99,22 @@ test('a file whose bytes do not match its claimed type is rejected and deleted',
   const empty = await upload(Buffer.alloc(0), 'image/webp');
   assert.equal(empty.status, 400, 'empty file');
   assert.equal(files().length, before, 'no file left behind');
+});
+
+test('a valid image header in chunks larger than the signature is stored byte for byte', async () => {
+  const bytes = Buffer.concat([PNG, Buffer.alloc(256 * 1024, 7)]);
+  const res = await upload(bytes, 'image/png');
+  assert.equal(res.status, 201);
+  const stored = fs.readFileSync(path.join(uploadDir, path.basename(res.body.data.url)));
+  assert.ok(stored.equals(bytes), 'stored file is identical to the upload');
+});
+
+test('an image over the 5 MB limit is refused and nothing is left on disk', async () => {
+  const before = files().length;
+  const res = await upload(Buffer.concat([PNG, Buffer.alloc(5 * 1024 * 1024)]), 'image/png');
+  assert.equal(res.status, 400);
+  assert.equal(res.body.message, 'Image must be smaller than 5 MB');
+  assert.equal(files().length, before, 'the partial file was removed');
 });
 
 test('non-image content types are still refused before storage', async () => {

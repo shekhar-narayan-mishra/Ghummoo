@@ -9,7 +9,7 @@ Contributions land in `staging` and reach `main` in a release. Each release name
 Changes merged into `staging` since v0.2.0. They will be released as v0.3.0.
 
 ### Added
-- Every response carries an `X-Request-Id`. The server writes one JSON log line per request (`time`, `level`, `requestId`, `method`, `path`, `status`, `durationMs`, `role`) and never logs query strings, bodies, cookies, IPs or personal data. 5xx responses include the `requestId`, so a user can quote it. `LOG_REQUESTS=false` turns the lines off. (#77, from #50)
+- Every response carries an `X-Request-Id`. The server writes one JSON log line per request (`time`, `level`, `requestId`, `method`, `path`, `status`, `durationMs`, `role`) and never logs query strings, bodies, cookies, IPs or personal data. 5xx responses include the `requestId`, so a user can quote it. `LOG_REQUESTS=false` turns the lines off. (#50)
 - Automated accessibility checks: axe-core (WCAG 2.1 A/AA) over the main public, traveller and organiser pages, at desktop and phone widths. Serious and critical violations fail CI; the known brand-colour contrast problem is tracked in #75. The logo link's accessible name is fixed. (#76, from #56)
 - ESLint for the server. `npm run lint` now lints the server and the client; independent sequential database writes run in parallel. (#71)
 - Owners can finish a contributor's PR in place. The `dco-maintainer-signoff` label lets an owner certify unsigned commits, so the contributor keeps the merged PR. (#79)

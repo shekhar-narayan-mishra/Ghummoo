@@ -59,7 +59,7 @@ These settings fit a team of two maintainers. Configure them in GitHub → **Set
 | Setting | `main` | `staging` |
 | --- | --- | --- |
 | Restrict direct pushes (require a pull request) | Yes | Yes |
-| Required approvals | 1 | 1 |
+| Required approvals | 1 | **0** (since 10 November 2026) |
 | Dismiss stale approvals when new commits are pushed | Yes | Yes |
 | Require review from Code Owners | Yes, once CODEOWNERS lists both owners | No |
 | Require status checks: `Lint, test, build`, `End-to-end (Playwright)`, `Secret scan`, `analyze` (CodeQL) | Yes | Yes (e2e may be optional at first if it is slow) |
@@ -69,7 +69,7 @@ These settings fit a team of two maintainers. Configure them in GitHub → **Set
 | Require linear history | No (release merges are merge commits) | Yes (squash merges only) |
 | Bypass list | **None.** Rulesets apply to admins unless they are on this list; keeping it empty means both owners also go through reviewed PRs | Repository admins, for emergencies only |
 
-Both owners, `shekhar-narayan-mishra` and `vedansha07`, are code owners ([GOVERNANCE.md](../GOVERNANCE.md)), so each one's PR is approved by the other. If only one maintainer is active for a while, one approval is impossible: you can't approve your own PR. In that case, set required approvals to **0** on `staging` but keep the PR requirement and the required checks. Restore it to 1 once the second maintainer reviews regularly.
+Both owners, `shekhar-narayan-mishra` and `vedansha07`, are code owners ([GOVERNANCE.md](../GOVERNANCE.md)). On **`main`**, each one's release PR is approved by the other. On **`staging`**, required approvals are **0** (since 10 November 2026), so an owner can merge their own day-to-day PRs once every required check, DCO included, is green. Contributors can't merge, so every outside PR is still merged by an owner. Raise it back to 1 if you want a second pair of eyes on every change.
 
 ## 5. Versioning
 

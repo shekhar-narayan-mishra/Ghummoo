@@ -74,7 +74,7 @@ function addedDependencies(patch) {
   return [...names('+')].filter((n) => !before.has(n));
 }
 
-function analyse({ pr, files, repoFullName }) {
+function analyse({ pr, files, commits = [], repoFullName }) {
   const errors = [];
   const warnings = [];
   const notes = [];
@@ -90,9 +90,12 @@ function analyse({ pr, files, repoFullName }) {
   }
 
   // 2. Linked issue (maintainers and release PRs are exempt)
-  const linksIssue = ISSUE_LINK.test(stripComments(pr.body));
+  // A closing reference counts in the description, the title or any commit message: contributors
+  // often write "(closes #21)" in the title or "Closes #2" in the commit.
+  const sources = [pr.body, pr.title, ...commits.map((c) => c && c.commit && c.commit.message)];
+  const linksIssue = sources.some((text) => ISSUE_LINK.test(stripComments(text)));
   if (!release && !maintainer && !linksIssue) {
-    errors.push('No linked issue. Add a line such as **`Closes #12`** to the description. Every contribution should start from an issue (see CONTRIBUTING.md).');
+    errors.push('No linked issue. Add a line such as **`Closes #12`** to the description, the title or a commit message. Every contribution should start from an issue (see CONTRIBUTING.md).');
   } else if (!release && maintainer && !linksIssue) {
     notes.push('No linked issue (fine for maintainer changes).');
   }

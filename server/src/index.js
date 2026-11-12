@@ -1,4 +1,4 @@
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), quiet: true });
 const crypto = require('crypto');
 const { connectDB, disconnectDB } = require('./config/db');
 const { seedIfEmpty } = require('./seedData');

@@ -49,7 +49,8 @@ jobs:
             const { owner, repo } = context.repo;
             const pr = context.payload.pull_request;
             const files = await github.paginate(github.rest.pulls.listFiles, { owner, repo, pull_number: pr.number, per_page: 100 });
-            const result = analyse({ pr, files, repoFullName: `${owner}/${repo}` });
+            const commits = await github.paginate(github.rest.pulls.listCommits, { owner, repo, pull_number: pr.number, per_page: 100 });
+            const result = analyse({ pr, files, commits, repoFullName: `${owner}/${repo}` });
 
             // One comment per PR, edited in place.
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number, per_page: 100 });

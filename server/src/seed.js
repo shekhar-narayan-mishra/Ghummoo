@@ -1,5 +1,5 @@
 // Resets the database and loads demo data:  npm run seed [-- --force]
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), quiet: true });
 const { connectDB, disconnectDB } = require('./config/db');
 const { seed, clearAll } = require('./seedData');
 const { runFoundation } = require('./migrations/v0_1');

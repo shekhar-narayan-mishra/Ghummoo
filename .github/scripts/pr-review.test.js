@@ -139,3 +139,13 @@ test('HTML comments are removed completely, so hidden text cannot count as an is
   const sneaky = analyse({ pr: pr({ body: '## What this changes\n\n<!<!-- -->-- Closes #1 -->\n\nStuff' }), files: [f('README.md')], repoFullName: REPO });
   assert.ok(sneaky.errors.some((e) => /No linked issue/.test(e)), 'a link hidden inside a comment does not count');
 });
+
+test('a closing reference in the title or a commit message counts as a linked issue (idea from #72)', () => {
+  const inTitle = analyse({ pr: pr({ body: 'Small fix', title: 'Add axe checks (closes #21)' }), files: [f('README.md')], repoFullName: REPO });
+  assert.deepEqual(inTitle.errors, []);
+  const commits = [{ commit: { message: 'fix: validate phones\n\nCloses #2\n\nSigned-off-by: A <a@example.com>' } }];
+  const inCommit = analyse({ pr: pr({ body: 'Small fix' }), files: [f('README.md')], commits, repoFullName: REPO });
+  assert.deepEqual(inCommit.errors, []);
+  const none = analyse({ pr: pr({ body: 'Small fix', title: 'Tidy up' }), files: [f('README.md')], commits: [{ commit: { message: 'tidy\n\nrelated to #2' } }], repoFullName: REPO });
+  assert.ok(none.errors.some((e) => /No linked issue/.test(e)), 'a bare mention still does not count');
+});

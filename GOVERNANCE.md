@@ -15,7 +15,7 @@ Both owners have equal standing. Each can review and merge contributions, triage
 
 | Decision | Who | How |
 | --- | --- | --- |
-| Merging a contribution into `staging` | Either owner | One approving review from an owner other than the author, and green CI |
+| Merging a contribution into `staging` | Either owner | Green CI (all required checks, including DCO). No approval is required on `staging`, so an owner may merge their own PR; contributors cannot merge, so every outside PR is merged by an owner who has read it |
 | Release PR from `staging` to `main` | Either owner | One approving review from the other owner, and green CI |
 | Changes to `.github/` (CI, CODEOWNERS, templates) | Either owner | A PR approved by the other owner |
 | **Owner-level decisions:** licence, relicensing, repository visibility, default branch, branch rules, adding or removing an owner or admin, transferring the repository, publishing proprietary code, financial commitments | **Both owners** | Written agreement from both, recorded in the PR or issue that makes the change |

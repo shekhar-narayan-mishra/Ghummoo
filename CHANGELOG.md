@@ -6,7 +6,7 @@ Contributions land in `staging` and reach `main` in a release. Each release name
 
 ## [Unreleased]
 
-Changes merged into `staging` since v0.2.0. They will be released as v0.3.0.
+Changes merged into `staging` since the last merge into `main`. They reach `main` with the next merge from `staging`.
 
 ### Added
 - Every response carries an `X-Request-Id`. The server writes one JSON log line per request (`time`, `level`, `requestId`, `method`, `path`, `status`, `durationMs`, `role`) and never logs query strings, bodies, cookies, IPs or personal data. 5xx responses include the `requestId`, so a user can quote it. `LOG_REQUESTS=false` turns the lines off. (#50)

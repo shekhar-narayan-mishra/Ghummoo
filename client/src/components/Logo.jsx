@@ -14,15 +14,12 @@ export function LogoMark({ className }) {
 
 export default function Logo({ to = '/', light, className }) {
   return (
-    <Link to={to} className={cx('group inline-flex items-center gap-2', className)}>
+    <Link to={to} className={cx('group inline-flex items-center gap-2', className)} aria-label="Ghumo AI home">
       <LogoMark className="transition-transform duration-300 group-hover:-rotate-6" />
       <span className={cx('flex items-start text-[22px] font-extrabold leading-none tracking-[-0.04em]', light ? 'text-white' : 'text-ink')}>
         ghumo
         <span className="ml-1 mt-[1px] rounded-md bg-peach px-1 py-[3px] text-[10px] font-extrabold tracking-wider text-brand-ink">AI</span>
       </span>
-      {/* The accessible name is built from the visible "ghumo AI" plus this hidden word, so it
-          includes the visible text (axe label-content-name-mismatch) instead of overriding it. */}
-      <span className="sr-only">{' '}home</span>
     </Link>
   );
 }

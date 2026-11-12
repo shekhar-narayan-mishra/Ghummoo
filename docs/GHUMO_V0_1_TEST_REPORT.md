@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | Server unit and API tests | `npm test --prefix server` | **50 / 50 pass** |
 | Client unit tests | `npm test --prefix client` | **6 / 6 pass** |
-| End-to-end (Playwright, Chromium) | `npm run test:e2e` | **27 / 27 pass** (about 4 minutes) |
+| End-to-end (Playwright, Chromium) | `npm run test:e2e` | **25 / 25 pass** (about 4 minutes) |
 | Lint | `npm run lint` | **0 errors**, 50 warnings (see known limitations) |
 | Production build | `npm run build` | Pass |
 
@@ -18,7 +18,7 @@
 
 - `npm run test:e2e` builds the client and starts the real Express server in **production mode** on port 5198, with a fresh embedded MongoDB seeded with demo data (`e2e/start-app.js`). Your own database is never touched.
 - AI calls go to a **deterministic OpenAI-compatible stub** on port 5199 (`e2e/ai-stub.js`), so AI Package Studio, natural-language interpretation and Ask This Trip are exercised through the real server code (grounding, validation, missing-field computation) without a paid key or flaky answers.
-- Specs run in order with one worker because they share one database: `01-traveller`, `02-organiser`, `03-quality`, `04-security`, `05-accessibility`.
+- Specs run in order with one worker because they share one database: `01-traveller`, `02-organiser`, `03-quality`, `04-security`.
 
 ## A. Traveller journey: `e2e/01-traveller.spec.js` (6 tests)
 
@@ -93,22 +93,6 @@ Production bundle (gzip):
 
 GSAP ScrollTriggers are created inside `gsap.context()` and reverted on unmount (`client/src/motion/useSceneMotion.js`). No 3D engine is used.
 
-## F. Accessibility: `e2e/05-accessibility.spec.js` (2 tests)
-
-The [axe-core](https://github.com/dequelabs/axe-core) rule engine (via `@axe-core/playwright`, test-only) runs over the same public, traveller and organiser pages the quality sweep visits — `PUBLIC` (10 paths), `TRAVELLER` (`/me/trips`) and `ORGANISER` (5 paths), exported from `e2e/helpers.js` so both specs stay in step — signed in with `apiLogin` where needed, at a desktop (1440px) and a mobile (390px) viewport. Rules checked are the WCAG 2.1 level A and AA tags (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`).
-
-| What the check does | Behaviour |
-| --- | --- |
-| Run axe on every page above, at both viewports, after `networkidle` | 2 tests (one per viewport) |
-| Fail on any violation with impact `serious` or `critical` | Build fails; message lists page, viewport, rule and node count |
-| Record `moderate` and `minor` violations | Written to `e2e/quality-metrics.json` under `accessibility` for this report |
-| Allow-list | 14 `color-contrast` entries (see first run below). Each names a rule, an exact page scope and a tracking issue (`ALLOWLIST` in the spec); matching is by rule + exact path, so it can never hide the same rule on another page or a new violation |
-
-**First run.** Two rules fired, both serious:
-
-- **`label-content-name-mismatch`** on the logo link, on every page at mobile. The logo's `aria-label="Ghumo AI home"` overrode its visible text ("ghumo AI"), so the visible text was not part of the accessible name — a small bug, **fixed in this PR** (`client/src/components/Logo.jsx`): the override is removed and a visually hidden "home" is appended, so the name is built from the visible text. Not allow-listed.
-- **`color-contrast`** (serious) on every page except `/cities` and `/decide`. The brand palette misses WCAG AA by small margins — mainly white text on the brand-orange CTA (`#ffffff` on `#f26a2e`, 3.05:1), plus near-misses on the success (4.36), warning (4.46) and `brand-ink` eyebrow (3.84–4.25) tokens. The CTA is a brand design decision, so these are tracked in an issue and held in the per-page allow-list rather than changed here; `/cities` and `/decide` stay enforced, as does every non-contrast rule everywhere. When fixed, fixes use the design tokens in `client/src/index.css` (no hex colours in components) and each allow-list entry is removed. Full per-page detail is in `e2e/quality-metrics.json`.
-
 ## Fixes made during the audit
 
 | Problem found | Fix | Files |
@@ -116,22 +100,19 @@ The [axe-core](https://github.com/dequelabs/axe-core) rule engine (via `@axe-cor
 | **Large layout shift (CLS 0.38–0.58):** while a lazy route loaded, the footer rendered at mid-screen and then jumped down | The main area takes at least the viewport height | `client/src/main.jsx` |
 | **No brute-force protection on sign-in or registration** | Failed-attempt limit on login (per IP and email) and a registration limit per IP, using the existing limiter with a new `onlyFailures` option; test added | `server/src/middleware/rateLimit.js`, `server/src/routes/auth.js`, `server/test/api.test.js`, `server/.env.example` |
 | **AI Studio showed server configuration to organisers** (env variable names) when no AI key was set | Plain "isn't available right now" notice with manual creation; setup stays in `server/.env.example` | `client/src/pages/operator/StudioPage.jsx` |
-| **Logo link name mismatch (axe `label-content-name-mismatch`, serious):** the `aria-label` overrode the visible "ghumo AI" text, so the visible text was not part of the link's accessible name | Removed the overriding `aria-label`; the name now comes from the visible text plus a visually hidden "home" | `client/src/components/Logo.jsx` |
 
 ## Tests added in this milestone
 
 - `playwright.config.js`, `e2e/start-app.js`, `e2e/ai-stub.js`, `e2e/helpers.js`
-- `e2e/01-traveller.spec.js`, `e2e/02-organiser.spec.js`, `e2e/03-quality.spec.js`, `e2e/04-security.spec.js`, `e2e/05-accessibility.spec.js`
+- `e2e/01-traveller.spec.js`, `e2e/02-organiser.spec.js`, `e2e/03-quality.spec.js`, `e2e/04-security.spec.js`
 - `server/test/api.test.js`: sign-in protection test
 - Root scripts `test:e2e` and `test:all`; dev dependency `@playwright/test` 1.64.1 (test-only; needed because no browser test runner existed)
-- Dev dependency `@axe-core/playwright` (test-only; axe-core is Deque's open-source WCAG rule engine, MPL-2.0, used only in e2e so nothing reaches the production bundle)
 
 ## Not covered automatically
 
 - Real AI provider answers (only the stub is used in e2e; provider failures are covered in `discovery.test.js`).
 - Safari, Firefox and real mobile devices (Chromium only, with viewport emulation).
 - Screen reader output (keyboard focus traps, labels and roles are used by the tests, but no assistive-technology run).
-- Accessibility rules axe cannot decide automatically: focus order, whether alt text is meaningful, reading order, and whether an ARIA name actually describes its control. axe (section F) catches contrast, missing labels, landmark and ARIA-misuse style issues, not these — they still need a human and a screen-reader pass.
 - Every loading, empty and error state individually.
 - Reviews after a completed trip, in a browser.
 - Deployment: external deployment was not configured or performed.

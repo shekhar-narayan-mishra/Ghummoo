@@ -6,8 +6,11 @@ const { badRequest, notFoundErr, forbidden, conflict } = require('../utils/http'
 const { bookingReference, isEmail, isPhone, EMERGENCY_CONTACT_MAX_LENGTH } = require('../utils/text');
 const { holdSeats, releaseSeats, adjustConfirmedSeats } = require('../services/seats');
 const { isBookable } = require('../services/trips');
+const { rateLimit } = require('../middleware/rateLimit');
 
 const MAX_SEATS = 10;
+// Per account, like the group report limiter: a review is written once per booking, so 10 a minute is generous.
+const reviewLimiter = rateLimit({ windowMs: 60000, max: Number(process.env.REVIEWS_PER_MIN) || 10, name: 'review', key: (req) => String(req.user._id) });
 
 router.use(verifyToken);
 
@@ -145,7 +148,7 @@ router.get('/:id/announcements', asyncHandler(async (req, res) => {
   return res.json({ success: true, data: { locked: false, items } });
 }));
 
-router.post('/:id/review', asyncHandler(async (req, res) => {
+router.post('/:id/review', reviewLimiter, asyncHandler(async (req, res) => {
   const { booking, isOwner } = await loadAccessible(req);
   if (!isOwner) throw forbidden();
   if (booking.status !== 'confirmed') throw conflict('Only confirmed trips can be reviewed');

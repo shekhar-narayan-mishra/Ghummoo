@@ -13,6 +13,7 @@ process.env.MONGODB_URI = '';
 process.env.EMBEDDED_DB_PATH = tmp;
 process.env.JWT_SECRET = 'test-secret';
 process.env.UPLOAD_DIR = path.join(tmp, 'uploads');
+process.env.RATE_LIMIT = 'off'; // one test below turns it back on to check the review limiter
 delete process.env.ANTHROPIC_API_KEY;
 delete process.env.OPENAI_API_KEY;
 delete process.env.AI_PROVIDER;
@@ -155,7 +156,6 @@ test('Only the traveller who booked can review: others get 404, the organiser 40
 test('Ratings must be whole numbers from 1 to 5', async () => {
   const { booking } = await createCompletedTrip();
   for (const rating of [0, 6, -1, 3.5, 'abc', null, undefined]) {
-    // eslint-disable-next-line no-await-in-loop
     const res = await review(traveller, booking._id, rating === undefined ? {} : { rating });
     assert.equal(res.status, 400, `rating ${JSON.stringify(rating)} is refused`);
     assert.equal(res.body.message, 'Rating must be between 1 and 5');
@@ -164,6 +164,23 @@ test('Ratings must be whole numbers from 1 to 5', async () => {
 
   const ok = await review(traveller, booking._id, { rating: '5' });
   assert.equal(ok.status, 201, 'a numeric string from a form is accepted');
+});
+
+test('Review requests are rate-limited per account', async () => {
+  const prev = process.env.RATE_LIMIT;
+  delete process.env.RATE_LIMIT;
+  try {
+    const { booking } = await createCompletedTrip();
+    const statuses = [];
+    for (let i = 0; i < 11; i += 1) statuses.push((await review(traveller, booking._id, { rating: 0 })).status);
+    assert.deepEqual(statuses.slice(0, 10), Array(10).fill(400), 'the first 10 reach the route');
+    assert.equal(statuses[10], 429, 'the 11th within a minute is limited');
+    const other = await createCompletedTrip({ travellerEmail: 'other.traveller@example.com' });
+    const unaffected = await review(otherTraveller, other.booking._id, { rating: 5 });
+    assert.equal(unaffected.status, 201, 'another account is not affected');
+  } finally {
+    process.env.RATE_LIMIT = prev;
+  }
 });
 
 test('Hidden reviews are left out of the public trip page', async () => {

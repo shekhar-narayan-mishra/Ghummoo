@@ -11,7 +11,14 @@ export function AuthProvider({ children }) {
     try { setUser(await api.get('/auth/me')); } catch { setUser(null); } finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    let ignore = false;
+    api.get('/auth/me')
+      .then((u) => { if (!ignore) setUser(u); })
+      .catch(() => { if (!ignore) setUser(null); })
+      .finally(() => { if (!ignore) setLoading(false); });
+    return () => { ignore = true; };
+  }, []);
 
   const value = useMemo(() => ({
     user,

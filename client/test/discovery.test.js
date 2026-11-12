@@ -39,6 +39,20 @@ test('filters: UI state maps to the /api/trips query without colliding with date
   assert.deepEqual(upcomingMonths(3, new Date(2026, 10, 15)), ['2026-11', '2026-12', '2027-01']);
 });
 
+test('filters: keeps legacy destination and limit without sending default sort or availability', () => {
+  assert.deepEqual(toTripParams({ destination: 'Goa', limit: 12, sort: 'departure', available: false }), {
+    destination: 'Goa', limit: 12,
+  });
+});
+
+test('filters: sends date bounds only for calendar months 01 through 12', () => {
+  for (const month of ['2027-00', '2027-13']) {
+    assert.deepEqual(toTripParams({ month, q: 'goa' }), { q: 'goa' });
+  }
+  assert.deepEqual(toTripParams({ month: '2027-01' }), { from: '2027-01-01', to: '2027-01-31' });
+  assert.deepEqual(toTripParams({ month: '2027-12' }), { from: '2027-12-01', to: '2027-12-31' });
+});
+
 const day = (n) => new Date(Date.now() + n * 86400000).toISOString();
 const card = (slug, o = {}) => ({
   slug, title: slug, categories: [], landscapes: [], durationDays: 3, priceFrom: 5000,

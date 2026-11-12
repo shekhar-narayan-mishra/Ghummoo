@@ -117,11 +117,13 @@ router.get('/reports', asyncHandler(async (req, res) => {
   const reports = await Report.find(q).sort({ createdAt: -1 }).populate('reporter', 'name email').lean();
   const pkgIds = reports.filter((r) => r.targetType === 'package').map((r) => r.targetId);
   const opIds = reports.filter((r) => r.targetType === 'operator').map((r) => r.targetId);
-  const [pkgs, ops] = await Promise.all([
+  const bookingIds = reports.filter((r) => r.targetType === 'booking').map((r) => r.targetId);
+  const [pkgs, ops, bookings] = await Promise.all([
     TripPackage.find({ _id: { $in: pkgIds } }, 'title slug status').lean(),
     Operator.find({ _id: { $in: opIds } }, 'businessName slug status').lean(),
+    Booking.find({ _id: { $in: bookingIds } }, 'reference status').lean(),
   ]);
-  const tm = new Map([...pkgs, ...ops].map((t) => [String(t._id), t]));
+  const tm = new Map([...pkgs, ...ops, ...bookings].map((t) => [String(t._id), t]));
   res.json({ success: true, data: reports.map((r) => ({ ...r, target: tm.get(String(r.targetId)) || null })) });
 }));
 

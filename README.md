@@ -85,6 +85,32 @@ Locally, all demo accounts share the password **`GhumoDemo#2026`**. Override it 
 
 Every seeded record is flagged `isDemo` and labelled "Demo" in the UI. No bookings, reviews, payments or "Verified" badges are seeded.
 
+### Run with Docker
+
+Requires Docker with Compose v2.24+. Builds the production app and runs it with MongoDB.
+
+```bash
+docker compose up --build    # http://localhost:5050
+docker compose down          # stop; data and uploads are kept in volumes
+docker compose down -v       # stop and delete data and uploads
+```
+
+The first start seeds demo data. The container runs with `NODE_ENV=production`, so the demo admin gets a random password unless `DEMO_ADMIN_PASSWORD` is set.
+
+Secrets are never built into the image. Put them in an untracked `.env` next to `docker-compose.yml` (see `server/.env.example`):
+
+| Variable | Default | Notes |
+| --- | --- | --- |
+| `JWT_SECRET` | random per start | Set it, or everyone is logged out on restart. |
+| `DEMO_PASSWORD` | `GhumoDemo#2026` | Demo accounts. |
+| `DEMO_ADMIN_PASSWORD` | random | Demo admin. |
+| `AI_PROVIDER`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `AI_MODEL` | unset | AI Package Studio. |
+| `MONGODB_URI` | `mongodb://mongo:27017/ghumo` | Set by compose. |
+| `SEED_ON_EMPTY` | `true` | Set by compose. |
+| `PORT` | `5050` | Set by compose. |
+
+Uploads are stored in `/app/server/uploads` (the `uploads` volume). The compose MongoDB is for local use and self-hosting, not a managed production database. Without compose, run the image with `MONGODB_URI` set; it does not include the embedded database.
+
 ## Configuration
 
 Copy `server/.env.example` to `server/.env`. Every variable is documented there, and none is needed locally. To try the AI features, set one provider:

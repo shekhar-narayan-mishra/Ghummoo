@@ -11,7 +11,7 @@ export function toTripParams(f = {}) {
   if (f.category) p.category = f.category;
   if (f.maxPrice) p.maxPrice = f.maxPrice;
   if (f.maxDays) p.maxDays = f.maxDays;
-  if (f.month && /^\d{4}-\d{2}$/.test(f.month)) {
+  if (typeof f.month === 'string' && /^\d{4}-(?:0[1-9]|1[0-2])$/.test(f.month)) {
     const [y, m] = f.month.split('-').map(Number);
     const last = new Date(Date.UTC(y, m, 0)).getUTCDate();
     p.from = `${f.month}-01`;

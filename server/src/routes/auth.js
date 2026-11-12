@@ -5,6 +5,7 @@ const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { isVerified } = require('../services/trips');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { badRequest } = require('../utils/http');
+const { isEmail, isPhone } = require('../utils/text');
 const { rateLimit } = require('../middleware/rateLimit');
 
 // Brute-force protection: failed sign-ins per account and IP, and new accounts per IP.
@@ -30,6 +31,15 @@ const cookieOpts = (req) => ({
   maxAge: 7 * 24 * 60 * 60 * 1000,
 });
 
+// Optional phone: empty input clears it (null); anything else must look like a phone number.
+function cleanPhone(value) {
+  if (value === undefined || value === null) return null;
+  const phone = String(value).trim();
+  if (!phone) return null;
+  if (!isPhone(phone)) throw badRequest('Phone number looks invalid. Use digits, spaces or hyphens, e.g. +91 98765 43210');
+  return phone;
+}
+
 const sign = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
 
 async function profile(user) {
@@ -45,10 +55,11 @@ router.post('/register', registerLimiter, asyncHandler(async (req, res) => {
   const { name, email, password, phone } = req.body || {};
   const role = req.body.role === 'operator' ? 'operator' : 'traveler';
   if (!name || String(name).trim().length < 2) throw badRequest('Please enter your full name');
-  if (!email || !/^\S+@\S+\.\S+$/.test(email)) throw badRequest('Please enter a valid email address');
+  if (!isEmail(email)) throw badRequest('Please enter a valid email address');
   if (!password || String(password).length < 8) throw badRequest('Password must be at least 8 characters');
+  const cleanedPhone = cleanPhone(phone);
   if (await User.exists({ email: String(email).toLowerCase().trim() })) throw badRequest('An account with this email already exists');
-  const user = await User.create({ name, email, passwordHash: String(password), role, phone: phone || null });
+  const user = await User.create({ name, email, passwordHash: String(password), role, phone: cleanedPhone });
   res.cookie('token', sign(user._id), cookieOpts(req));
   res.status(201).json({ success: true, data: await profile(user) });
 }));
@@ -76,12 +87,13 @@ router.get('/me', optionalAuth, asyncHandler(async (req, res) => {
 
 router.put('/me', verifyToken, asyncHandler(async (req, res) => {
   const { name, phone } = req.body || {};
+  const cleanedPhone = phone === undefined ? undefined : cleanPhone(phone);
   const user = await User.findById(req.user._id);
   if (name !== undefined) {
     if (String(name).trim().length < 2) throw badRequest('Please enter your full name');
     user.name = name;
   }
-  if (phone !== undefined) user.phone = phone;
+  if (cleanedPhone !== undefined) user.phone = cleanedPhone;
   await user.save();
   res.json({ success: true, data: await profile(user) });
 }));

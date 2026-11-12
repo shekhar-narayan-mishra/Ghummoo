@@ -1,0 +1,16 @@
+.git
+**/node_modules
+**/.env
+**/.env.*
+!**/.env.example
+server/.data
+server/uploads
+server/.cache
+.cache
+client/dist
+test-results
+playwright-report
+e2e/results.json
+e2e/quality-metrics.json
+**/*.log
+.DS_Store

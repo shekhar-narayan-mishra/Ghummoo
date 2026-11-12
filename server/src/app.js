@@ -30,7 +30,6 @@ app.use(helmet({
 const allowed = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map((s) => s.trim());
 app.use(cors({ origin: (origin, cb) => cb(null, !origin || allowed.includes(origin)), credentials: true }));
 app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const uploadDir = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads');
@@ -38,10 +37,14 @@ fs.mkdirSync(uploadDir, { recursive: true });
 app.use('/uploads', express.static(uploadDir, { maxAge: '7d' }));
 
 // Health reports database readiness so hosts and humans can see why the API isn't serving.
+// In production the reason (host names, raw driver errors) stays in the server logs, not in public responses.
+const hideDbError = () => process.env.NODE_ENV === 'production';
+
 app.get('/api/health', (req, res) => {
   const db = req.app.locals.db;
   const ok = !db || db.ready;
-  res.status(ok ? 200 : 503).json({ success: ok, data: { status: ok ? 'ok' : db.state, database: db ? (db.ready ? 'ready' : db.error || 'connecting') : 'ready' } });
+  const reason = db?.error && hideDbError() ? 'unavailable' : db?.error;
+  res.status(ok ? 200 : 503).json({ success: ok, data: { status: ok ? 'ok' : db.state, database: db ? (db.ready ? 'ready' : reason || 'connecting') : 'ready' } });
 });
 
 // Until the database is connected, answer API calls immediately with a readable 503
@@ -49,11 +52,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api', (req, res, next) => {
   const db = req.app.locals.db;
   if (!db || db.ready) return next();
-  return res.status(503).json({
-    success: false,
-    code: 'DB_UNAVAILABLE',
-    message: db.error ? `The server can't reach its database. ${db.error}` : 'The server is starting up. Please try again in a few seconds.',
-  });
+  let message = 'The server is starting up. Please try again in a few seconds.';
+  if (db.error) message = hideDbError() ? "The server can't reach its database right now. Please try again shortly." : `The server can't reach its database. ${db.error}`;
+  return res.status(503).json({ success: false, code: 'DB_UNAVAILABLE', message });
 });
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/trips', require('./routes/trips'));

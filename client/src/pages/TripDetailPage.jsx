@@ -204,20 +204,18 @@ function ReportButton({ trip }) {
   );
 }
 
-export default function TripDetailPage() {
-  const { slug } = useParams();
+function TripDetailView({ trip }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { data: trip, loading, error, reload } = useAsync(() => api.get(`/trips/${slug}`), [slug]);
-  const [departureId, setDepartureId] = useState(null);
+  const [departureId, setDepartureId] = useState(() => trip.departures.find((d) => d.isBookable)?._id || null);
   const [seats, setSeats] = useState(1);
   const [openDays, setOpenDays] = useState({ 0: true });
   const [sheet, setSheet] = useState(false);
 
   useEffect(() => {
-    if (trip) { setDepartureId(trip.departures.find((d) => d.isBookable)?._id || null); setSeats(1); setOpenDays({ 0: true }); }
-  }, [trip]);
-  useEffect(() => { if (trip) document.title = `${trip.title} · Ghumo AI`; return () => { document.title = 'Ghumo AI: Group trips, minus the chaos'; }; }, [trip]);
+    document.title = `${trip.title} · Ghumo AI`;
+    return () => { document.title = 'Ghumo AI: Group trips, minus the chaos'; };
+  }, [trip.title]);
   // Lift the compare tray above the mobile booking bar on this page.
   useEffect(() => {
     const root = document.documentElement;
@@ -225,10 +223,7 @@ export default function TripDetailPage() {
     return () => root.style.removeProperty('--ghumo-bottom-bar');
   }, []);
 
-  const images = useMemo(() => (trip ? [...new Set([trip.coverImage, ...(trip.images || [])].filter(Boolean))] : []), [trip]);
-
-  if (loading) return <Spinner className="py-40" label="Loading trip" />;
-  if (error) return <div className="mx-auto max-w-3xl px-4 py-24"><EmptyState icon={MapPin} title={error.status === 404 ? 'Trip not found' : 'Could not load this trip'} action={<Button to="/trips">Browse trips</Button>}>{error.status === 404 ? 'It may have been unpublished by the organiser.' : error.message}</EmptyState>{error.status !== 404 && <div className="mt-4 text-center"><Button variant="ghost" onClick={reload}>Try again</Button></div>}</div>;
+  const images = useMemo(() => [...new Set([trip.coverImage, ...(trip.images || [])].filter(Boolean))], [trip]);
 
   const onBook = () => {
     const target = `/trips/${trip.slug}/book?departure=${departureId}&seats=${seats}`;
@@ -481,4 +476,14 @@ export default function TripDetailPage() {
       </Modal>
     </div>
   );
+}
+
+export default function TripDetailPage() {
+  const { slug } = useParams();
+  const { data: trip, loading, error, reload } = useAsync(() => api.get(`/trips/${slug}`), [slug]);
+
+  if (loading) return <Spinner className="py-40" label="Loading trip" />;
+  if (error || !trip) return <div className="mx-auto max-w-3xl px-4 py-24"><EmptyState icon={MapPin} title={error?.status === 404 ? 'Trip not found' : 'Could not load this trip'} action={<Button to="/trips">Browse trips</Button>}>{error?.status === 404 ? 'It may have been unpublished by the organiser.' : error?.message}</EmptyState>{error && error.status !== 404 && <div className="mt-4 text-center"><Button variant="ghost" onClick={reload}>Try again</Button></div>}</div>;
+
+  return <TripDetailView key={trip._id} trip={trip} />;
 }

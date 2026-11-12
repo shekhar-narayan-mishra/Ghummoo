@@ -43,5 +43,5 @@
 
 ## Engineering debt
 
-- ESLint reports **50 warnings, 0 errors**: 45 are `react-refresh/only-export-components` (files that export helpers next to components; affects only hot reload in development) and 5 are `set-state-in-effect` notices. None affects production behaviour; they are left as they are rather than suppressed.
+- ESLint reports **44 warnings, 0 errors**: all 44 are `react-refresh/only-export-components` (files that export helpers next to components; affects only hot reload in development). `react-hooks/set-state-in-effect` is now configured as an error with 0 violations.
 - The `/v01` design prototype is still routed (lazy chunk, not linked from the live navigation). It should be removed or put behind a flag before a public launch.

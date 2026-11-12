@@ -11,15 +11,20 @@ import { NEXT_STEP } from '../design/BookingProgress';
 import { getMyGroups } from '../lib/groups';
 import { TripCard } from '../design/Cards';
 import { GridSkeleton } from '../design/Feedback';
+import { optionalPhoneError, PHONE_MAX_LENGTH } from '../lib/validation';
 
 function Profile() {
   const { user, refresh } = useAuth();
   const [name, setName] = useState(user.name);
   const [phone, setPhone] = useState(user.phone || '');
+  const [phoneError, setPhoneError] = useState();
   const [busy, setBusy] = useState(false);
   const save = async (e) => {
     e.preventDefault();
     if (name.trim().length < 2) return toast.error('Please enter your name');
+    const badPhone = optionalPhoneError(phone);
+    setPhoneError(badPhone);
+    if (badPhone) return null;
     setBusy(true);
     try { await api.put('/auth/me', { name, phone }); await refresh(); toast.success('Profile updated'); } catch (err) { toast.error(err.message); } finally { setBusy(false); }
     return null;
@@ -31,7 +36,7 @@ function Profile() {
       <div className="mt-4 space-y-4">
         <Input label="Full name" value={name} onChange={(e) => setName(e.target.value)} />
         <Input label="Email" value={user.email} disabled hint="Email can't be changed" />
-        <Input label="Phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <Input label="Phone" type="tel" value={phone} error={phoneError} maxLength={PHONE_MAX_LENGTH} onChange={(e) => { setPhone(e.target.value); setPhoneError(undefined); }} hint="Optional. Leave blank to remove it." autoComplete="tel" />
       </div>
       <Button type="submit" className="mt-5" loading={busy}>Save</Button>
     </form>

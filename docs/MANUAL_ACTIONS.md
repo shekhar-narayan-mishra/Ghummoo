@@ -4,6 +4,10 @@
 
 ---
 
+> **Status, 8 November 2026:**
+> - Done: PR #1 merged into `main` with all checks green; `staging` created; Dependabot alerts and security updates, private vulnerability reporting and secret scanning are on; rulesets are active on `main` and `staging` with empty bypass lists; labels created; 25 issues published (#2 to #26).
+> - Still open: M1 and M2 (rotations and revoking the pasted tokens), M3 (copyright in writing), G6 (organisation transfer, if wanted), G7 (conduct email), DCO or CLA, and GSAP.
+
 ## Critical: before anything else is made public or shared
 
 ### [ ] M1. Secure any deployment that already exists
@@ -64,7 +68,7 @@
 
 ## Required before onboarding contributors
 
-### [ ] G1. Review and commit this audit's changes, then merge V0.1 into `main`
+### [x] G1. Review and commit this audit's changes, then merge V0.1 into `main`
 - **WHAT:** Commit the local changes on `feat/ghumo-v0.1`, push the branch, open a PR into `main` and merge it.
 - **WHY:** `main` is 8 commits behind and lacks everything from V0.1 and this audit. `staging` must branch from an up-to-date `main`.
 - **WHERE:** Here: say "commit" and I'll commit with your Git identity, staging only the files listed in [EXECUTION_PROGRESS.md](EXECUTION_PROGRESS.md). Then on GitHub: **Pull requests → New pull request**, with base `main` and compare `feat/ghumo-v0.1`.
@@ -73,7 +77,7 @@
 - **SUCCESS CHECK:** The `main` branch on GitHub shows the new docs, and the **Actions** tab shows a CI run.
 - **NEXT STEP:** G2.
 
-### [ ] G2. Create the `staging` branch
+### [x] G2. Create the `staging` branch
 - **WHAT:** Create `staging` from the updated `main`.
 - **WHY:** Contributor PRs target `staging` ([BRANCHING_AND_RELEASE_WORKFLOW.md](BRANCHING_AND_RELEASE_WORKFLOW.md)). Dependabot is configured to target it and fails until it exists.
 - **WHERE:** A terminal.
@@ -87,7 +91,7 @@
 - **SUCCESS CHECK:** `staging` appears under **Code → Branches**.
 - **NEXT STEP:** G3.
 
-### [ ] G3. Turn on the security features (free for public repositories)
+### [x] G3. Turn on the security features (free for public repositories)
 - **WHERE:** The repository → **Settings → Security** section → **Advanced Security** (called **Code security** on some accounts).
 - **HOW:** Click **Enable** for each of:
   1. **Private vulnerability reporting.**
@@ -99,7 +103,7 @@
 - **SUCCESS CHECK:** The **Security** tab shows "Report a vulnerability". Pushing a test commit containing a fake `ghp_…` token is blocked (then delete the test commit locally).
 - **NEXT STEP:** G4.
 
-### [ ] G4. Allow the workflows to run
+### [x] G4. Allow the workflows to run
 - **WHERE:** **Settings → Actions → General**.
 - **HOW:**
   - Under **Actions permissions**, choose **Allow all actions and reusable workflows**. Or choose "Allow … and select non-…", and allow `actions/*`, `github/codeql-action/*` and `gitleaks/gitleaks-action@*`.
@@ -109,7 +113,7 @@
 - **SUCCESS CHECK:** The **Actions** tab shows green runs of "CI" and "CodeQL" on `main`.
 - **NEXT STEP:** G5. Note: if the repository is ever moved into a GitHub **organisation**, gitleaks-action needs a free licence key as a secret named `GITLEAKS_LICENSE`. Personal repositories don't.
 
-### [ ] G5. Branch protection (rulesets)
+### [x] G5. Branch protection (rulesets)
 - **WHERE:** **Settings → Rules → Rulesets → New ruleset → New branch ruleset**.
 - **HOW (ruleset 1, "main"):**
   1. Ruleset name: `main`. Enforcement status: **Active**.
@@ -161,7 +165,7 @@
 - **SUCCESS CHECK:** `grep CONDUCT_CONTACT_EMAIL CODE_OF_CONDUCT.md` returns nothing.
 - **NEXT STEP:** G8.
 
-### [ ] G8. Labels, then issues
+### [x] G8. Labels, then issues
 - **WHAT:** Create the labels, review the issue drafts, then publish the ones you approve.
 - **WHERE:** A terminal with the GitHub CLI.
 - **HOW:**

@@ -7,7 +7,7 @@
 // The password is hashed by the User model exactly like a normal sign-up. Existing sessions stay
 // valid until they expire (JWT_EXPIRES_IN, default 7 days); rotate JWT_SECRET on the host to end
 // them immediately.
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), quiet: true });
 const { connectDB, disconnectDB } = require('./config/db');
 const { User } = require('./models');
 

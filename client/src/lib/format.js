@@ -42,10 +42,15 @@ export const CATEGORY_LABELS = {
   cultural: 'Culture & heritage', beach: 'Beaches', wildlife: 'Wildlife', spiritual: 'Spiritual', trek: 'Treks',
 };
 
+// True only when the URL's host really is Unsplash's image CDN (not just a URL containing that text).
+export function isUnsplash(url) {
+  try { return new URL(url).hostname === 'images.unsplash.com'; } catch { return false; }
+}
+
 // Request a resized Unsplash image; other URLs pass through unchanged.
 export function sized(url, w) {
   if (!url) return url;
-  if (url.includes('images.unsplash.com')) return url.replace(/([?&])w=\d+/, `$1w=${w}`);
+  if (isUnsplash(url)) return url.replace(/([?&])w=\d+/, `$1w=${w}`);
   return url;
 }
 

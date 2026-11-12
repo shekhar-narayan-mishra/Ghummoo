@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useId, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertCircle, CheckCircle2, Info, Loader2, X, TriangleAlert, ImageOff } from 'lucide-react';
-import { sized } from '../lib/format';
+import { isUnsplash, sized } from '../lib/format';
 
 export const cx = (...c) => c.filter(Boolean).join(' ');
 
@@ -227,12 +227,12 @@ export function SafeImage({ src, alt, className, sizes = '100vw', widths = [480,
       </div>
     );
   }
-  const isUnsplash = src.includes('images.unsplash.com');
+  const fromUnsplash = isUnsplash(src);
   return (
     <img
-      src={isUnsplash ? sized(src, widths[1] || 800) : src}
-      srcSet={isUnsplash ? widths.map((w) => `${sized(src, w)} ${w}w`).join(', ') : undefined}
-      sizes={isUnsplash ? sizes : undefined}
+      src={fromUnsplash ? sized(src, widths[1] || 800) : src}
+      srcSet={fromUnsplash ? widths.map((w) => `${sized(src, w)} ${w}w`).join(', ') : undefined}
+      sizes={fromUnsplash ? sizes : undefined}
       alt={alt}
       loading={eager ? 'eager' : 'lazy'}
       fetchPriority={eager ? 'high' : undefined}

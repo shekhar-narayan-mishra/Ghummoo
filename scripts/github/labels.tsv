@@ -13,3 +13,6 @@ devops	c5def5	CI, Docker, deployment
 easy	c2e0c6	A few hours; one area of the code
 medium	fef2c0	A day or more; several modules
 hard	f9d0c4	Multi-day; design discussion first
+needs-tests	fbca04	Set by the PR bot: application code changed without a test change
+needs-careful-review	d93f0b	Set by the PR bot: workflows, dependencies, auth or other sensitive files changed
+dco-maintainer-signoff	5319e7	Owner certifies unsigned commits under DCO clause (b); see CONTRIBUTING.md

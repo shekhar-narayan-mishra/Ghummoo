@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
+const { PHONE_MAX_LENGTH, EMERGENCY_CONTACT_MAX_LENGTH } = require('../utils/text');
 
 // Traveler is stored as a subdocument: a traveller only exists in the context of one booking.
 const travelerSchema = new mongoose.Schema({
   fullName: { type: String, required: [true, 'Traveller name is required'], trim: true, maxlength: 100 },
   age: { type: Number, min: 1, max: 110, required: [true, 'Traveller age is required'] },
   gender: { type: String, enum: ['female', 'male', 'other', 'prefer_not'], default: 'prefer_not' },
-  phone: { type: String, trim: true, default: '' },
+  phone: { type: String, trim: true, default: '', maxlength: [PHONE_MAX_LENGTH, 'Traveller phone is too long'] },
   email: { type: String, trim: true, lowercase: true, default: '' },
   idType: { type: String, trim: true, default: '' },
-  emergencyContact: { type: String, trim: true, default: '' },
+  emergencyContact: { type: String, trim: true, default: '', maxlength: [EMERGENCY_CONTACT_MAX_LENGTH, 'Emergency contact is too long'] },
 });
 
 const historySchema = new mongoose.Schema(

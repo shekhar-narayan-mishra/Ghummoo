@@ -55,7 +55,10 @@ Never commit `server/.env`. It is gitignored.
 npm run seed    # WIPES the configured database and reloads the demo data
 ```
 
-Only run this against your local embedded database. It refuses to run when `NODE_ENV=production`.
+It prints the target it is about to wipe. It refuses, before connecting, when `NODE_ENV=production`
+or when `MONGODB_URI` points at anything but the local machine (`localhost`, `127.0.0.1`, `::1`,
+or the embedded database); every `mongodb+srv://` URI is treated as remote. Pass `--force` to
+confirm a deliberate wipe: `npm run seed -- --force`.
 
 ## Production-like run
 

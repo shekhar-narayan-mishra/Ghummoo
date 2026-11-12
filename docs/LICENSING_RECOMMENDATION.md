@@ -1,6 +1,6 @@
 # Ghumo AI: licensing recommendation
 
-*Status: **DECIDED, 8 November 2026: AGPL-3.0-only for the repository**, chosen by the owners. `LICENSE` (the verbatim gnu.org text), `TRADEMARKS.md` and the `package.json` licence fields are prepared locally, waiting for approval to commit. Copyright line: "Copyright (C) 2026 shekhar-narayan-mishra and vedansha07". Still open: the written copyright agreement (L1), legacy contributors (L4), DCO or CLA (L6) and GSAP (§3). This is not legal advice.*
+*Status: **DECIDED, 8 November 2026: AGPL-3.0-only for the repository**, chosen by the owners. `LICENSE` (the verbatim gnu.org text), `TRADEMARKS.md` and the `package.json` licence fields are prepared locally, waiting for approval to commit. Copyright line: "Copyright (C) 2026 shekhar-narayan-mishra and vedansha07". **Contributor terms: DCO (9 November 2026)**, with no CLA. Still open: the written copyright agreement (L1), legacy contributors (L4) and GSAP (§3). This is not legal advice.*
 
 ## 1. Why this is urgent
 

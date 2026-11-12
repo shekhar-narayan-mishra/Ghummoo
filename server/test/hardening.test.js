@@ -207,3 +207,69 @@ test('Image uploads (multer 2): a valid image is stored; wrong type, oversize an
   assert.match((await tooBig.json()).message, /smaller than 5 MB/);
   assert.equal((await upload(jpeg, 'photo.jpg', {})).status, 401, 'signed-out upload refused');
 });
+
+test('Email validation is linear: a crafted 1 MB-scale email is rejected quickly (CodeQL js/polynomial-redos)', async () => {
+  const { isEmail } = require('../src/utils/text');
+  assert.equal(isEmail('priya@example.com'), true);
+  assert.equal(isEmail('no-at-sign.example.com'), false);
+  assert.equal(isEmail(`${'a'.repeat(250)}@b.co`), false, 'over 254 characters');
+  assert.equal(isEmail({ $ne: '' }), false);
+
+  const hostile = '!@'.repeat(200000); // 400,000 characters; the old regex needed minutes on input this size
+  let t = Date.now();
+  assert.equal(isEmail(hostile), false);
+  assert.ok(Date.now() - t < 50, 'helper rejects instantly');
+
+  t = Date.now();
+  const reg = await client().post('/api/auth/register', { name: 'Slow Loris', email: hostile, password: 'long-enough-1' });
+  assert.equal(reg.status, 400);
+  assert.ok(Date.now() - t < 1500, `register answered in ${Date.now() - t} ms`);
+});
+
+test('Bookings reject a non-string departure id; booking references are well-formed', async () => {
+  const trav = client();
+  assert.equal((await trav.login('traveller@ghumo.demo')).status, 200);
+  const r = await trav.post('/api/bookings', { departureId: { $gt: '' }, seats: 1, travelers: [{ fullName: 'Test Person', age: 30 }], contact: { name: 'T', email: 't@example.com', phone: '+91 90000 11111' } });
+  assert.equal(r.status, 400);
+
+  const { bookingReference } = require('../src/utils/text');
+  const seen = new Set();
+  for (let i = 0; i < 3000; i += 1) {
+    const ref = bookingReference();
+    assert.match(ref, /^GHM-[A-HJ-NP-Z2-9]{6}$/);
+    for (const ch of ref.slice(4)) seen.add(ch);
+  }
+  assert.equal(seen.size, 31, 'every symbol of the 31-character alphabet is used');
+});
+
+test('The API accepts JSON only: form-encoded bodies are not parsed', async () => {
+  const res = await fetch(`${base}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: `email=traveller%40ghumo.demo&password=${encodeURIComponent(DEMO_PASSWORD)}`,
+  });
+  assert.equal(res.status, 400, 'a cross-site HTML form cannot sign anyone in');
+});
+
+test('Database errors are hidden from public responses in production, shown in development', async () => {
+  const c = client();
+  const saved = { env: process.env.NODE_ENV, db: app.locals.db };
+  app.locals.db = { ready: false, state: 'error', error: 'Could not find the MongoDB host (mongodb+srv://***@secret-host.example.net/x)' };
+  try {
+    for (const env of ['production', 'development']) {
+      process.env.NODE_ENV = env;
+      const health = await c.get('/api/health');
+      const gated = await c.get('/api/trips');
+      assert.equal(health.status, 503);
+      assert.equal(health.body.success, false);
+      assert.equal(health.data.status, 'error', 'host health checks keep reading the same state');
+      assert.equal(gated.status, 503);
+      assert.equal(gated.body.code, 'DB_UNAVAILABLE');
+      const leaks = health.text.includes('secret-host') || gated.text.includes('secret-host');
+      assert.equal(leaks, env !== 'production', `${env}: detailed reason ${env === 'production' ? 'hidden' : 'shown'}`);
+    }
+  } finally {
+    if (saved.env === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = saved.env;
+    if (saved.db === undefined) delete app.locals.db; else app.locals.db = saved.db;
+  }
+});

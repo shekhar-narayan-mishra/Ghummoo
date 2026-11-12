@@ -94,7 +94,6 @@ Whether any deployment exists at all is unknown to me. If none does, M1 is unnec
 | --- | --- | --- | --- |
 | L1 | **Copyright ownership in writing.** Both founders are the project's owners and repository admins (see [GOVERNANCE.md](../GOVERNANCE.md)), but all 36 commits are by `shekhar-narayan-mishra`. Who holds the copyright: both founders jointly, or a company? Has `vedansha07` contributed code, designs or content outside Git? A short written agreement between the two of you settles it | Both | Choosing any licence |
 | L4 | Did anyone else (team-mates, a college, a course) write code in the legacy *Ghummoo* project (`backup/ghummoo-legacy`, commits before `56ad883`) that still exists? | Founders | The licence; possibly removing code |
-| L6 | DCO or CLA? A CLA is needed only if you may sell a closed licence of the app later. It must be decided before the first outside PR merges | Both | Merging outside PRs |
 | L7 | Brand: are the "Ghumo AI" name, logo and the custom landmark and landscape illustrations excluded from the code licence? Is the name protected (a trademark search or filing)? | Both | `TRADEMARKS.md` |
 | L8 | Who wrote the Explore India copy (`server/src/content/india.js`)? Under what licence should it be released (CC BY 4.0, or all rights reserved)? | Founders | The content licence |
 | L9 | **GSAP and the AGPL.** GSAP's licence is not GPL-compatible, and the built client bundles it. Either replace it (issue `medium/14`; it is used in one module) or add a lawyer-drafted AGPL §7 permission | Both | Clean redistribution of the built app under the AGPL |
@@ -107,6 +106,7 @@ Whether any deployment exists at all is unknown to me. If none does, M1 is unnec
 | # | Question | Resolution |
 | --- | --- | --- |
 | L2 | `vedansha07`'s role | **Resolved 8 November 2026:** `shekhar-narayan-mishra` and `vedansha07` are both project owners and repository admins, so both must approve owner-level decisions. Copyright stays open under L1 |
+| L6 | DCO or CLA | **Resolved 9 November 2026: DCO.** Contributors sign off each commit (`git commit -s`); the `DCO sign-off` CI check enforces it. No CLA, so all contributions stay AGPL-3.0 |
 | L5 | Licence choice | **Resolved 8 November 2026:** AGPL-3.0-only. Copyright (C) 2026 shekhar-narayan-mishra and vedansha07. Files are prepared locally, waiting for a commit approval |
 | L3 | CoNSTruct 2.0 terms | **Resolved 8 November 2026:** the owners confirm it was a competition Ghumo AI took part in, with no ownership restrictions or agreements attached. It is no longer a legal concern |
 
@@ -193,7 +193,7 @@ git commit -m "chore: license under AGPL-3.0-only" -m "Copyright (C) 2026 shekha
 ## 8. What must be resolved before inviting external contributors
 
 - [ ] **L1 and L4:** copyright ownership agreed in writing by both owners; legacy *Ghummoo* contributors checked. (L2 and L3 are resolved.)
-- [ ] **L5 and L6:** AGPL-3.0 chosen ✅; `LICENSE` committed and merged ⏳; DCO or CLA decided, and CONTRIBUTING updated to match.
+- [ ] **L5 and L6:** AGPL-3.0 chosen ✅; `LICENSE` committed and merged ⏳; DCO chosen ✅ and CONTRIBUTING updated ✅; make **DCO sign-off** a required check.
 - [ ] **L9:** GSAP replaced (`medium/14`) or a §7 permission added.
 - [ ] **L7:** brand exclusion decided, and `TRADEMARKS.md` added.
 - [ ] **M1 and M2:** any existing deployment's admin password and `JWT_SECRET` rotated; any shared tokens or keys revoked.

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Check, CalendarDays, Minus, Plus, ShieldAlert, X, MapPin } from 'lucide-react';
@@ -7,6 +7,7 @@ import useAsync from '../lib/useAsync';
 import { useAuth } from '../lib/auth';
 import { Button, Input, Select, Textarea, Notice, Spinner, EmptyState, SafeImage, cx } from '../components/ui';
 import { money, dateRange, durationLong } from '../lib/format';
+import { isPhone, optionalPhoneError, PHONE_MAX_LENGTH, EMERGENCY_CONTACT_MAX_LENGTH } from '../lib/validation';
 
 const STEPS = ['Departure', 'Travellers', 'Review'];
 const blankTraveller = () => ({ fullName: '', age: '', gender: 'prefer_not', phone: '', email: '', emergencyContact: '' });
@@ -18,6 +19,9 @@ function validateTravellers(list) {
     const age = Number(t.age);
     if (!Number.isInteger(age) || age < 1 || age > 110) e.age = 'Enter a valid age';
     if (t.email && !/^\S+@\S+\.\S+$/.test(t.email)) e.email = 'Email looks invalid';
+    const phoneError = optionalPhoneError(t.phone);
+    if (phoneError) e.phone = phoneError;
+    if (t.emergencyContact.trim().length > EMERGENCY_CONTACT_MAX_LENGTH) e.emergencyContact = `Keep it under ${EMERGENCY_CONTACT_MAX_LENGTH} characters`;
     return e;
   });
   return errs.some((e) => Object.keys(e).length) ? errs : null;
@@ -26,7 +30,7 @@ function validateContact(c) {
   const e = {};
   if (c.name.trim().length < 2) e.name = 'Required';
   if (!/^\S+@\S+\.\S+$/.test(c.email)) e.email = 'Enter a valid email';
-  if (!/^[+\d][\d\s-]{7,16}$/.test(c.phone.trim())) e.phone = 'Enter a valid phone number';
+  if (!isPhone(c.phone)) e.phone = 'Enter a valid phone number';
   return Object.keys(e).length ? e : null;
 }
 
@@ -37,31 +41,87 @@ export default function BookPage() {
   const { user } = useAuth();
   const { data: trip, loading, error } = useAsync(() => api.get(`/trips/${slug}`), [slug]);
 
+  const initialDeparture = params.get('departure');
+  const initialSeats = Math.max(1, Number(params.get('seats')) || 1);
+
   const [step, setStep] = useState(0);
-  const [departureId, setDepartureId] = useState(params.get('departure'));
-  const [seats, setSeats] = useState(Math.max(1, Number(params.get('seats')) || 1));
-  const [travellers, setTravellers] = useState([blankTraveller()]);
+  const [departureId, setDepartureId] = useState(initialDeparture);
+  const [seats, setSeats] = useState(initialSeats);
+  const [travellers, setTravellers] = useState(() => {
+    const list = [blankTraveller()];
+    if (user?.name) {
+      list[0] = { ...list[0], fullName: user.name, email: user.email || '', phone: user.phone || '' };
+    }
+    while (list.length < initialSeats) list.push(blankTraveller());
+    return list;
+  });
   const [contact, setContact] = useState({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '' });
   const [special, setSpecial] = useState('');
   const [agree, setAgree] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  const dep = useMemo(() => trip?.departures.find((d) => d._id === departureId), [trip, departureId]);
+  const firstBookable = useMemo(() => trip?.departures.find((d) => d.isBookable) || null, [trip]);
+  const chosenDep = useMemo(() => trip?.departures.find((d) => d._id === departureId) || null, [trip, departureId]);
+  const dep = chosenDep?.isBookable ? chosenDep : firstBookable;
   const maxSeats = dep ? Math.min(10, dep.seatsAvailable) : 10;
+  const effectiveSeats = Math.max(1, Math.min(seats, maxSeats));
 
-  useEffect(() => {
-    if (trip && (!dep || !dep.isBookable)) setDepartureId(trip.departures.find((d) => d.isBookable)?._id || null);
-  }, [trip, dep]);
-  useEffect(() => { if (seats > maxSeats) setSeats(Math.max(1, maxSeats)); }, [maxSeats, seats]);
-  useEffect(() => {
+  const changeSeats = (count, maxLimit = maxSeats) => {
+    const nextCount = Math.max(1, Math.min(maxLimit, count));
+    setSeats(nextCount);
     setTravellers((list) => {
-      const next = list.slice(0, seats);
-      while (next.length < seats) next.push(blankTraveller());
-      if (!next[0].fullName && user?.name && list.length === 1 && !list[0].fullName) next[0] = { ...next[0], fullName: user.name, email: user.email, phone: user.phone || '' };
+      const next = list.slice(0, nextCount);
+      while (next.length < nextCount) next.push(blankTraveller());
       return next;
     });
-  }, [seats, user]);
+  };
+
+  const handleDepartureChange = (id) => {
+    setDepartureId(id);
+    const selected = trip?.departures.find((d) => d._id === id);
+    if (selected) {
+      const newMax = Math.min(10, selected.seatsAvailable);
+      if (seats > newMax) {
+        changeSeats(Math.max(1, newMax), newMax);
+      }
+    }
+  };
+
+  const [prevTrip, setPrevTrip] = useState(trip);
+  if (trip !== prevTrip) {
+    setPrevTrip(trip);
+    if (trip && seats > maxSeats) {
+      const clamped = Math.max(1, maxSeats);
+      setSeats(clamped);
+      setTravellers((list) => {
+        const next = list.slice(0, clamped);
+        while (next.length < clamped) next.push(blankTraveller());
+        return next;
+      });
+    }
+  }
+
+  const [prevUser, setPrevUser] = useState(user);
+  if (user !== prevUser) {
+    setPrevUser(user);
+    if (user?.name && travellers.length === 1 && !travellers[0].fullName) {
+      setTravellers((list) => {
+        if (list.length === 1 && !list[0].fullName) {
+          return [{ ...list[0], fullName: user.name, email: user.email || '', phone: user.phone || '' }];
+        }
+        return list;
+      });
+    }
+    if (user?.name && !contact.name) {
+      setContact((prev) => ({
+        ...prev,
+        name: prev.name || user.name,
+        email: prev.email || user.email || '',
+        phone: prev.phone || user.phone || '',
+      }));
+    }
+  }
 
   if (loading) return <Spinner className="py-40" />;
   if (error || !trip) return <div className="mx-auto max-w-2xl px-4 py-24"><EmptyState title="Trip not available" action={<Button to="/trips">Browse trips</Button>}>{error?.message}</EmptyState></div>;
@@ -74,7 +134,8 @@ export default function BookPage() {
       if (!dep || !dep.isBookable) return toast.error('Please choose an available departure');
       setStep(1);
     } else if (step === 1) {
-      const tErr = validateTravellers(travellers);
+      const activeTravellers = travellers.slice(0, effectiveSeats);
+      const tErr = validateTravellers(activeTravellers);
       const cErr = validateContact(contact);
       setErrors({ travellers: tErr, contact: cErr });
       if (tErr || cErr) return toast.error('Please fix the highlighted fields');
@@ -89,8 +150,8 @@ export default function BookPage() {
     setSubmitting(true);
     try {
       const booking = await api.post('/bookings', {
-        departureId: dep._id, seats,
-        travelers: travellers.map((t) => ({ ...t, age: Number(t.age) })),
+        departureId: dep._id, seats: effectiveSeats,
+        travelers: travellers.slice(0, effectiveSeats).map((t) => ({ ...t, age: Number(t.age) })),
         contact, specialRequests: special,
       });
       navigate(`/bookings/${booking._id}?new=1`, { replace: true });
@@ -100,7 +161,7 @@ export default function BookPage() {
     }
   };
 
-  const total = dep ? dep.price * seats : 0;
+  const total = dep ? dep.price * effectiveSeats : 0;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
@@ -124,8 +185,8 @@ export default function BookPage() {
               <h2 className="text-xl font-extrabold">Choose your departure</h2>
               <div className="mt-4 grid gap-2" role="radiogroup">
                 {trip.departures.map((d) => (
-                  <button key={d._id} type="button" role="radio" aria-checked={d._id === departureId} disabled={!d.isBookable} onClick={() => setDepartureId(d._id)}
-                    className={cx('flex items-center justify-between gap-3 rounded-2xl border px-4 py-3.5 text-left transition', d._id === departureId ? 'border-brand bg-peach/40 ring-2 ring-brand/20' : 'border-line hover:border-brand-soft', !d.isBookable && 'cursor-not-allowed opacity-50')}>
+                  <button key={d._id} type="button" role="radio" aria-checked={d._id === dep?._id} disabled={!d.isBookable} onClick={() => handleDepartureChange(d._id)}
+                    className={cx('flex items-center justify-between gap-3 rounded-2xl border px-4 py-3.5 text-left transition', d._id === dep?._id ? 'border-brand bg-peach/40 ring-2 ring-brand/20' : 'border-line hover:border-brand-soft', !d.isBookable && 'cursor-not-allowed opacity-50')}>
                     <span><span className="flex items-center gap-2 font-bold"><CalendarDays className="size-4 text-brand" />{dateRange(d.startDate, d.endDate)}</span>
                       <span className="text-[13px] font-semibold text-subtle">{d.isBookable ? `${d.seatsAvailable} seats left` : d.seatsAvailable === 0 ? 'Sold out' : 'Closed'}</span></span>
                     <span className="num font-extrabold">{money(d.price, trip.currency)}</span>
@@ -135,9 +196,9 @@ export default function BookPage() {
               <div className="mt-6 flex items-center justify-between rounded-2xl bg-sand p-4">
                 <div><p className="font-bold">Number of travellers</p><p className="text-[13px] text-subtle">{dep ? `Up to ${maxSeats} for this departure` : 'Select a departure first'}</p></div>
                 <div className="flex items-center gap-1 rounded-full bg-white p-1 ring-1 ring-line">
-                  <button type="button" onClick={() => setSeats(Math.max(1, seats - 1))} disabled={seats <= 1} className="grid size-9 place-items-center rounded-full hover:bg-sand disabled:opacity-40" aria-label="Fewer travellers"><Minus className="size-4" /></button>
-                  <span className="num w-8 text-center text-lg font-extrabold">{seats}</span>
-                  <button type="button" onClick={() => setSeats(Math.min(maxSeats, seats + 1))} disabled={seats >= maxSeats} className="grid size-9 place-items-center rounded-full hover:bg-sand disabled:opacity-40" aria-label="More travellers"><Plus className="size-4" /></button>
+                  <button type="button" onClick={() => changeSeats(effectiveSeats - 1)} disabled={effectiveSeats <= 1} className="grid size-9 place-items-center rounded-full hover:bg-sand disabled:opacity-40" aria-label="Fewer travellers"><Minus className="size-4" /></button>
+                  <span className="num w-8 text-center text-lg font-extrabold">{effectiveSeats}</span>
+                  <button type="button" onClick={() => changeSeats(effectiveSeats + 1)} disabled={effectiveSeats >= maxSeats} className="grid size-9 place-items-center rounded-full hover:bg-sand disabled:opacity-40" aria-label="More travellers"><Plus className="size-4" /></button>
                 </div>
               </div>
             </section>
@@ -145,7 +206,7 @@ export default function BookPage() {
 
           {step === 1 && (
             <>
-              {travellers.map((t, i) => {
+              {travellers.slice(0, effectiveSeats).map((t, i) => {
                 const e = errors.travellers?.[i] || {};
                 return (
                   <section key={i} className="rounded-3xl border border-line bg-white p-5 sm:p-6">
@@ -158,9 +219,9 @@ export default function BookPage() {
                           <option value="prefer_not">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="other">Other</option>
                         </Select>
                       </div>
-                      <Input label="Phone" type="tel" value={t.phone} onChange={(ev) => updateT(i, { phone: ev.target.value })} hint="Optional" />
+                      <Input label="Phone" type="tel" value={t.phone} error={e.phone} maxLength={PHONE_MAX_LENGTH} onChange={(ev) => updateT(i, { phone: ev.target.value })} hint="Optional" />
                       <Input label="Email" type="email" value={t.email} error={e.email} onChange={(ev) => updateT(i, { email: ev.target.value })} hint="Optional" />
-                      <Input label="Emergency contact" className="sm:col-span-2" value={t.emergencyContact} onChange={(ev) => updateT(i, { emergencyContact: ev.target.value })} placeholder="Name and phone number" hint="Optional, but recommended" />
+                      <Input label="Emergency contact" className="sm:col-span-2" value={t.emergencyContact} error={e.emergencyContact} maxLength={EMERGENCY_CONTACT_MAX_LENGTH} onChange={(ev) => updateT(i, { emergencyContact: ev.target.value })} placeholder="Name and phone number" hint="Optional, but recommended" />
                     </div>
                   </section>
                 );
@@ -171,7 +232,7 @@ export default function BookPage() {
                 <div className="mt-4 grid gap-4 sm:grid-cols-3">
                   <Input label="Name" required value={contact.name} error={errors.contact?.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
                   <Input label="Email" required type="email" value={contact.email} error={errors.contact?.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
-                  <Input label="Phone" required type="tel" value={contact.phone} error={errors.contact?.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} placeholder="+91 98xxx xxxxx" />
+                  <Input label="Phone" required type="tel" value={contact.phone} error={errors.contact?.phone} maxLength={PHONE_MAX_LENGTH} onChange={(e) => setContact({ ...contact, phone: e.target.value })} placeholder="+91 98xxx xxxxx" />
                 </div>
                 <Textarea className="mt-4" label="Special requests" rows={3} value={special} onChange={(e) => setSpecial(e.target.value)} placeholder="Dietary needs, room sharing preferences, etc." hint="Optional" />
               </section>
@@ -183,7 +244,7 @@ export default function BookPage() {
               <section className="rounded-3xl border border-line bg-white p-5 sm:p-6">
                 <h2 className="text-lg font-extrabold">Travellers</h2>
                 <ul className="mt-3 divide-y divide-line">
-                  {travellers.map((t, i) => <li key={i} className="flex justify-between py-2.5 text-[15px]"><span className="font-bold">{t.fullName}</span><span className="text-subtle">{t.age} yrs</span></li>)}
+                  {travellers.slice(0, effectiveSeats).map((t, i) => <li key={i} className="flex justify-between py-2.5 text-[15px]"><span className="font-bold">{t.fullName}</span><span className="text-subtle">{t.age} yrs</span></li>)}
                 </ul>
                 <p className="mt-3 text-sm text-subtle">Contact: {contact.name} · {contact.email} · {contact.phone}</p>
                 <button type="button" className="mt-2 text-sm font-bold text-brand-ink hover:underline" onClick={() => setStep(1)}>Edit details</button>
@@ -219,7 +280,7 @@ export default function BookPage() {
               <p className="mt-1 text-sm font-semibold text-subtle">by {trip.operator.businessName} · {durationLong(trip.durationDays, trip.durationNights)}</p>
               <dl className="mt-4 space-y-2 text-[14px]">
                 <div className="flex justify-between gap-3"><dt className="text-subtle">Departure</dt><dd className="text-right font-bold">{dep ? dateRange(dep.startDate, dep.endDate) : '—'}</dd></div>
-                <div className="flex justify-between"><dt className="text-subtle">Travellers</dt><dd className="font-bold">{seats}</dd></div>
+                <div className="flex justify-between"><dt className="text-subtle">Travellers</dt><dd className="font-bold">{effectiveSeats}</dd></div>
                 <div className="flex justify-between"><dt className="text-subtle">Price per person</dt><dd className="num font-bold">{dep ? money(dep.price, trip.currency) : '—'}</dd></div>
               </dl>
               <div className="mt-4 flex items-end justify-between border-t border-line pt-4">

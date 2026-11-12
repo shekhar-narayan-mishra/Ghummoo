@@ -1,0 +1,71 @@
+# Automated first-pass review: posts one summary comment on each PR (updated on every push),
+# labels it (needs-tests, needs-careful-review), and fails the "PR checklist" check when the PR
+# targets the wrong branch or links no issue. The logic is in .github/scripts/pr-review.js.
+#
+# Security: this uses pull_request_target so it can comment on PRs from forks. It therefore
+# NEVER checks out, installs or runs code from the PR. actions/checkout below checks out the
+# BASE branch (trusted code), and the script reads only the PR's metadata and file list through
+# the API. Do not add steps that check out github.event.pull_request.head.
+#
+# Both actions are pinned to full commit SHAs because this job holds a write token. Dependabot's
+# github-actions updates (.github/dependabot.yml) keep the pins current.
+#
+# "PR checklist" is advisory and deliberately NOT a required check: its failures are messages
+# for contributors (wrong target branch, no linked issue), and maintainers can override them.
+name: PR review
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+    branches: [main, staging]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: pr-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checklist:
+    name: PR checklist
+    # Dependabot updates are reviewed through their own CI and the maintainers.
+    if: github.event.pull_request.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out the base branch (trusted code only)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+      - name: Review the PR
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const { analyse, MARKER } = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/pr-review.js`);
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const files = await github.paginate(github.rest.pulls.listFiles, { owner, repo, pull_number: pr.number, per_page: 100 });
+            const commits = await github.paginate(github.rest.pulls.listCommits, { owner, repo, pull_number: pr.number, per_page: 100 });
+            const result = analyse({ pr, files, commits, repoFullName: `${owner}/${repo}` });
+
+            // One comment per PR, edited in place.
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number, per_page: 100 });
+            // Only ever edit this workflow's own comment, never one posted by another app.
+            const mine = comments.find((c) => c.user.login === 'github-actions[bot]' && c.body.includes(MARKER));
+            if (mine) await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body: result.comment });
+            else await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body: result.comment });
+
+            const current = (pr.labels || []).map((l) => l.name);
+            const add = result.labels.add.filter((l) => !current.includes(l));
+            if (add.length) await github.rest.issues.addLabels({ owner, repo, issue_number: pr.number, labels: add });
+            for (const name of result.labels.remove.filter((l) => current.includes(l))) {
+              await github.rest.issues.removeLabel({ owner, repo, issue_number: pr.number, name });
+            }
+
+            core.summary.addRaw(result.comment);
+            await core.summary.write();
+            if (result.errors.length) core.setFailed(`${result.errors.length} problem(s) to fix. See the PR comment.`);

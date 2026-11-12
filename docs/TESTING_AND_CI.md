@@ -49,6 +49,8 @@ One e2e test, `A14–A16`, failed in an earlier run during this audit:
 | CodeQL | `.github/workflows/codeql.yml` | PRs and pushes to `main` and `staging`; weekly | JavaScript analysis with the `security-extended` query set |
 | Dependabot | `.github/dependabot.yml` | Weekly npm updates (server, client, root), monthly Actions updates | Grouped minor and patch PRs **targeting `staging`**, which must exist first |
 
+| PR review | `.github/workflows/pr-review.yml` | PRs into `main` and `staging` (not Dependabot) | **PR checklist**: posts and updates one summary comment; labels `needs-tests` and `needs-careful-review`; fails on a wrong target branch or a missing issue link. Logic in `.github/scripts/pr-review.js`, with tests in `.github/scripts/pr-review.test.js` that run in CI (`node --test .github/scripts/*.test.js`; Node 22 needs file names, not a folder). Uses `pull_request_target` and never checks out the PR's code. Actions are pinned to commit SHAs. **Advisory: not a required check** |
+
 Design choices:
 - **No new test framework.** The workflows use the existing `node --test` and Playwright.
 - **No type-checking step.** The project is plain JavaScript, so there is nothing to type-check. ESLint covers only the client until easy/10 adds server lint.

@@ -56,7 +56,7 @@ Until the database is connected (and, with the embedded database, seeded), every
 { "success": false, "code": "DB_UNAVAILABLE", "message": "The server is starting up. Please try again in a few seconds." }
 ```
 
-If the connection failed, the message is `The server can't reach its database. <reason>`. This response is sent before the router, so it is not affected by the production message rewrite.
+If the connection failed, the message is `The server can't reach its database. <reason>`. In production (`NODE_ENV=production`) the reason is left out, so host names and driver errors are not exposed, and the message is `The server can't reach its database right now. Please try again shortly.`; the reason is in the server logs. This response is sent before the router, so it is not affected by the production message rewrite.
 
 ### List filters on operator and admin endpoints
 
@@ -203,7 +203,7 @@ There is no payment gateway. Bookings are requests that an organiser confirms or
 Anonymous. Not blocked by the database-readiness gate.
 
 - **200** when the database is ready (or no readiness state is attached, as in tests): `{ success: true, data: { status: "ok", database: "ready" } }`.
-- **503** otherwise: `{ success: false, data: { status, database } }`, where `status` is the startup state (`starting`, `seeding` or `error`, set in `server/src/index.js`) and `database` is the error reason or `connecting`.
+- **503** otherwise: `{ success: false, data: { status, database } }`, where `status` is the startup state (`starting`, `seeding` or `error`, set in `server/src/index.js`) and `database` is `connecting` or the error reason. In production the error reason is replaced with `unavailable`.
 
 ## Auth (`/api/auth`)
 
@@ -872,7 +872,7 @@ Query: `status`, `q` (reference, contact name or contact email), both plain stri
 
 ### `GET /api/admin/reports`
 
-Query: `status` (plain string). **200** `data: [report + reporter: { name, email }, target]`, newest first. `target` is resolved only for `package` (`title`, `slug`, `status`) and `operator` (`businessName`, `slug`, `status`) reports; it is `null` for `booking` and `message` reports.
+Query: `status` (plain string). **200** `data: [report + reporter: { name, email }, target]`, newest first. `target` is resolved for `package` (`title`, `slug`, `status`), `operator` (`businessName`, `slug`, `status`) and `booking` (`reference`, `status`) reports; it is `null` for `message` reports. Booking target details do not include traveller contact information.
 
 ### `POST /api/admin/reports/:id/resolve`
 
@@ -889,11 +889,11 @@ Signed in, any role. Body:
 | Field | Rule |
 | --- | --- |
 | `targetType` | Required: `package`, `operator` or `booking`. |
-| `targetId` | Required. Must be an ObjectId (model validation, 400 otherwise). The route does not check that the target exists. |
+| `targetId` | Required. Must be a valid ObjectId; the target must exist. A booking can be reported only by its traveller or its organiser. |
 | `reason` | Required: `misleading`, `pricing`, `safety`, `fraud` or `other`. |
 | `details` | Optional, truncated to 2000 characters. |
 
-**201** `data`: the report (`status: "open"`). **400** `Invalid report target`, `Please choose a reason`, or a validation error.
+Five reports per user per minute. **201** `data`: the report (`status: "open"`). **400** `Invalid report target` or `Please choose a reason`. **404** `We couldn't find what you're reporting` for missing targets or bookings the user cannot access. **429** `RATE_LIMITED` when the per-user limit is exceeded.
 
 Group messages are reported through `POST /api/groups/:departureId/messages/:messageId/report` instead.
 

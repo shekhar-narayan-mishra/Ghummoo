@@ -9,22 +9,26 @@
     "start": "node src/index.js",
     "seed": "node src/seed.js",
     "test": "node --test --test-concurrency=1 test/*.test.js",
+    "lint": "eslint .",
     "migrate": "node src/migrate.js",
     "set-password": "node src/setPassword.js"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
+    "dotenv": "^18.0.9",
     "express": "^4.22.3",
-    "helmet": "^7.1.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb-memory-server": "^10.4.3",
+    "mongodb-memory-server": "^11.3.0",
     "mongoose": "^8.2.1",
     "multer": "^2.5.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "@eslint/js": "^9.39.4",
+    "eslint": "^9.39.4",
+    "globals": "^17.14.0",
+    "nodemon": "^3.1.14"
   }
 }

@@ -9,7 +9,7 @@ const { verifyToken } = require('../middleware/auth');
 const { requireRole, loadOperator } = require('../middleware/roleGuard');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { badRequest, notFoundErr, conflict, forbidden, queryFilter } = require('../utils/http');
-const { uniqueSlug, toList, escapeRegex, csvCell } = require('../utils/text');
+const { uniqueSlug, toList, escapeRegex, csvCell, isEmail } = require('../utils/text');
 const { releaseSeats, adjustConfirmedSeats } = require('../services/seats');
 
 router.use(verifyToken, requireRole('operator'));
@@ -29,7 +29,7 @@ function validateProfile(data, creating) {
   if (creating) {
     if (!data.description || String(data.description).trim().length < 30) throw badRequest('Tell travellers about your business (at least 30 characters)');
     if (!data.contactPhone) throw badRequest('Contact phone is required');
-    if (!data.contactEmail || !/^\S+@\S+\.\S+$/.test(data.contactEmail)) throw badRequest('A valid contact email is required');
+    if (!data.contactEmail || !isEmail(data.contactEmail)) throw badRequest('A valid contact email is required');
     if (!data.location) throw badRequest('Location is required');
   }
   if (data.foundedYear) {
@@ -184,16 +184,19 @@ const PKG_FIELDS = [
 
 // Validates optional links to the India content directory. Departure cities must be cities.
 async function validatePlaceRefs(data) {
-  for (const [field, label, onlyCities] of [['destinationRefs', 'Destination', false], ['departureCityRefs', 'Departure city', true]]) {
-    if (data[field] === undefined) continue;
-    const ids = Array.isArray(data[field]) ? [...new Set(data[field].map(String))] : null;
-    if (!ids || ids.some((id) => !mongoose.isValidObjectId(id))) throw badRequest(`${label} links must be a list of place IDs`);
-    if (ids.length > 12) throw badRequest(`Link at most 12 places in ${label.toLowerCase()}s`);
-    const found = await Place.find({ _id: { $in: ids }, contentStatus: 'published' }, 'kind').lean();
-    if (found.length !== ids.length) throw badRequest(`${label}: one or more places were not found`);
-    if (onlyCities && found.some((p) => p.kind !== 'city')) throw badRequest('Departure cities must be cities');
-    data[field] = ids;
-  }
+  const fields = [['destinationRefs', 'Destination', false], ['departureCityRefs', 'Departure city', true]];
+  await Promise.all(
+    fields.map(async ([field, label, onlyCities]) => {
+      if (data[field] === undefined) return;
+      const ids = Array.isArray(data[field]) ? [...new Set(data[field].map(String))] : null;
+      if (!ids || ids.some((id) => !mongoose.isValidObjectId(id))) throw badRequest(`${label} links must be a list of place IDs`);
+      if (ids.length > 12) throw badRequest(`Link at most 12 places in ${label.toLowerCase()}s`);
+      const found = await Place.find({ _id: { $in: ids }, contentStatus: 'published' }, 'kind').lean();
+      if (found.length !== ids.length) throw badRequest(`${label}: one or more places were not found`);
+      if (onlyCities && found.some((p) => p.kind !== 'city')) throw badRequest('Departure cities must be cities');
+      data[field] = ids;
+    })
+  );
 }
 
 function cleanPackage(body) {

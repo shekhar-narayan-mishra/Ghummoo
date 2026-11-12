@@ -29,4 +29,6 @@
 
 ---
 
-By submitting this PR I confirm the contribution is my own work and I agree to it being distributed under the project's licence (see CONTRIBUTING.md, "Licensing of contributions").
+- [ ] Every commit is signed off (`git commit -s`), certifying the [Developer Certificate of Origin](https://developercertificate.org). The **DCO sign-off** check enforces this.
+
+Contributions are distributed under the project's licence, AGPL-3.0 (see CONTRIBUTING.md, "Licensing of contributions").

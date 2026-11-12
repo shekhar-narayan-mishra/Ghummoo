@@ -1,6 +1,6 @@
 # GitHub issue roadmap
 
-*There are 31 drafts in `docs/github-issues/`, none published yet. Each came from a verified gap in the code, checked against the files it names. None was invented to reach a target count. Publishing instructions are in [GITHUB_ISSUE_PUBLICATION_GUIDE.md](GITHUB_ISSUE_PUBLICATION_GUIDE.md).*
+*There are 31 drafts in `docs/github-issues/`. **25 were published on 8 November 2026** (issues #2 to #26); 6 are held back on purpose (see "Held back" below). Each came from a verified gap in the code, checked against the files it names. None was invented to reach a target count. Publishing instructions are in [GITHUB_ISSUE_PUBLICATION_GUIDE.md](GITHUB_ISSUE_PUBLICATION_GUIDE.md).*
 
 ## Totals
 
@@ -13,39 +13,49 @@
 
 ## All issues
 
-| ID | Title | Area | First-timer | Depends on |
-| --- | --- | --- | --- | --- |
-| easy/01 | Validate and length-limit phone and emergency-contact fields | backend + frontend | ✅ | — |
-| easy/02 | Validate offline payment record fields before saving | backend | ✅ | after medium/07 |
-| easy/03 | Check uploaded image file signatures instead of trusting Content-Type | backend, security | | — (coordinate with medium/04) |
-| easy/04 | Make `npm run seed` refuse to wipe a remote database without `--force` | backend, devops | ✅ | — |
-| easy/05 | Hide database error details from public responses in production | backend, security | | — |
-| easy/06 | Unit tests for server text utilities | testing | ✅ | — |
-| easy/07 | Unit tests for client formatting and trip-query helpers | testing, frontend | ✅ | — |
-| easy/08 | Fix the five `set-state-in-effect` lint warnings | frontend | | coordinate with easy/09 (`lib/auth.jsx`) |
-| easy/09 | Resolve the `only-export-components` lint warnings | frontend | | after medium/08 (`main.jsx`) |
-| easy/10 | Add ESLint to the server | devops | | best before many server PRs |
-| easy/11 | Dockerfile and docker-compose with MongoDB | devops | | — |
-| easy/12 | Warn when an ungrounded seat capacity is cleared | ai | ✅ | before medium/01 and hard/01 (same file) |
-| easy/13 | Test traveller cancellation edge cases | testing | ✅ | — |
-| easy/14 | Rate-limit content reports and check the target exists | backend | ✅ | — |
-| medium/01 | Ground departure dates and durations | ai | | the order with hard/01 is agreed by maintainers |
-| medium/02 | Make offline payment recording atomic | backend | | after medium/07 |
-| medium/03 | Limit seat holds from pending booking requests | backend | | **maintainer policy decision** |
-| medium/04 | Persistent photo storage behind a storage adapter | backend | | — |
-| medium/05 | Optional MongoDB-backed rate-limit store | backend | | — |
-| medium/06 | Revocable sessions ("sign out everywhere") | backend, security | | — |
-| medium/07 | Split `routes/operator.js` (pure refactor) | architecture | | **maintainer-led; do first** |
-| medium/08 | Remove the `/v01` prototype or put it behind a flag | frontend | | **owner approval** |
-| medium/09 | Automated accessibility checks in Playwright | testing | | — |
-| medium/10 | The review flow end to end, with a completed-trip fixture | testing | | — |
-| medium/11 | Request IDs and structured request logging | backend, devops | | — |
-| medium/12 | Record a refund or acknowledgement when declining a paid booking | backend | | after medium/07 |
-| medium/13 | Make departure capacity edits atomic | backend | | after medium/07 |
-| medium/14 | Replace GSAP with CSS scroll-driven animations (AGPL compatibility) | frontend | | after medium/08 |
-| hard/01 | Extract the grounded extraction core into a package | ai, architecture | | **licence approval**; maintainer-led |
-| hard/02 | Evaluation harness for AI Package Studio | ai, testing | | **data-consent decision**; best after hard/01 |
-| hard/03 | Email notifications and password reset | backend | | **choice of email provider** |
+| ID | GitHub | Title | Area | First-timer | Depends on |
+| --- | --- | --- | --- | --- | --- |
+| easy/01 | [#2](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/2) | Validate and length-limit phone and emergency-contact fields | backend + frontend | ✅ | — |
+| easy/02 | held | Validate offline payment record fields before saving | backend | ✅ | after medium/07 |
+| easy/03 | [#3](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/3) | Check uploaded image file signatures instead of trusting Content-Type | backend, security | | — (coordinate with medium/04) |
+| easy/04 | [#4](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/4) | Make `npm run seed` refuse to wipe a remote database without `--force` | backend, devops | ✅ | — |
+| easy/05 | [#5](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/5) | Hide database error details from public responses in production | backend, security | | — |
+| easy/06 | [#6](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/6) | Unit tests for server text utilities | testing | ✅ | — |
+| easy/07 | [#7](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/7) | Unit tests for client formatting and trip-query helpers | testing, frontend | ✅ | — |
+| easy/08 | [#8](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/8) | Fix the five `set-state-in-effect` lint warnings | frontend | | coordinate with easy/09 (`lib/auth.jsx`) |
+| easy/09 | [#9](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/9) | Resolve the `only-export-components` lint warnings | frontend | | after medium/08 (`main.jsx`) |
+| easy/10 | [#10](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/10) | Add ESLint to the server | devops | | best before many server PRs |
+| easy/11 | [#11](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/11) | Dockerfile and docker-compose with MongoDB | devops | | — |
+| easy/12 | [#12](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/12) | Warn when an ungrounded seat capacity is cleared | ai | ✅ | before medium/01 and hard/01 (same file) |
+| easy/13 | [#13](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/13) | Test traveller cancellation edge cases | testing | ✅ | — |
+| easy/14 | [#14](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/14) | Rate-limit content reports and check the target exists | backend | ✅ | — |
+| medium/01 | [#15](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/15) | Ground departure dates and durations | ai | | the order with hard/01 is agreed by maintainers |
+| medium/02 | held | Make offline payment recording atomic | backend | | after medium/07 |
+| medium/03 | [#16](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/16) | Limit seat holds from pending booking requests | backend | | **maintainer policy decision** |
+| medium/04 | [#17](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/17) | Persistent photo storage behind a storage adapter | backend | | — |
+| medium/05 | [#18](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/18) | Optional MongoDB-backed rate-limit store | backend | | — |
+| medium/06 | [#19](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/19) | Revocable sessions ("sign out everywhere") | backend, security | | — |
+| medium/07 | held | Split `routes/operator.js` (pure refactor) | architecture | | **maintainer-led; do first** |
+| medium/08 | [#20](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/20) | Remove the `/v01` prototype or put it behind a flag | frontend | | **owner approval** |
+| medium/09 | [#21](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/21) | Automated accessibility checks in Playwright | testing | | — |
+| medium/10 | [#22](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/22) | The review flow end to end, with a completed-trip fixture | testing | | — |
+| medium/11 | [#23](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/23) | Request IDs and structured request logging | backend, devops | | — |
+| medium/12 | held | Record a refund or acknowledgement when declining a paid booking | backend | | after medium/07 |
+| medium/13 | held | Make departure capacity edits atomic | backend | | after medium/07 |
+| medium/14 | held | Replace GSAP with CSS scroll-driven animations (AGPL compatibility) | frontend | | after medium/08 |
+| hard/01 | [#24](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/24) | Extract the grounded extraction core into a package | ai, architecture | | **licence approval**; maintainer-led |
+| hard/02 | [#25](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/25) | Evaluation harness for AI Package Studio | ai, testing | | **data-consent decision**; best after hard/01 |
+| hard/03 | [#26](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/26) | Email notifications and password reset | backend | | **choice of email provider** |
+
+## Held back (not yet published)
+
+| Draft | Why it is held | Publish when |
+| --- | --- | --- |
+| medium/07 (split `routes/operator.js`) | Maintainer-led refactor that the next four depend on | A maintainer starts it; publish it then, for tracking |
+| easy/02, medium/02, medium/12, medium/13 | They all edit `routes/operator.js` | medium/07 is merged |
+| medium/14 (replace GSAP) | Waits on the owners' GSAP decision (L9) | The owners choose to replace GSAP |
+
+Publish them later with `xargs scripts/github/publish-issues.sh --apply` on their file names. The ledger `docs/github-issues/.published` stops anything already published from being published twice.
 
 ## Order of work
 

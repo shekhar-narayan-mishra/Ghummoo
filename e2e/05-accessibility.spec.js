@@ -24,12 +24,12 @@ const VIEWPORTS = [
 //
 // All current entries are `color-contrast` (serious): the brand palette fails WCAG AA by small
 // margins, driven by white text on the brand-orange CTA (3.05:1) which is a design decision for
-// the maintainers. Tracked in the accessibility issue; fixes must use the tokens in
+// the maintainers. Tracked in issue #75; fixes must use the tokens in
 // client/src/index.css. `/cities` and `/decide` are deliberately NOT listed — they pass today, so
 // a regression there fails the build. Remove each entry as its page is fixed. (The one other
 // violation first-run found, `label-content-name-mismatch` on the logo link, was a small bug and
 // is fixed in this PR — client/src/components/Logo.jsx — not allow-listed.)
-const CONTRAST_ISSUE = 'https://github.com/shekhar-narayan-mishra/Ghummoo/issues/21';
+const CONTRAST_ISSUE = 'https://github.com/shekhar-narayan-mishra/Ghummoo/issues/75';
 const CONTRAST_PAGES = [
   '/', '/india', '/places/jaipur', '/trips', '/trips/rishikesh-adventure-weekend',
   '/compare?trips=rishikesh-adventure-weekend,nainital-lakes-weekend', '/partners', '/login',

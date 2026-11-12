@@ -13,6 +13,8 @@ const env = {
   PORT: process.env.E2E_APP_PORT || '5198',
   MONGODB_URI: '',
   EMBEDDED_DB_PATH: dbPath,
+  // A fixed port so e2e/fixtures.js can reach this temporary database to add test-only records.
+  EMBEDDED_DB_PORT: process.env.E2E_DB_PORT || '5197',
   JWT_SECRET: 'e2e-only-secret',
   // Production seeding gives the demo admin a random password unless one is set (server/src/seedData.js).
   DEMO_ADMIN_PASSWORD: 'GhumoDemo#2026',

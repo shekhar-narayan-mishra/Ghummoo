@@ -9,6 +9,7 @@ Contributions land in `staging` and reach `main` in a release. Each release name
 Changes merged into `staging` since the last merge into `main`. They reach `main` with the next merge from `staging`.
 
 ### Added
+- Tests for the review flow: server tests for every review rule (`server/test/reviews.test.js`) and an e2e journey from a completed booking to the public trip page (`e2e/05-reviews.spec.js`), using a test-only completed-trip fixture that is never part of the seed.
 - Every response carries an `X-Request-Id`. The server writes one JSON log line per request (`time`, `level`, `requestId`, `method`, `path`, `status`, `durationMs`, `role`) and never logs query strings, bodies, cookies, IPs or personal data. 5xx responses include the `requestId`, so a user can quote it. `LOG_REQUESTS=false` turns the lines off. (#50)
 - Automated accessibility checks: axe-core (WCAG 2.1 A/AA) over the main public, traveller and organiser pages, at desktop and phone widths. Serious and critical violations fail CI; the known brand-colour contrast problem is tracked in #75. The logo link's accessible name is fixed. (#56)
 - ESLint for the server. `npm run lint` now lints the server and the client; independent sequential database writes run in parallel. (#71)
@@ -16,6 +17,7 @@ Changes merged into `staging` since the last merge into `main`. They reach `main
 - The PR review bot accepts `Closes #N` in the PR title or a commit message. (#74)
 
 ### Fixed
+- A second review for the same booking now returns 409 "You have already reviewed this trip" instead of "That booking is already in use", including when two requests arrive at once.
 - Phone and emergency-contact fields are validated and length-limited on the server and in the forms (sign-up, profile, booking contact, travellers). (#55)
 - Content reports are rate-limited (5 per user per minute), and the reported item must exist. A booking can be reported only by its traveller or its organiser. (#29)
 - React lint: the five `react-hooks/set-state-in-effect` warnings are fixed properly, and the rule is now an error. (#73)

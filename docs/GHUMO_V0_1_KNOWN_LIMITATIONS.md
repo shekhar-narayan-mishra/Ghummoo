@@ -10,7 +10,7 @@
 | Email and SMS | No notifications, password reset or email verification. | Status changes appear in My trips, booking pages, the organiser activity feed and the navbar's unread trip-group badge. |
 | Trip group delivery | Messages arrive by polling every 6 seconds, not over a socket. | Unread counts refresh on read and every 60 seconds. |
 | Trip group media | Text only: no photos, files, reactions or editing. | Messages can be deleted by their author or the organiser, and reported. |
-| Reviews | Review collection exists, but the seed has no completed trips, so it has only been exercised in API tests, not in a browser journey. | |
+| Reviews | The seed has no completed trips, so demo data shows no reviews. The review rules are covered by `server/test/reviews.test.js`, and `e2e/05-reviews.spec.js` runs the browser journey on a test-only completed trip. There is no admin screen to hide a review yet (`Review.hidden` is honoured by public reads). | |
 | Admin | No user management screen; approvals, verification and moderation only. | |
 | Languages | English only. | |
 

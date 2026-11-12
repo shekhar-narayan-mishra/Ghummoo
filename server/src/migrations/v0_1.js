@@ -22,14 +22,12 @@ async function upsertDoc(Model, slug, fields) {
 }
 
 async function upsertContent({ LANDSCAPES, CITIES, PLACES } = content) {
-  const landscapeDocs = await Promise.all(
-    LANDSCAPES.map(async (l) => {
-      const { slug, ...fields } = l;
-      const doc = await upsertDoc(Landscape, slug, fields);
-      return [slug, doc._id];
-    })
-  );
-  const landscapeIds = new Map(landscapeDocs);
+  const landscapeIds = new Map();
+  for (const l of LANDSCAPES) {
+    const { slug, ...fields } = l;
+    const doc = await upsertDoc(Landscape, slug, fields);
+    landscapeIds.set(slug, doc._id);
+  }
   const resolveLandscapes = (slugs, owner) => slugs.map((s) => {
     if (!landscapeIds.has(s)) throw new Error(`Content error: ${owner} references unknown landscape "${s}"`);
     return landscapeIds.get(s);
@@ -40,27 +38,22 @@ async function upsertContent({ LANDSCAPES, CITIES, PLACES } = content) {
     ...CITIES.map((c) => ({ ...c, kind: 'city', featured: true })),
     ...PLACES.map((p) => ({ featured: false, ...p })),
   ];
-  const placeDocs = await Promise.all(
-    all.map(async (p) => {
-      const { slug, nearby: _nearby, landscapes = [], ...fields } = p;
-      const doc = await upsertDoc(Place, slug, { ...fields, landscapes: resolveLandscapes(landscapes, slug), nearby: [] });
-      return [slug, doc._id];
-    })
-  );
-  const placeIds = new Map(placeDocs);
+  const placeIds = new Map();
+  for (const p of all) {
+    const { slug, nearby, landscapes = [], ...fields } = p;
+    const doc = await upsertDoc(Place, slug, { ...fields, landscapes: resolveLandscapes(landscapes, slug), nearby: [] });
+    placeIds.set(slug, doc._id);
+  }
   // Pass 2: nearby links.
-  await Promise.all(
-    all
-      .filter((p) => p.nearby?.length)
-      .map((p) => {
-        const ids = p.nearby.map((s) => {
-          if (!placeIds.has(s)) throw new Error(`Content error: ${p.slug} lists unknown nearby place "${s}"`);
-          if (s === p.slug) throw new Error(`Content error: ${p.slug} lists itself as nearby`);
-          return placeIds.get(s);
-        });
-        return Place.updateOne({ slug: p.slug }, { $set: { nearby: ids } });
-      })
-  );
+  for (const p of all) {
+    if (!p.nearby?.length) continue;
+    const ids = p.nearby.map((s) => {
+      if (!placeIds.has(s)) throw new Error(`Content error: ${p.slug} lists unknown nearby place "${s}"`);
+      if (s === p.slug) throw new Error(`Content error: ${p.slug} lists itself as nearby`);
+      return placeIds.get(s);
+    });
+    await Place.updateOne({ slug: p.slug }, { $set: { nearby: ids } });
+  }
   return { landscapes: landscapeIds.size, places: placeIds.size };
 }
 
@@ -108,23 +101,23 @@ async function linkPackagePlaces(pkg, index) {
 async function linkAllPackages() {
   const index = await placeIndex();
   const pkgs = await TripPackage.find({}, 'destination startLocation destinationRefs departureCityRefs').lean();
-  const updates = [];
+  let linked = 0;
   for (const pkg of pkgs) {
     const m = matchPlaces(pkg, index);
     const set = {};
     if (!pkg.destinationRefs?.length && m.destinationRefs.length) set.destinationRefs = m.destinationRefs;
     if (!pkg.departureCityRefs?.length && m.departureCityRefs.length) set.departureCityRefs = m.departureCityRefs;
     if (Object.keys(set).length) {
-      updates.push(TripPackage.updateOne({ _id: pkg._id }, { $set: set }, { timestamps: false }));
+      await TripPackage.updateOne({ _id: pkg._id }, { $set: set }, { timestamps: false });
+      linked += 1;
     }
   }
-  await Promise.all(updates);
-  return { packages: pkgs.length, linked: updates.length };
+  return { packages: pkgs.length, linked };
 }
 
 async function backfillConfirmedSeats({ all = false } = {}) {
   const deps = await TripDeparture.find(all ? {} : { confirmedSeats: { $exists: false } }, '_id').lean();
-  await Promise.all(deps.map((dep) => recountConfirmedSeats(dep._id)));
+  for (const dep of deps) await recountConfirmedSeats(dep._id);
   return { departures: deps.length };
 }
 

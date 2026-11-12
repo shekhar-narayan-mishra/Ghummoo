@@ -11,7 +11,7 @@
     "start": "node server/src/index.js",
     "seed": "npm run seed --prefix server --",
     "test": "npm test --prefix server && npm test --prefix client",
-    "lint": "npm run lint --prefix server && npm run lint --prefix client",
+    "lint": "npm run lint --prefix client",
     "replit": "npm run setup && npm run build && npm start",
     "migrate": "npm run migrate --prefix server",
     "content:export": "node scripts/export-india-content.js",

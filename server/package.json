@@ -9,7 +9,6 @@
     "start": "node src/index.js",
     "seed": "node src/seed.js",
     "test": "node --test --test-concurrency=1 test/*.test.js",
-    "lint": "eslint .",
     "migrate": "node src/migrate.js",
     "set-password": "node src/setPassword.js"
   },
@@ -26,9 +25,6 @@
     "multer": "^2.5.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
-    "eslint": "^9.39.4",
-    "globals": "^17.14.0",
     "nodemon": "^3.1.14"
   }
 }

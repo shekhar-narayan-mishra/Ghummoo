@@ -38,16 +38,16 @@ function explain(err) {
 async function connectWithRetry() {
   for (;;) {
     try {
-      // eslint-disable-next-line no-await-in-loop -- sequential database connection in retry loop
+      // eslint-disable-next-line no-await-in-loop
       const { mode } = await connectDB();
       app.locals.db = { ready: false, mode, error: null, state: 'seeding' };
       if (process.env.SEED_ON_EMPTY !== 'false' && (mode === 'embedded' || process.env.SEED_ON_EMPTY === 'true')) {
-        // eslint-disable-next-line no-await-in-loop -- sequential seed check after connection
+        // eslint-disable-next-line no-await-in-loop
         await seedIfEmpty();
       }
       // V0.1 content directory + package links + confirmed-seat counters (idempotent, non-destructive).
       if (process.env.AUTO_MIGRATE !== 'false') {
-        // eslint-disable-next-line no-await-in-loop -- sequential migration after database connection
+        // eslint-disable-next-line no-await-in-loop
         await runFoundation({ log: console.log });
       }
       app.locals.db = { ready: true, mode, error: null, state: 'ready' };
@@ -57,7 +57,7 @@ async function connectWithRetry() {
       const reason = explain(err);
       app.locals.db = { ready: false, error: reason, state: 'error' };
       console.error(`[db] ${reason} Retrying in ${RETRY_MS / 1000}s.`);
-      // eslint-disable-next-line no-await-in-loop -- backoff delay before reconnect attempt
+      // eslint-disable-next-line no-await-in-loop
       await new Promise((r) => setTimeout(r, RETRY_MS));
     }
   }

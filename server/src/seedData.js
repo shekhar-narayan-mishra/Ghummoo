@@ -287,47 +287,40 @@ async function seed() {
   users.admin = await User.create({ name: 'Ghumo Admin', email: 'admin@ghumo.demo', passwordHash: demoAdminPassword(), role: 'admin', isDemo: true });
   users.traveler = await User.create({ name: 'Priya Sharma', email: 'traveller@ghumo.demo', passwordHash: DEMO_PASSWORD, role: 'traveler', phone: '+91 90000 00000', isDemo: true });
 
-  const createdOps = await Promise.all(
-    OPERATORS.map(async (o) => {
-      const u = await User.create({ name: o.owner, email: o.email, passwordHash: DEMO_PASSWORD, role: 'operator', phone: o.contactPhone, isDemo: true });
-      const op = await Operator.create({
-        owner: u._id, businessName: o.businessName, slug: o.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, ''),
-        description: o.description, contactEmail: o.email, contactPhone: o.contactPhone, location: o.location,
-        instagram: o.instagram, foundedYear: o.foundedYear, status: o.status, isDemo: true,
-      });
-      return [o.key, op];
-    })
-  );
-  const ops = Object.fromEntries(createdOps);
+  const ops = {};
+  for (const o of OPERATORS) {
+    const u = await User.create({ name: o.owner, email: o.email, passwordHash: DEMO_PASSWORD, role: 'operator', phone: o.contactPhone, isDemo: true });
+    ops[o.key] = await Operator.create({
+      owner: u._id, businessName: o.businessName, slug: o.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, ''),
+      description: o.description, contactEmail: o.email, contactPhone: o.contactPhone, location: o.location,
+      instagram: o.instagram, foundedYear: o.foundedYear, status: o.status, isDemo: true,
+    });
+  }
   // Submitted (not yet reviewed) verification so the admin review flow can be demonstrated.
   await OperatorVerification.create({
     operator: ops.pahadi._id, registrationType: 'gst', registrationNumber: 'DEMO-GSTIN-0000', legalName: 'Wandering Pahadi Co. (demo)',
     notes: 'Demo submission: not a real registration.',
   });
 
-  await Promise.all(
-    PACKAGES.map(async (p) => {
-      const { op, departures, ...data } = p;
-      const pkg = await TripPackage.create({
-        ...data,
-        itinerary: data.itinerary.map((d, i) => ({ day: i + 1, ...d })),
-        operator: ops[op]._id,
-        slug: data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, ''),
-        status: 'published',
-        isDemo: true,
+  for (const p of PACKAGES) {
+    const { op, departures, ...data } = p;
+    const pkg = await TripPackage.create({
+      ...data,
+      itinerary: data.itinerary.map((d, i) => ({ day: i + 1, ...d })),
+      operator: ops[op]._id,
+      slug: data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, ''),
+      status: 'published',
+      isDemo: true,
+    });
+    for (const [offset, price, cap] of departures) {
+      const startDate = day(offset);
+      await TripDeparture.create({
+        package: pkg._id, operator: ops[op]._id, startDate, endDate: day(offset + data.durationDays - 1),
+        price, totalCapacity: cap, seatsAvailable: cap, bookingDeadline: day(offset - 2),
+        pickupPoint: data.pickupInfo.split('.')[0], status: 'open',
       });
-      await Promise.all(
-        departures.map(([offset, price, cap]) => {
-          const startDate = day(offset);
-          return TripDeparture.create({
-            package: pkg._id, operator: ops[op]._id, startDate, endDate: day(offset + data.durationDays - 1),
-            price, totalCapacity: cap, seatsAvailable: cap, bookingDeadline: day(offset - 2),
-            pickupPoint: data.pickupInfo.split('.')[0], status: 'open',
-          });
-        })
-      );
-    })
-  );
+    }
+  }
 
   // A draft from the pending operator, for the admin moderation demo.
   await TripPackage.create({

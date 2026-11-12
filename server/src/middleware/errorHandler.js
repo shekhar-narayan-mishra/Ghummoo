@@ -1,4 +1,4 @@
-const errorHandler = (err, req, res, next) => { // eslint-disable-line no-unused-vars -- Express error handlers require 4 parameters
+const errorHandler = (err, req, res, next) => { // eslint-disable-line no-unused-vars
   if (err.name === 'ValidationError') {
     const messages = Object.values(err.errors).map((e) => e.message);
     return res.status(400).json({ success: false, message: messages.join('. ') });

@@ -84,7 +84,7 @@ async function send(url, init, timeoutMs) {
 
 async function callAnthropic(cfg, { system, user, schema, name, maxTokens, timeoutMs }) {
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    // eslint-disable-next-line no-await-in-loop -- sequential request in retry loop
+    // eslint-disable-next-line no-await-in-loop
     const res = await send('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': cfg.key, 'anthropic-version': '2023-06-01' },
@@ -97,7 +97,7 @@ async function callAnthropic(cfg, { system, user, schema, name, maxTokens, timeo
         messages: [{ role: 'user', content: user }],
       }),
     }, timeoutMs);
-    // eslint-disable-next-line no-await-in-loop -- response body parse in retry loop
+    // eslint-disable-next-line no-await-in-loop
     const body = await res.json().catch(() => ({}));
     if (res.ok) {
       const block = (body.content || []).find((c) => c.type === 'tool_use');
@@ -106,7 +106,7 @@ async function callAnthropic(cfg, { system, user, schema, name, maxTokens, timeo
     }
     const busy = res.status === 429 || res.status === 503 || res.status === 529;
     if (!busy) throw new AiError('AI_PROVIDER_ERROR', body.error?.message || `AI provider returned ${res.status}`, 502);
-    // eslint-disable-next-line no-await-in-loop -- backoff delay before second attempt
+    // eslint-disable-next-line no-await-in-loop
     if (attempt === 0) await new Promise((r) => setTimeout(r, 800));
   }
   throw new AiError('AI_RATE_LIMITED', 'The AI provider is busy right now. Please try again in a minute.', 429);
@@ -126,18 +126,18 @@ async function callOpenAI(cfg, { system, user, schema, timeoutMs }) {
       ],
     });
     for (let attempt = 0; attempt < 2; attempt += 1) {
-      // eslint-disable-next-line no-await-in-loop -- sequential request across models/retries
+      // eslint-disable-next-line no-await-in-loop
       const res = await send(`${cfg.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${cfg.key}` },
         body: payload,
       }, timeoutMs);
-      // eslint-disable-next-line no-await-in-loop -- response body parse across models/retries
+      // eslint-disable-next-line no-await-in-loop
       const body = await res.json().catch(() => ({}));
       if (res.ok) return { data: parseJsonContent(body.choices?.[0]?.message?.content), model };
       const busy = res.status === 503 || res.status === 429;
       if (!busy) throw new AiError('AI_PROVIDER_ERROR', providerError(body).message || `AI provider returned ${res.status}`, 502);
-      // eslint-disable-next-line no-await-in-loop -- backoff delay before second attempt
+      // eslint-disable-next-line no-await-in-loop
       if (attempt === 0) await new Promise((r) => setTimeout(r, 800));
     }
   }

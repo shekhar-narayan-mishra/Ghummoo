@@ -28,6 +28,12 @@ permissions:
   contents: read
   issues: read
 
+# One run per PR at a time: a newer event cancels an older run, so a stale result (for example
+# from an event before the label was added) can't finish last and leave the check red.
+concurrency:
+  group: dco-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   dco:
     name: DCO sign-off
@@ -48,7 +54,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           remediated=0
-          if echo "$LABELS" | jq -e 'index("dco-maintainer-signoff")' >/dev/null; then remediated=1; fi
+          # Read the PR's labels now rather than trusting the event payload, which is a snapshot from
+          # when the event fired. Fall back to the payload if the API isn't reachable.
+          current=$(gh api "repos/$REPO/issues/$PR/labels" --jq '[.[].name]' 2>/dev/null || echo "$LABELS")
+          if echo "$current" | jq -e 'index("dco-maintainer-signoff")' >/dev/null; then remediated=1; fi
           missing=0
           for c in $(git rev-list --no-merges "$BASE..$HEAD"); do
             if git log -1 --format=%B "$c" | grep -qE '^Signed-off-by: .+ <[^>]+@[^>]+>$'; then

@@ -26,13 +26,6 @@ Error:
 - `message` is always present and written for the end user.
 - `code` appears at the top level only on these errors: `DB_UNAVAILABLE` (503), `RATE_LIMITED` (429) and `ONBOARDING_REQUIRED` (409).
 - `details` appears when the route attaches it. Known uses: trip-group access errors (`details.code`, see Groups), AI provider errors (`details.code`, see AI) and publish blockers (`details.blockers`).
-- `requestId` appears in the body of 5xx errors and matches the `X-Request-Id` response header (see the next section).
-
-### Request correlation (X-Request-Id)
-
-Every response — including static `/uploads/*` files and the 503 database-unavailable reply — carries an `X-Request-Id` header. A client-supplied header is echoed only when it is a safe short string (1–64 characters of `A-Za-z0-9._-`); otherwise (or when absent) the server answers with a freshly generated UUID. Users can quote this id so support can find the matching server log entry.
-
-The id is stored as `req.id` in server code. Each request writes exactly one JSON log line: `{ time, level, requestId, method, path, status, durationMs, role }`, where `path` is the route path without its query string and `role` is the authenticated role or `anonymous`. Log lines never contain query strings, request bodies, headers or any other personal data. Static files (`/assets/*`, `/uploads/*`) log at `debug` level, everything else at `info`. Set `LOG_REQUESTS=false` to turn the request lines off — see `server/.env.example`.
 
 ### Error statuses produced by shared middleware
 

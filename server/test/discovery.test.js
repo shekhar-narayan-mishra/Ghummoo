@@ -12,7 +12,6 @@ process.env.MONGODB_URI = '';
 process.env.EMBEDDED_DB_PATH = tmp;
 process.env.JWT_SECRET = 'test-secret';
 process.env.UPLOAD_DIR = path.join(tmp, 'uploads');
-process.env.LOG_REQUESTS = 'false'; // keep request-log lines out of test output
 process.env.RATE_LIMIT = 'off';
 const clearAi = () => { for (const k of ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'AI_PROVIDER', 'OPENAI_BASE_URL', 'AI_MODEL']) delete process.env[k]; };
 clearAi();

@@ -21,23 +21,10 @@ const errorHandler = (err, req, res, next) => { // eslint-disable-line no-unused
     return res.status(413).json({ success: false, message: 'Request is too large' });
   }
   const statusCode = err.statusCode || 500;
-  if (statusCode >= 500 && statusCode !== 503) {
-    // The id is what a user can quote from the client, so the log line carries it with the error.
-    // The format argument stays a constant (user values never sit in Node's format position) and
-    // JSON.stringify escapes newlines and control characters, so log entries can't be forged.
-    console.error('[error]', JSON.stringify({
-      time: new Date().toISOString(),
-      level: 'error',
-      requestId: req.id || null,
-      method: req.method,
-      path: req.path,
-      status: statusCode,
-    }), err);
-  }
+  if (statusCode >= 500 && statusCode !== 503) console.error('[error]', err);
   return res.status(statusCode).json({
     success: false,
     message: statusCode >= 500 && process.env.NODE_ENV === 'production' ? 'Something went wrong on our side' : err.message,
-    ...(statusCode >= 500 && req.id ? { requestId: req.id } : {}),
     ...(err.details ? { details: err.details } : {}),
   });
 };

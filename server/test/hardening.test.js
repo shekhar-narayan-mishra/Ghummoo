@@ -11,7 +11,6 @@ process.env.MONGODB_URI = '';
 process.env.EMBEDDED_DB_PATH = tmp;
 process.env.JWT_SECRET = 'test-secret';
 process.env.UPLOAD_DIR = path.join(tmp, 'uploads');
-process.env.LOG_REQUESTS = 'false'; // keep request-log lines out of test output
 process.env.AI_EXTRACTIONS_PER_HOUR = '3';
 delete process.env.RATE_LIMIT;
 delete process.env.ANTHROPIC_API_KEY;

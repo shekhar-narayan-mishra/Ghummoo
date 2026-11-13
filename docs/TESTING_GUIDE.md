@@ -49,6 +49,7 @@ These follow `.agents/skills/test-and-qa/SKILL.md`:
 ## End-to-end tests
 
 - The specs run **in order with one worker** because they share one seeded database. `01-traveller` creates a booking that later specs use.
+- `05-reviews` needs a trip that has already ended, which the API cannot create. `e2e/fixtures.js` connects to the temporary e2e database (fixed port, `E2E_DB_PORT`, default 5197) and adds one through `server/test/fixtures/completedTrip.js`, then removes it after the spec. Fixtures are never part of `seed()` or demo data.
 - `03-quality` checks horizontal overflow and console errors at five widths, plus reduced motion, layout shift and long tasks. It writes `e2e/quality-metrics.json`, which is gitignored.
 - `04-security` scans the built bundle for secrets, checks headers and role boundaries, and confirms that forged booking fields are ignored.
 - When a test fails, run `npx playwright show-trace test-results/<test>/trace.zip`.

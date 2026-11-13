@@ -14,6 +14,7 @@ import { Button, Input, Textarea, Select, Card, cx } from '../../components/ui';
 import { LogoPicker, REG_TYPES } from './ProfilePage';
 import { isPhone } from '../../lib/validation';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const ORGANISER_TYPES = [
   { value: 'independent', label: 'Independent organiser', hint: 'You lead or run trips yourself, often with a small team.', icon: UserRound },
   { value: 'company', label: 'Travel company', hint: 'A registered business running group departures.', icon: Building2 },

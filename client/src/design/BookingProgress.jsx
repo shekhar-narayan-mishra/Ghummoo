@@ -4,6 +4,7 @@ import { cx } from '../components/ui';
 /* Every booking state in plain words: where the request is, what happens next, and who acts.
    Mirrors the server's state machine: requested → confirmed | rejected; requested|confirmed
    → cancelled. Payment is always offline, with the organiser. */
+// eslint-disable-next-line react-refresh/only-export-components
 export const NEXT_STEP = {
   requested: 'Waiting for the organiser to confirm. Your seats are held and nothing has been charged.',
   confirmed: 'Confirmed. The organiser shares payment details directly, and trip updates appear on the booking page.',
@@ -18,6 +19,7 @@ const STEPS = [
   { key: 'travel', label: 'Travel together', hint: 'Updates on your trip board' },
 ];
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function bookingStepIndex(status) {
   return status === 'confirmed' ? 1 : 0;
 }

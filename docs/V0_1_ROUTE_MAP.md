@@ -75,7 +75,7 @@ Responses from `/india/*` are sent with `Cache-Control: public, max-age=300`.
 | `GET /india/places` | public | **New.** Every published place (summary, with aliases), for search suggestions |
 | `GET /saved`, `PUT /saved/:slug`, `DELETE /saved/:slug` | traveller | **New.** Saved trips (`User.savedTrips`). Idempotent; unpublished trips drop out, and the count is returned as `unavailable` |
 
-The client routes `/`, `/india`, `/cities`, `/places/:slug`, `/trips`, `/trips/:slug`, `/compare` and `/decide` are live and use these APIs. `/destinations` redirects to `/india`. The sample-data prototype stays at `/v01`.
+The client routes `/`, `/india`, `/cities`, `/places/:slug`, `/trips`, `/trips/:slug`, `/compare` and `/decide` are live and use these APIs. `/destinations` redirects to `/india`. The `/v01` sample-data prototype has been removed (issue #20).
 
 ### Built in the AI-discovery milestone
 

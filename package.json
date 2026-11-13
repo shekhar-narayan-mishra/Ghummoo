@@ -14,7 +14,6 @@
     "lint": "npm run lint --prefix server && npm run lint --prefix client",
     "replit": "npm run setup && npm run build && npm start",
     "migrate": "npm run migrate --prefix server",
-    "content:export": "node scripts/export-india-content.js",
     "test:e2e": "playwright test",
     "test:all": "npm test && npm run test:e2e"
   },

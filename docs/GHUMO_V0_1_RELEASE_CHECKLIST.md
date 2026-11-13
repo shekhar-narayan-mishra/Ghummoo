@@ -80,7 +80,7 @@
 
 - [ ] Move uploads to persistent storage.
 - [ ] Set `JWT_SECRET`, `MONGODB_URI`, `CLIENT_URL` and the AI provider variables on the host.
-- [ ] Remove or gate the `/v01` prototype route.
+- [x] Remove or gate the `/v01` prototype route. ✅ removed (issue #20)
 - [ ] Replace demo seed data with real, verified organisers (`isDemo` records off).
 - [ ] Decide on a refund record for declined paid bookings.
 - [ ] External deployment was **not** configured or performed in this milestone.

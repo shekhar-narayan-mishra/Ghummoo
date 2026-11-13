@@ -25,7 +25,7 @@
 | | Secret scanning and push protection, Dependabot alerts | ✅ on (Dependabot security updates and private vulnerability reporting too) |
 | **Code health** | Tests: 62 unit and API tests (56 server, 6 client) and 25 e2e tests, all passing | ✅ ([TESTING_AND_CI.md](TESTING_AND_CI.md)) |
 | | Lint: 0 errors (50 warnings, tracked as issues) | ✅ |
-| | `/v01` prototype removed or flagged | 🔒 (issue medium/08) |
+| | `/v01` prototype removed | ✅ (issue #20) |
 | | Untracked scratch files (`query_guides.js`, `server/query_guides.js`, `reorder.py`) | 🔒 the owner decides whether to delete them |
 | | Uncommitted lockfile changes that predate this audit (`client/` and root) | 🔒 review them before committing |
 | **Docs** | README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CHANGELOG | ✅ (the conduct contact email is a placeholder 🧑) |

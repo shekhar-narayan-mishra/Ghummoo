@@ -13,6 +13,7 @@ export function DesignProvider({ base = '', places = [], saved = null, children 
   return <DesignCtx.Provider value={value}>{children}</DesignCtx.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function usePaths() {
   const { base } = useContext(DesignCtx);
   return useMemo(() => ({
@@ -27,5 +28,7 @@ export function usePaths() {
   }), [base]);
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const usePlaces = () => useContext(DesignCtx).places;
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSaved = () => useContext(DesignCtx).saved;

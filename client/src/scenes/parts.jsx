@@ -99,6 +99,7 @@ export function Boat({ x, y, s = 1, hull = '#5A3B2A', sail, figure = '#3A2A22' }
 }
 
 /* Arched window used in Rajasthani and Mughal façades. */
+// eslint-disable-next-line react-refresh/only-export-components
 export const archPath = (x, y, w, h) => `M${x} ${y + h} V${y + w / 2} A${w / 2} ${w / 2} 0 0 1 ${x + w} ${y + w / 2} V${y + h} Z`;
 
 /* Scene frame: decorative by default; pass `title` to expose it as an image. */

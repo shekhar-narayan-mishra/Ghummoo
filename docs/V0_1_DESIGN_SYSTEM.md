@@ -1,9 +1,10 @@
 # Ghumo AI V0.1: design system
 
-*Warm Tangerine Glass, applied to the V0.1 prototype at `/v01`.*
+*Warm Tangerine Glass — the design system used across all traveller pages.*
 
 - **Code:** `client/src/design/` (components), `client/src/scenes/` (illustrations) and `client/src/index.css` (tokens).
 - **Motion:** see `V0_1_MOTION_GUIDELINES.md`.
+- **Note:** The `/v01` prototype that previously showcased this system has been removed (issue #20).
 
 ## 1. Principles
 
@@ -63,7 +64,7 @@ The tokens are defined once in `client/src/index.css` (`@theme`) and used throug
 | Component | File | Purpose and rules |
 | --- | --- | --- |
 | **Navbar** | `Navbar.jsx` | Sticky, and turns to glass once scrolled. Links: Explore India, Trips, Help me decide. A search button opens the search dialog, and the mobile menu is a drawer. Never hidden by animation |
-| **Search** | `SearchBox.jsx` | ARIA combobox over places (name, alias, state). Arrow keys, Enter and Escape work. Picking a place opens its page; Enter with free text goes to `/v01/trips?q=`. Comes in `lg` (hero) and `md` (dialog, results) sizes |
+| **Search** | `SearchBox.jsx` | ARIA combobox over places (name, alias, state). Arrow keys, Enter and Escape work. Picking a place opens its page; Enter with free text goes to `/trips?q=`. Comes in `lg` (hero) and `md` (dialog, results) sizes |
 | **Buttons** | `components/ui.jsx` `Button` (reused) | Variants: `primary`, `dark`, `secondary`, `ghost`, `soft`, `danger`. Sizes `sm`, `md`, `lg`. Renders a link with `to` or `href`. One primary action per region |
 | **Destination card** | `Cards.jsx` `DestinationCard` | City or destination tile with its palette and art, state, theme name and an honest trip count ("No trips listed yet") |
 | **Landscape tile** | `Cards.jsx` `LandscapeTile` | Entry into a landscape chapter, with the scene thumbnail and a solid label panel |
@@ -75,7 +76,7 @@ The tokens are defined once in `client/src/index.css` (`@theme`) and used throug
 | **AI input** | `Inputs.jsx` `AIInput` | One prompt with a character counter, suggestion chips and a note on what the assistant can see. Enter sends, Shift+Enter adds a new line. **Not a chat thread** |
 | **Preference selectors** | `Inputs.jsx` `PreferenceSelector` | Chip groups built on native radio or checkbox inputs inside a `fieldset` and `legend`. Single-select chips can be cleared by clicking again |
 | **Comparison table** | `ComparisonTable.jsx` | A real `<table>` with row headers and a sticky first column. Scrolls sideways in a focusable region. "Not stated by organiser" for gaps. No AI |
-| **Compare tray** | `Compare.jsx` | Up to 3 trips, kept in `sessionStorage`, shown as a floating ink pill. Opens `/v01/compare` once 2 or more are selected |
+| **Compare tray** | `Compare.jsx` | Up to 3 trips, kept in `sessionStorage`, shown as a floating ink pill. Opens `/compare` once 2 or more are selected |
 | **Loading skeletons** | `Feedback.jsx` `Bone`, `TripCardSkeleton`, `DestinationCardSkeleton`, `GridSkeleton` | Shaped like the final layout, `role="status"` with a hidden label. The pulse stops under reduced motion |
 | **Empty and error states** | `Feedback.jsx` `EmptyState`, `ErrorState` | An empty state always offers a next step. An error state uses `role="alert"` and offers "Try again" |
 | **Labels** | `Feedback.jsx` `SampleBadge`, `GuideLabel`, `NotStated` | Sample data, editorial content and missing values are always labelled |
@@ -98,13 +99,13 @@ The tokens are defined once in `client/src/index.css` (`@theme`) and used throug
   - No sacred symbols used as decoration.
   - Scenes are `aria-hidden` unless they carry meaning, in which case they get a descriptive `aria-label`.
   - Trip photos are used only when they show the trip's own destination; otherwise the place art stands in, labelled "no trip photo provided".
-- **Weight:** the scenes are a few KB each, gzipped inside the lazy-loaded prototype chunk. There are no image requests for artwork.
+- **Weight:** the scenes are a few KB each, gzipped inside the lazy-loaded page chunks. There are no image requests for artwork.
 
 ## 6. Content and voice
 
 - Plain, warm and specific: "No organiser lists a trip here yet", not "Nothing to see here".
 - Prices are always in ₹ per person. Dates are short ("12 Dec"). Seat counts come from listing data.
-- Editorial copy is labelled **Ghumo guide** and comes from `server/src/content/india.js`, exported to the prototype with `npm run content:export`. It contains no distances, travel times, seasons or superlatives.
+- Editorial copy is labelled **Ghumo guide** and comes from `server/src/content/india.js`. It contains no distances, travel times, seasons or superlatives.
 - "Nearby" is explained as "often visited together, not by distance".
 
 ## 7. Accessibility checklist (applies to every component)

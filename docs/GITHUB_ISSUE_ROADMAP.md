@@ -36,7 +36,7 @@
 | medium/05 | [#18](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/18) | Optional MongoDB-backed rate-limit store | backend | | — |
 | medium/06 | [#19](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/19) | Revocable sessions ("sign out everywhere") | backend, security | | — |
 | medium/07 | held | Split `routes/operator.js` (pure refactor) | architecture | | **maintainer-led; do first** |
-| medium/08 | [#20](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/20) | Remove the `/v01` prototype or put it behind a flag | frontend | | **owner approval** |
+| medium/08 | [#20](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/20) | Remove the `/v01` prototype or put it behind a flag | frontend | ✅ done | — |
 | medium/09 | [#21](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/21) | Automated accessibility checks in Playwright | testing | | — |
 | medium/10 | [#22](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/22) | The review flow end to end, with a completed-trip fixture | testing | | — |
 | medium/11 | [#23](https://github.com/shekhar-narayan-mishra/Ghummoo/issues/23) | Request IDs and structured request logging | backend, devops | | — |

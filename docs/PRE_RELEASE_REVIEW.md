@@ -202,7 +202,7 @@ git commit -m "chore: license under AGPL-3.0-only" -m "Copyright (C) 2026 shekha
 - [ ] **G6:** `vedansha07`'s collaborator invitation accepted (check Settings → Collaborators). For **Admin**, move the repository into an organisation both of you own: a personal-account repository can't have a second admin. Then update the repository URLs and add `GITLEAKS_LICENSE`.
 - [ ] **G7:** the Code of Conduct contact email. **Pending: you'll give me the address, and I'll replace the placeholder only then.**
 - [ ] **medium/07:** the `operator.js` split done by a maintainer, or the issues that touch it held back.
-- [ ] **medium/03 and medium/08:** the seat-hold policy and the `/v01` prototype decided.
+- [x] **medium/08:** the `/v01` prototype removed (issue #20 ✅).
 - [ ] **G8:** issue drafts reviewed by both maintainers; labels created; approved issues published; a "Start here" issue pinned.
 - [ ] **Maintainer time** (step L3 in MANUAL_ACTIONS): who triages and reviews, on which days; a 48-hour first-response commitment for the first month.
 - [ ] `gh` signed in on this machine, if you want me to run the GitHub steps for you. Each one still needs your approval.

@@ -40,8 +40,6 @@ const OperatorInsights = lazy(() => import('./pages/operator/InsightsPage'));
 const TripGroupPage = lazy(() => import('./pages/TripGroupPage'));
 
 const AdminPage = lazy(() => import('./pages/admin/AdminPage'));
-// V0.1 design prototype (sample data only, no booking APIs).
-const V01App = lazy(() => import('./v01/V01App'));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -112,7 +110,6 @@ export default function App() {
             <Route path="insights" element={<OperatorInsights />} />
             <Route path="groups/:departureId" element={<TripGroupPage organiserView />} />
           </Route>
-          <Route path="/v01/*" element={<V01App />} />
           <Route path="/admin/*" element={<RequireRole roles={['admin']}><AdminPage /></RequireRole>} />
         </Routes>
       </Suspense>

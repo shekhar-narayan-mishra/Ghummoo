@@ -74,6 +74,25 @@ test('issue links: Closes, Fixes, Resolves and full URLs count; a bare mention d
   assert.equal(analyse({ pr: pr({ body: 'related to #4' }), files: [f('README.md')], repoFullName: REPO }).errors.length, 1);
 });
 
+test('a reference without closing ("Refs #25", "Part of #25") links the issue, with a note that it stays open', () => {
+  for (const body of ['Refs #25', 'ref: #25', 'References #25', 'Part of #25', 'part  of #25', `Refs https://github.com/${REPO}/issues/25`]) {
+    const r = analyse({ pr: pr({ body }), files: [f('README.md')], repoFullName: REPO });
+    assert.deepEqual(r.errors, [], body);
+    assert.ok(r.notes.some((n) => /leaves the issue open/.test(n)), body);
+  }
+  const inCommit = analyse({ pr: pr({ body: 'Harness' }), files: [f('README.md')], commits: [{ commit: { message: 'feat: harness\n\nRefs #25' } }], repoFullName: REPO });
+  assert.deepEqual(inCommit.errors, []);
+  const both = analyse({ pr: pr({ body: 'Closes #4\nRefs #25' }), files: [f('README.md')], repoFullName: REPO });
+  assert.ok(!both.notes.some((n) => /leaves the issue open/.test(n)), 'a closing link wins, so no "stays open" note');
+  for (const body of ['prefs #4', 'Part #4', 'see #25', '<!-- Refs #25 -->']) {
+    assert.ok(analyse({ pr: pr({ body }), files: [f('README.md')], repoFullName: REPO }).errors.some((e) => /No linked issue/.test(e)), body);
+  }
+  const hostile = `refs${' :'.repeat(100000)}x`;
+  const t = Date.now();
+  analyse({ pr: pr({ body: hostile }), files: [f('README.md')], repoFullName: REPO });
+  assert.ok(Date.now() - t < 200, `took ${Date.now() - t} ms`);
+});
+
 test('maintainers do not need a linked issue', () => {
   const r = analyse({ pr: pr({ author_association: 'OWNER', body: 'Docs tweak' }), files: [f('docs/ROADMAP.md')], repoFullName: REPO });
   assert.deepEqual(r.errors, []);

@@ -1,0 +1,32 @@
+{
+  "id": "hampi-heritage",
+  "text": "Hampi heritage trail | 3 nights, 4 days | Bengaluru to Bengaluru by overnight sleeper bus | 25 & 26 Jan batches (long weekend!) | Price ₹8,500 | Heritage hotel stay, breakfast, certified guide for Vijaya Vittala and Virupaksha temples, coracle ride | Lunch, dinner and entry tickets extra | Full refund up to 7 days before the trip",
+  "expected": {
+    "title": "Hampi heritage trail",
+    "destination": "Hampi",
+    "price": 8500,
+    "currency": "INR",
+    "durationDays": 4,
+    "durationNights": 3,
+    "departureDates": [
+      "01-25",
+      "01-26"
+    ],
+    "capacity": null,
+    "inclusions": [
+      "Overnight sleeper bus",
+      "Heritage hotel stay",
+      "Breakfast",
+      "Certified guide",
+      "Coracle ride"
+    ],
+    "exclusions": [
+      "Lunch",
+      "Dinner",
+      "Entry tickets"
+    ],
+    "pickupInfo": null,
+    "cancellationPolicy": "Full refund up to 7 days before the trip"
+  },
+  "notes": "Nights before days, and two dates sharing one month."
+}

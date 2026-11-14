@@ -1,0 +1,31 @@
+{
+  "id": "rishikesh-rafting",
+  "text": "Rishikesh rafting + camping, 2 days 1 night. Every weekend in March: 7, 14, 21 and 28 March. Rs 3,200 per person. Group size 25. Includes 16 km rafting, riverside camp, cliff jumping, meals. GST extra. Pickup: Haridwar railway station at 9 am.",
+  "expected": {
+    "title": "Rishikesh rafting and camping",
+    "destination": "Rishikesh",
+    "price": 3200,
+    "currency": "INR",
+    "durationDays": 2,
+    "durationNights": 1,
+    "departureDates": [
+      "03-07",
+      "03-14",
+      "03-21",
+      "03-28"
+    ],
+    "capacity": 25,
+    "inclusions": [
+      "16 km rafting",
+      "Riverside camp",
+      "Cliff jumping",
+      "Meals"
+    ],
+    "exclusions": [
+      "GST"
+    ],
+    "pickupInfo": "Haridwar railway station at 9 am",
+    "cancellationPolicy": null
+  },
+  "notes": "A list of days sharing one month."
+}

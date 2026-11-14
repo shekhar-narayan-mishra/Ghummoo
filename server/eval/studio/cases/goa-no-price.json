@@ -1,0 +1,29 @@
+{
+  "id": "goa-no-price",
+  "text": "Goa beach getaway for working folks 🌊 4N/5D, North Goa stays, scooter rental, sunset cruise, Dudhsagar day trip. Leaving 14 Feb from Mumbai. DM for price! Food and flights not included.",
+  "expected": {
+    "title": "Goa beach getaway",
+    "destination": "North Goa",
+    "price": null,
+    "currency": null,
+    "durationDays": 5,
+    "durationNights": 4,
+    "departureDates": [
+      "02-14"
+    ],
+    "capacity": null,
+    "inclusions": [
+      "North Goa stays",
+      "Scooter rental",
+      "Sunset cruise",
+      "Dudhsagar day trip"
+    ],
+    "exclusions": [
+      "Food",
+      "Flights"
+    ],
+    "pickupInfo": null,
+    "cancellationPolicy": null
+  },
+  "notes": "No price: any price in the output is invented."
+}

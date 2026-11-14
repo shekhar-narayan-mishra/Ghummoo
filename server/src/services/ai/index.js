@@ -240,7 +240,9 @@ function normalise(raw, text) {
   return { draft, missing, warnings: [...new Set(warnings)] };
 }
 
-async function extractPackage(text) {
+// The model's answer before any grounding or clean-up. The evaluation harness
+// (server/eval/studio) uses it to measure how often the model itself invents values.
+async function extractRaw(text) {
   const { data, provider, model } = await callStructured({
     system: systemPrompt(),
     user: `Extract the package from this post:\n\n"""${text}"""`,
@@ -250,7 +252,12 @@ async function extractPackage(text) {
     timeoutMs: 60000,
     strict: false,
   });
-  return { ...normalise(data || {}, text), provider, model };
+  return { raw: data || {}, provider, model };
 }
 
-module.exports = { extractPackage, status, normalise, numberInText, dateInText };
+async function extractPackage(text) {
+  const { raw, provider, model } = await extractRaw(text);
+  return { ...normalise(raw, text), provider, model };
+}
+
+module.exports = { extractPackage, extractRaw, status, normalise, numberInText, dateInText };

@@ -1,0 +1,33 @@
+{
+  "id": "spiti-winter",
+  "text": "❄️ SPITI WINTER EXPEDITION ❄️\n8D/7N ex Chandigarh | Batches: 20 Dec, 3 Jan, 17 Jan\n₹21,999 per head (twin sharing)\nIncludes: homestays, all meals, 4x4 Scorpio, local guide, permits\nNot included: flights, travel insurance, anything not mentioned\nOnly 10 seats per batch! Reporting 6 am at Sector 17 ISBT, Chandigarh.\nCancellation: 50% refund till 15 days before departure, no refund after.",
+  "expected": {
+    "title": "Spiti winter expedition",
+    "destination": "Spiti",
+    "price": 21999,
+    "currency": "INR",
+    "durationDays": 8,
+    "durationNights": 7,
+    "departureDates": [
+      "12-20",
+      "01-03",
+      "01-17"
+    ],
+    "capacity": 10,
+    "inclusions": [
+      "Homestays",
+      "All meals",
+      "4x4 Scorpio",
+      "Local guide",
+      "Permits"
+    ],
+    "exclusions": [
+      "Flights",
+      "Travel insurance",
+      "Anything not mentioned"
+    ],
+    "pickupInfo": "6 am at Sector 17 ISBT, Chandigarh",
+    "cancellationPolicy": "50% refund till 15 days before departure, no refund after"
+  },
+  "notes": "Every field stated. Dates have no year."
+}

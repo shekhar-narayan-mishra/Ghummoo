@@ -31,6 +31,7 @@ export function CompareProvider({ children }) {
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCompare = () => useContext(Ctx);
 
 export function CompareToggle({ trip, className, onImage, plain }) {

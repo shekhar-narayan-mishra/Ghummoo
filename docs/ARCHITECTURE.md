@@ -88,7 +88,6 @@ client/src/
   traveller/        traveller pages
   pages/            booking, trip detail, organiser (pages/operator/*), admin
   scenes/ motion/   illustrated landscapes and city scenes, lazy GSAP scroll motion
-  v01/              design prototype with sample data (to be removed; issue medium/08)
 ```
 
 ## Deployment shape

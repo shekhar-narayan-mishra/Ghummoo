@@ -92,6 +92,7 @@ function useProfileForm(initial) {
   return { form, set, errors, check, payload };
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const REG_TYPES = [['gst', 'GST registration'], ['msme', 'MSME / Udyam'], ['company', 'Company / LLP registration'], ['tourism_license', 'State tourism licence'], ['other', 'Other']];
 
 function VerificationCard({ verification, onSubmitted }) {

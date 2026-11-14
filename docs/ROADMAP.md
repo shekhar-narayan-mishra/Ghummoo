@@ -11,7 +11,7 @@ Goal: a traveller can find a real trip, understand it and request it, and the or
 - A refund trail when a paid booking is declined (medium/12).
 - Validation and small hardening fixes (easy/01 to easy/05, easy/14).
 - Split the organiser routes, to reduce merge conflicts (medium/07).
-- Decide what happens to the `/v01` prototype (medium/08).
+- Remove the `/v01` prototype (medium/08) ✅ done.
 - Tests for under-covered flows: cancellation (easy/13), reviews (medium/10), accessibility checks (medium/09).
 
 ## Next: prove AI Package Studio with real content

@@ -1,0 +1,68 @@
+# AI Package Studio evaluation against a real provider. Manual trigger only: it never runs on
+# pull requests, so forks can't reach its secrets. See server/eval/studio/README.md.
+# CI runs the same harness against the local stub on every PR (ci.yml).
+name: Studio evaluation
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: AI provider
+        type: choice
+        options: [anthropic, openai]
+        default: anthropic
+      model:
+        description: Model id (empty for the server default)
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: studio-eval
+  cancel-in-progress: false
+
+jobs:
+  evaluate:
+    name: Evaluate extraction
+    if: github.repository == 'shekhar-narayan-mishra/Ghummoo'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: studio-eval
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Install
+        run: npm ci --prefix server
+      # The private corpus (real posts, used with organisers' written consent). Without it,
+      # the run uses the synthetic sample in server/eval/studio/cases.
+      - name: Check out the private corpus
+        if: vars.STUDIO_EVAL_CORPUS_REPO != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.STUDIO_EVAL_CORPUS_REPO }}
+          token: ${{ secrets.STUDIO_EVAL_CORPUS_TOKEN }}
+          path: private-corpus
+          persist-credentials: false
+      - name: Run the evaluation
+        # An explicit bash shell adds pipefail, so a failed run isn't hidden by tee.
+        shell: bash
+        env:
+          AI_PROVIDER: ${{ inputs.provider }}
+          AI_MODEL: ${{ inputs.model }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ vars.OPENAI_BASE_URL }}
+          CORPUS_REPO: ${{ vars.STUDIO_EVAL_CORPUS_REPO }}
+          CORPUS_DIR: ${{ vars.STUDIO_EVAL_CORPUS_DIR }}
+        run: |
+          corpus="server/eval/studio/cases"
+          if [ -n "$CORPUS_REPO" ]; then corpus="private-corpus/${CORPUS_DIR:-.}"; fi
+          # Prints only the summary table: no captions, keys or per-case values.
+          npm run eval:studio --prefix server -- --corpus "$GITHUB_WORKSPACE/$corpus" --out "$RUNNER_TEMP/studio-eval.json" | tee "$RUNNER_TEMP/table.txt"
+          { echo '```'; cat "$RUNNER_TEMP/table.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

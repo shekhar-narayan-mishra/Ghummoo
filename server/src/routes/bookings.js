@@ -6,8 +6,11 @@ const { badRequest, notFoundErr, forbidden, conflict } = require('../utils/http'
 const { bookingReference, isEmail, isPhone, EMERGENCY_CONTACT_MAX_LENGTH } = require('../utils/text');
 const { holdSeats, releaseSeats, adjustConfirmedSeats } = require('../services/seats');
 const { isBookable } = require('../services/trips');
+const { rateLimit } = require('../middleware/rateLimit');
 
 const MAX_SEATS = 10;
+// Per account, like the group report limiter: a review is written once per booking, so 10 a minute is generous.
+const reviewLimiter = rateLimit({ windowMs: 60000, max: Number(process.env.REVIEWS_PER_MIN) || 10, name: 'review', key: (req) => String(req.user._id) });
 
 router.use(verifyToken);
 
@@ -145,17 +148,26 @@ router.get('/:id/announcements', asyncHandler(async (req, res) => {
   return res.json({ success: true, data: { locked: false, items } });
 }));
 
-router.post('/:id/review', asyncHandler(async (req, res) => {
+router.post('/:id/review', reviewLimiter, asyncHandler(async (req, res) => {
   const { booking, isOwner } = await loadAccessible(req);
   if (!isOwner) throw forbidden();
   if (booking.status !== 'confirmed') throw conflict('Only confirmed trips can be reviewed');
   if (new Date(booking.departure.endDate) > new Date()) throw conflict('You can review this trip after it ends');
   const rating = Number(req.body?.rating);
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) throw badRequest('Rating must be between 1 and 5');
-  const review = await Review.create({
-    package: booking.package._id, operator: booking.operator._id, booking: booking._id, user: req.user._id,
-    rating, comment: String(req.body?.comment || '').slice(0, 2000),
-  });
+  const ALREADY = 'You have already reviewed this trip';
+  if (await Review.exists({ booking: booking._id })) throw conflict(ALREADY);
+  let review;
+  try {
+    review = await Review.create({
+      package: booking.package._id, operator: booking.operator._id, booking: booking._id, user: req.user._id,
+      rating, comment: String(req.body?.comment || '').slice(0, 2000),
+    });
+  } catch (err) {
+    // Two requests at once: the unique index on Review.booking lets only one through.
+    if (err && err.code === 11000) throw conflict(ALREADY);
+    throw err;
+  }
   res.status(201).json({ success: true, data: review });
 }));
 

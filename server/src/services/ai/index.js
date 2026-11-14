@@ -87,6 +87,72 @@ function numberInText(n, text) {
   return numbersInText(text).has(Number(n));
 }
 
+const MONTHS = {
+  jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3, apr: 4, april: 4, may: 5, jun: 6, june: 6,
+  jul: 7, july: 7, aug: 8, august: 8, sep: 9, sept: 9, september: 9, oct: 10, october: 10,
+  nov: 11, november: 11, dec: 12, december: 12,
+};
+// Words that may sit between a day and its month: "20th to 22nd Dec", "Dec 5, 12 and 19".
+const DATE_JOINERS = new Set(['to', 'till', 'until', 'and', 'or', 'of', 'the', 'from', 'on']);
+const MAX_DATE_GAP = 4;
+
+// Every day-month pair written in the text, as "day-month" keys ("20-12").
+// - A day (1-31, a whole number, ordinals allowed) near a month name or abbreviation, with only
+//   other days or joining words between them. A day as close to the month before it as to the
+//   one after it pairs with both.
+// - Numeric day-first dates: 20/12, 20-12, 20.12, with or without a year; and 2026-12-20.
+//   "5-6 Jan" is a range of days, not 5 June, and "10.30 am" or "1.5 lakh" are not dates.
+function datesInText(text) {
+  const s = String(text || '');
+  const found = new Set();
+  const add = (day, month) => {
+    if (day >= 1 && day <= 31 && month >= 1 && month <= 12) found.add(`${day}-${month}`);
+  };
+
+  // "20th" and "20" are days; "5D" or "120" glued to letters is not. An amount with thousands
+  // separators ("18,999", "1,25,000") is one word, so its "18" or "1" is never read as a day.
+  // "Dec 5,12,19" still lists days: a separator group of three digits marks an amount.
+  const tokens = [...s.matchAll(/\d{1,3}(?:,\d{2})*,\d{3}(?:\.\d+)?(?!\d)|(\d+)(?:st|nd|rd|th)?(?![a-z\d])|[a-z]+|\d+/gi)].map((m) => {
+    if (m[1] !== undefined) return { day: Number(m[1]) };
+    const word = m[0].toLowerCase();
+    return MONTHS[word] ? { month: MONTHS[word] } : { word };
+  });
+  tokens.forEach((t, i) => {
+    if (t.day === undefined) return;
+    const nearest = (step) => {
+      for (let j = i + step, gap = 1; j >= 0 && j < tokens.length && gap <= MAX_DATE_GAP; j += step, gap += 1) {
+        if (tokens[j].month) return { month: tokens[j].month, gap };
+        if (tokens[j].day === undefined && !DATE_JOINERS.has(tokens[j].word)) return null;
+      }
+      return null;
+    };
+    const before = nearest(-1);
+    const after = nearest(1);
+    if (before && (!after || before.gap <= after.gap)) add(t.day, before.month);
+    if (after && (!before || after.gap <= before.gap)) add(t.day, after.month);
+  });
+
+  for (const m of s.matchAll(/(?<!\d)(\d{4})-(\d{1,2})-(\d{1,2})(?!\d)/g)) add(Number(m[3]), Number(m[2]));
+  const names = Object.keys(MONTHS).join('|');
+  const monthAfter = new RegExp(`^\\s*(?:${names})\\b`, 'i');
+  const monthBefore = new RegExp(`\\b(?:${names})\\.?\\s*$`, 'i');
+  for (const m of s.matchAll(/(?<![\d/.-])(\d{1,2})\s*[/.-]\s*(\d{1,2})(?![\d])/g)) {
+    const rest = s.slice(m.index + m[0].length);
+    if (monthAfter.test(rest) || monthBefore.test(s.slice(0, m.index))) continue; // a range: "5-6 Jan", "Jan 5-6"
+    if (/^\s*(?:am|pm|hrs?|k|lakhs?|lacs?|cr)\b/i.test(rest)) continue; // a time or an amount
+    add(Number(m[1]), Number(m[2]));
+  }
+  return found;
+}
+
+// Grounding check for a departure date (YYYY-MM-DD): its day and month must both be written in
+// the text. The year may be missing; the prompt tells the model to assume the next occurrence.
+function dateInText(isoDate, text) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(isoDate || ''));
+  if (!m) return false;
+  return datesInText(text).has(`${Number(m[3])}-${Number(m[2])}`);
+}
+
 function normalise(raw, text) {
   const warnings = arr(raw.warnings);
   let price = raw.price == null ? null : Number(raw.price);
@@ -101,7 +167,27 @@ function normalise(raw, text) {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const departureDates = arr(raw.departureDates).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d) && !Number.isNaN(Date.parse(d)) && d >= today);
+  const departureDates = arr(raw.departureDates).filter((d) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || Number.isNaN(Date.parse(d))) return false;
+    if (d < today) {
+      warnings.push(`Departure date ${d} is in the past and was cleared`);
+      return false;
+    }
+    if (!dateInText(d, text)) {
+      warnings.push(`Departure date ${d} could not be found in the text and was cleared`);
+      return false;
+    }
+    return true;
+  });
+
+  const duration = (value, unit) => {
+    const n = int(value);
+    if (n == null || numberInText(n, text)) return n;
+    warnings.push(`Duration ${n} ${unit} could not be found in the text and was cleared`);
+    return null;
+  };
+  const durationDays = duration(raw.durationDays, 'days');
+  const durationNights = duration(raw.durationNights, 'nights');
 
   const itinerary = arr(raw.itinerary)
     .filter((d) => d && typeof d === 'object' && str(d.title))
@@ -113,8 +199,8 @@ function normalise(raw, text) {
     region: str(raw.region),
     country: str(raw.country),
     startLocation: str(raw.startLocation),
-    durationDays: int(raw.durationDays),
-    durationNights: int(raw.durationNights),
+    durationDays,
+    durationNights,
     basePrice: price,
     currency: (str(raw.currency) || (price != null ? 'INR' : null))?.toUpperCase() || null,
     departureDates,
@@ -154,7 +240,9 @@ function normalise(raw, text) {
   return { draft, missing, warnings: [...new Set(warnings)] };
 }
 
-async function extractPackage(text) {
+// The model's answer before any grounding or clean-up. The evaluation harness
+// (server/eval/studio) uses it to measure how often the model itself invents values.
+async function extractRaw(text) {
   const { data, provider, model } = await callStructured({
     system: systemPrompt(),
     user: `Extract the package from this post:\n\n"""${text}"""`,
@@ -164,7 +252,12 @@ async function extractPackage(text) {
     timeoutMs: 60000,
     strict: false,
   });
-  return { ...normalise(data || {}, text), provider, model };
+  return { raw: data || {}, provider, model };
 }
 
-module.exports = { extractPackage, status, normalise, numberInText };
+async function extractPackage(text) {
+  const { raw, provider, model } = await extractRaw(text);
+  return { ...normalise(raw, text), provider, model };
+}
+
+module.exports = { extractPackage, extractRaw, status, normalise, numberInText, dateInText };

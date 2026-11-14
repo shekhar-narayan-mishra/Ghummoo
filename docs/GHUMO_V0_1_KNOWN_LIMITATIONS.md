@@ -10,7 +10,7 @@
 | Email and SMS | No notifications, password reset or email verification. | Status changes appear in My trips, booking pages, the organiser activity feed and the navbar's unread trip-group badge. |
 | Trip group delivery | Messages arrive by polling every 6 seconds, not over a socket. | Unread counts refresh on read and every 60 seconds. |
 | Trip group media | Text only: no photos, files, reactions or editing. | Messages can be deleted by their author or the organiser, and reported. |
-| Reviews | Review collection exists, but the seed has no completed trips, so it has only been exercised in API tests, not in a browser journey. | |
+| Reviews | The seed has no completed trips, so demo data shows no reviews. The review rules are covered by `server/test/reviews.test.js`, and `e2e/05-reviews.spec.js` runs the browser journey on a test-only completed trip. There is no admin screen to hide a review yet (`Review.hidden` is honoured by public reads). | |
 | Admin | No user management screen; approvals, verification and moderation only. | |
 | Languages | English only. | |
 
@@ -21,7 +21,7 @@
 | Image uploads | Uploaded photos are stored on local disk (`server/uploads`, `UPLOAD_DIR`). **On a host with an ephemeral filesystem they disappear on redeploy.** Photo URLs entered by organisers are unaffected. This must move to persistent storage (GridFS or object storage) before a real launch. |
 | Declining a paid booking | An organiser can decline a booking that already has payments recorded. The note to the traveller is required, but no refund record is created. |
 | Rate limits | In-memory and per process. With more than one server instance, each instance has its own counters. |
-| AI provider | AI Package Studio, natural-language interpretation and Ask This Trip depend on a configured provider. Without one, interpretation falls back to deterministic parsing, Ask answers "not confirmed", and Studio shows a plain "isn't available right now" notice with a link to manual creation. Provider quality and latency were tested only against a deterministic stub in e2e. |
+| AI provider | AI Package Studio, natural-language interpretation and Ask This Trip depend on a configured provider. Without one, interpretation falls back to deterministic parsing, Ask answers "not confirmed", and Studio shows a plain "isn't available right now" notice with a link to manual creation. Provider quality and latency were tested only against a deterministic stub in e2e. The Studio evaluation harness (`server/eval/studio`) can measure extraction quality, but so far only a synthetic sample exists; a real corpus waits on the data-consent decision in #25. |
 | Verification | Organiser registration numbers (GST, MSME and others) are recorded and reviewed by an admin; nothing is checked against a government register. |
 | Seed data | All seeded organisers, trips and travellers are demo records (`isDemo: true`) and are labelled "Demo" in the UI. |
 
@@ -43,5 +43,4 @@
 
 ## Engineering debt
 
-- ESLint reports **44 warnings, 0 errors**: all 44 are `react-refresh/only-export-components` (files that export helpers next to components; affects only hot reload in development). `react-hooks/set-state-in-effect` is now configured as an error with 0 violations.
-- The `/v01` design prototype is still routed (lazy chunk, not linked from the live navigation). It should be removed or put behind a flag before a public launch.
+- The `/v01` design prototype has been removed (issue #20). The `client/src/v01/` folder, its sample data, the `/v01/*` route, and the `content:export` script no longer exist.

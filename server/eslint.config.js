@@ -31,7 +31,7 @@ module.exports = defineConfig([
     },
   },
   {
-    files: ['test/**/*.js', '**/*.test.js'],
+    files: ['test/**/*.js', '**/*.test.js', 'eval/**/*.js'],
     languageOptions: {
       globals: {
         ...globals.node,

@@ -47,6 +47,10 @@ jobs:
         run: npm test
       - name: PR-review bot tests
         run: node --test .github/scripts/*.test.js
+      # Checks the harness and that grounding clears every invented value. Uses the local stub,
+      # so the scores say nothing about model quality (server/eval/studio/README.md).
+      - name: AI Studio evaluation harness (stub)
+        run: npm run eval:studio -- --stub
       - name: Production build
         run: npm run build
       - name: Dependency audit (production dependencies, high and above)

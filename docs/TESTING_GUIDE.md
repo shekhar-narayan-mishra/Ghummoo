@@ -54,6 +54,10 @@ These follow `.agents/skills/test-and-qa/SKILL.md`:
 - `04-security` scans the built bundle for secrets, checks headers and role boundaries, and confirms that forged booking fields are ignored.
 - When a test fails, run `npx playwright show-trace test-results/<test>/trace.zip`.
 
+## AI Package Studio evaluation
+
+`npm run eval:studio -- --stub` runs Studio extraction over the labelled corpus in `server/eval/studio/cases` and reports per-field precision, recall and exact-match rate, plus how often values that aren't in the post appear. CI runs it against the stub on every PR, and the run fails if an invented value survives grounding. Run it without `--stub` after changing the prompt, the model (`AI_MODEL`) or the grounding rules, and compare the results with the previous run on the same corpus version. Definitions, the corpus format and the private-corpus rules are in `server/eval/studio/README.md`.
+
 ## Manual QA
 
 Before a release, walk through `docs/GHUMO_V0_1_RELEASE_CHECKLIST.md` in a real browser, on a phone-width screen and with the keyboard only.

@@ -40,3 +40,6 @@ test-results/
 playwright-report/
 e2e/results.json
 e2e/quality-metrics.json
+
+# AI Package Studio evaluation output
+server/eval/studio/results/

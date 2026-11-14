@@ -1,0 +1,27 @@
+{
+  "id": "kasol-group-price",
+  "text": "Kasol & Kheerganga weekend 🌲 Fri night to Mon morning. Departure Dec 5: ₹18,999 for a group of 4, or ₹4,999 per person. Volvo from Delhi, camps, bonfire, trek guide. Dinner & breakfast included.",
+  "expected": {
+    "title": "Kasol and Kheerganga weekend",
+    "destination": "Kasol & Kheerganga",
+    "price": 4999,
+    "currency": "INR",
+    "durationDays": null,
+    "durationNights": null,
+    "departureDates": [
+      "12-05"
+    ],
+    "capacity": null,
+    "inclusions": [
+      "Volvo from Delhi",
+      "Camps",
+      "Bonfire",
+      "Trek guide",
+      "Dinner and breakfast"
+    ],
+    "exclusions": [],
+    "pickupInfo": null,
+    "cancellationPolicy": null
+  },
+  "notes": "A group price next to the date: 18 Dec must not be grounded by ₹18,999. The duration is described, not stated as days or nights."
+}

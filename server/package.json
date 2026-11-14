@@ -10,6 +10,7 @@
     "seed": "node src/seed.js",
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "lint": "eslint .",
+    "eval:studio": "node eval/studio/run.js",
     "migrate": "node src/migrate.js",
     "set-password": "node src/setPassword.js"
   },

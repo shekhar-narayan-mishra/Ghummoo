@@ -1,0 +1,24 @@
+{
+  "id": "chopta-weekend",
+  "text": "Chopta Tungnath weekend trek 🏔️ 3D/2N from Delhi, 6499 per person. Tempo traveller, camps in Chopta, breakfast + dinner, trek leader. Tungnath temple and Chandrashila summit!",
+  "expected": {
+    "title": "Chopta Tungnath weekend trek",
+    "destination": "Chopta",
+    "price": 6499,
+    "currency": "INR",
+    "durationDays": 3,
+    "durationNights": 2,
+    "departureDates": [],
+    "capacity": null,
+    "inclusions": [
+      "Tempo traveller",
+      "Camps in Chopta",
+      "Breakfast and dinner",
+      "Trek leader"
+    ],
+    "exclusions": [],
+    "pickupInfo": null,
+    "cancellationPolicy": null
+  },
+  "notes": "The caption the Playwright Studio journey uses; e2e/ai-stub.js answers it, so the stub run has one case it can score well."
+}

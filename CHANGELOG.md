@@ -15,6 +15,7 @@ Changes merged into `staging` since the last merge into `main`. They reach `main
 - ESLint for the server. `npm run lint` now lints the server and the client; independent sequential database writes run in parallel. (#71)
 - Owners can finish a contributor's PR in place. The `dco-maintainer-signoff` label lets an owner certify unsigned commits, so the contributor keeps the merged PR. (#79)
 - The PR review bot accepts `Closes #N` in the PR title or a commit message. (#74)
+- The PR review bot accepts `Refs #N` or `Part of #N` as a linked issue, for a PR that does only part of an issue, and notes that the issue stays open. Found while running a contributor PR end to end (#90).
 
 ### Fixed
 - A second review for the same booking now returns 409 "You have already reviewed this trip" instead of "That booking is already in use", including when two requests arrive at once.

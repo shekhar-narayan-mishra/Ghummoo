@@ -20,18 +20,27 @@ function createDiskStorage(uploadDir) {
       await fs.promises.writeFile(filePath(filename), buffer, { flag: 'wx' });
       return { url: `/uploads/${filename}` };
     },
+    // Opens the file before returning, so the size and the stream refer to the same file: a file
+    // removed or replaced after open() is still read in full (a lazily opened stream would fail with
+    // ENOENT, or send different bytes than Content-Length promised).
     async open(filename) {
-      const currentPath = filePath(filename);
+      let handle;
       try {
-        const stat = await fs.promises.stat(currentPath);
-        if (!stat.isFile()) return null;
+        handle = await fs.promises.open(filePath(filename), 'r');
+      } catch (err) {
+        if (err.code === 'ENOENT' || err.code === 'EISDIR') return null;
+        throw err;
+      }
+      try {
+        const stat = await handle.stat();
+        if (!stat.isFile()) { await handle.close(); return null; }
         return {
-          stream: fs.createReadStream(currentPath),
+          stream: handle.createReadStream(),
           contentType: CONTENT_TYPES[path.extname(filename).toLowerCase()] || 'application/octet-stream',
           size: stat.size,
         };
       } catch (err) {
-        if (err.code === 'ENOENT') return null;
+        await handle.close().catch(() => {});
         throw err;
       }
     },

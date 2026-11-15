@@ -196,7 +196,10 @@ test('adapters can remove a stored file, and an unknown UPLOAD_STORAGE is reject
     const storage = getStorage();
     const filename = `rm-${mode}.png`;
     await storage.save({ buffer: PNG, filename, contentType: 'image/png' });
-    assert.ok(await storage.open(filename));
+    // An open file can be removed: the stream already holds the file. Close it to free the handle.
+    const opened = await storage.open(filename);
+    assert.ok(opened);
+    opened.stream.destroy();
     await storage.remove(filename);
     assert.equal(await storage.open(filename), null);
     await storage.remove(filename); // removing twice is not an error

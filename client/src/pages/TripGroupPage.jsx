@@ -56,7 +56,7 @@ function Message({ m, showAuthor, onReport }) {
             <MoreHorizontal className="size-4" />
           </button>
         )}
-        <div className={cx('rounded-2xl px-3.5 py-2 text-[15px] leading-snug [overflow-wrap:anywhere]', m.mine ? 'rounded-br-md bg-brand text-white' : m.author.role === 'organiser' ? 'rounded-bl-md bg-ink text-white' : 'rounded-bl-md bg-white ring-1 ring-line', m.hidden && 'italic opacity-70', m.pending && 'opacity-60')}>
+        <div className={cx('rounded-2xl px-3.5 py-2 text-[15px] leading-snug [overflow-wrap:anywhere]', m.mine ? 'rounded-br-md bg-action text-white' : m.author.role === 'organiser' ? 'rounded-bl-md bg-ink text-white' : 'rounded-bl-md bg-white ring-1 ring-line', m.hidden && 'italic opacity-70', m.pending && 'opacity-60')}>
           <p className="whitespace-pre-line">{m.body}</p>
           <p className={cx('mt-0.5 text-right text-[10px]', m.mine || m.author.role === 'organiser' ? 'text-white/70' : 'text-subtle')}>
             <time dateTime={m.createdAt}>{m.pending ? 'Sending…' : time(m.createdAt)}</time>
@@ -235,7 +235,7 @@ export default function TripGroupPage({ organiserView = false }) {
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
             placeholder={asAnnouncement ? 'Announcement to everyone…' : 'Message the group…'}
             className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-line bg-ivory/60 px-3.5 py-2.5 text-[15px] focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/10" />
-          <button type="submit" disabled={!text.trim() || sending} className="grid size-11 shrink-0 place-items-center rounded-full bg-brand text-white transition hover:bg-brand-hover disabled:opacity-40" aria-label="Send">
+          <button type="submit" disabled={!text.trim() || sending} className="grid size-11 shrink-0 place-items-center rounded-full bg-action text-white transition hover:bg-action-hover disabled:opacity-40" aria-label="Send">
             <SendHorizontal className="size-5" />
           </button>
         </div>

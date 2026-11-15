@@ -66,7 +66,7 @@ export default function PlacePage() {
               <PlaceArt place={p} palette={pal} className="size-full [&>svg]:size-full" label={p.featured ? `Illustration of ${p.name}` : undefined} />
             </div>
             <div style={{ color: pal.ink }}>
-              {p.intro && <GuideLabel />}
+              {p.intro && <GuideLabel inherit />}
               <h1 className="mt-2 text-5xl font-extrabold leading-none sm:text-6xl">{p.name}</h1>
               <p className="mt-2 font-bold opacity-80">{p.kind === 'city' ? 'City' : 'Destination'} · {p.state}{p.theme?.name ? ` · ${p.theme.name}` : ''}</p>
               {p.intro ? <p className="mt-4 text-[17px] leading-relaxed">{p.intro}</p> : <p className="mt-4 text-[15px] opacity-80">We haven't written a guide for {p.name} yet.</p>}

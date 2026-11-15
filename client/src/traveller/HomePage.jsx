@@ -68,7 +68,7 @@ export default function HomePage() {
               </span>
             </Link>
             <Link to={paths.decide} className="group flex items-start gap-4 rounded-[24px] bg-ink p-4 sm:p-5 text-white transition hover:-translate-y-0.5 hover:shadow-lift motion-reduce:hover:translate-y-0">
-              <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-brand text-white sm:size-12"><Sparkles className="size-5 sm:size-6" aria-hidden /></span>
+              <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-action text-white sm:size-12"><Sparkles className="size-5 sm:size-6" aria-hidden /></span>
               <span>
                 <span className="block text-lg font-extrabold">Help me decide</span>
                 <span className="mt-0.5 hidden text-sm text-white/75 sm:block">Tell us your budget, dates and vibe. We'll suggest listed trips that fit.</span>

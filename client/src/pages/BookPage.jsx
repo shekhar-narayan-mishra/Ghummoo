@@ -174,7 +174,7 @@ export default function BookPage() {
       <ol className="mt-6 flex items-center gap-2 sm:gap-3" aria-label="Booking steps">
         {STEPS.map((s, i) => (
           <li key={s} className="flex flex-1 items-center gap-2 sm:flex-none">
-            <span className={cx('grid size-8 shrink-0 place-items-center rounded-full text-sm font-extrabold', i < step ? 'bg-success text-white' : i === step ? 'bg-brand text-white' : 'bg-sand text-subtle')}>{i < step ? <Check className="size-4" strokeWidth={3} /> : i + 1}</span>
+            <span className={cx('grid size-8 shrink-0 place-items-center rounded-full text-sm font-extrabold', i < step ? 'bg-success text-white' : i === step ? 'bg-action text-white' : 'bg-sand text-subtle')}>{i < step ? <Check className="size-4" strokeWidth={3} /> : i + 1}</span>
             <span className={cx('text-sm font-bold', i === step ? 'text-ink' : 'text-subtle', i !== step && 'hidden sm:inline')}>{s}</span>
             {i < STEPS.length - 1 && <span className="h-0.5 flex-1 rounded bg-line sm:w-10 sm:flex-none" />}
           </li>

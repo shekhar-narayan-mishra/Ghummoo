@@ -40,7 +40,7 @@ export default function Navbar({ showAuth = false }) {
     window.addEventListener('ghumo:groups-read', load);
     return () => { live = false; clearInterval(id); window.removeEventListener('ghumo:groups-read', load); };
   }, [traveller, pathname]);
-  const badge = traveller && unread > 0 ? <span className="ml-1 rounded-full bg-brand px-1.5 py-0.5 text-[11px] font-extrabold text-white" aria-label={`${unread} unread trip group messages`}>{unread}</span> : null;
+  const badge = traveller && unread > 0 ? <span className="ml-1 rounded-full bg-action px-1.5 py-0.5 text-[11px] font-extrabold text-white" aria-label={`${unread} unread trip group messages`}>{unread}</span> : null;
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 8);

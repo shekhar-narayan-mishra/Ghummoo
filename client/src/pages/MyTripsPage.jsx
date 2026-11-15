@@ -102,9 +102,9 @@ export default function MyTripsPage() {
                       <p className="mt-0.5 flex items-center gap-1.5 text-sm font-semibold text-subtle"><CalendarDays className="size-4 shrink-0 text-brand" /><span className="truncate">{dateRange(b.departure.startDate, b.departure.endDate)}</span></p>
                       <p className="mt-0.5 text-[13px] text-subtle">{b.seats} traveller{b.seats > 1 ? 's' : ''} · <span className="num">{money(b.totalAmount, b.currency)}</span> · {b.reference}</p>
                       <p className="mt-1.5 text-[13px] font-semibold text-ink/80">{NEXT_STEP[b.status]}</p>
-                      {b.status === 'confirmed' && unreadFor(b.departure._id) > 0 && <p className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-brand px-2.5 py-0.5 text-xs font-extrabold text-white">{unreadFor(b.departure._id)} new in trip group</p>}
+                      {b.status === 'confirmed' && unreadFor(b.departure._id) > 0 && <p className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-action px-2.5 py-0.5 text-xs font-extrabold text-white">{unreadFor(b.departure._id)} new in trip group</p>}
                     </div>
-                    <ChevronRight className="size-5 shrink-0 text-muted transition group-hover:translate-x-0.5" />
+                    <ChevronRight className="size-5 shrink-0 text-subtle transition group-hover:translate-x-0.5" />
                   </div>
                 </Link>
               );

@@ -21,6 +21,7 @@ Changes merged into `staging` since the last merge into `main`. They reach `main
 - The PR review bot accepts `Refs #N` or `Part of #N` as a linked issue, for a PR that does only part of an issue, and notes that the issue stays open. Found while running a contributor PR end to end (#90).
 
 ### Fixed
+- Colour contrast meets WCAG 2.1 AA on every page the accessibility checks visit, and their allow-list is empty. Buttons, badges and other white-on-orange text use a deeper action orange (`--color-action`, 5.18:1). Success and warning pills, small secondary text, and labels on the tinted city panels are darker. The bright brand orange stays for decoration. (#95, closes #75)
 - A second review for the same booking now returns 409 "You have already reviewed this trip" instead of "That booking is already in use", including when two requests arrive at once.
 - Phone and emergency-contact fields are validated and length-limited on the server and in the forms (sign-up, profile, booking contact, travellers). (#55)
 - Content reports are rate-limited (5 per user per minute), and the reported item must exist. A booking can be reported only by its traveller or its organiser. (#29)

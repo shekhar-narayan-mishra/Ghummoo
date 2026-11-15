@@ -86,7 +86,7 @@ export default function PartnersPage() {
         <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(([t, d], i) => (
             <li key={t} className="rounded-3xl bg-sand p-6">
-              <span className="grid size-9 place-items-center rounded-full bg-brand text-sm font-extrabold text-white">{i + 1}</span>
+              <span className="grid size-9 place-items-center rounded-full bg-action text-sm font-extrabold text-white">{i + 1}</span>
               <h3 className="mt-4 font-extrabold">{t}</h3><p className="mt-1.5 text-[15px] text-subtle">{d}</p>
             </li>
           ))}

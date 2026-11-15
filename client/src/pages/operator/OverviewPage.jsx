@@ -132,7 +132,7 @@ export default function OverviewPage() {
                         <p className="num text-sm font-extrabold">{booked}/{d.totalCapacity}</p>
                         <p className="text-[11px] font-semibold text-subtle">seats held</p>
                       </div>
-                      <ArrowRight className="size-4 text-muted" />
+                      <ArrowRight className="size-4 text-subtle" />
                     </Link>
                   </li>
                 );

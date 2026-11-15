@@ -322,7 +322,7 @@ function TripDetailView({ trip }) {
                       const isOpen = !!openDays[i];
                       return (
                         <li key={i} className="relative pl-14">
-                          <span className={cx('absolute left-0 top-3 grid size-10 place-items-center rounded-full text-sm font-extrabold ring-4 ring-ivory', isOpen ? 'bg-brand text-white' : 'bg-white text-ink ring-ivory border border-line')}>{d.day}</span>
+                          <span className={cx('absolute left-0 top-3 grid size-10 place-items-center rounded-full text-sm font-extrabold ring-4 ring-ivory', isOpen ? 'bg-action text-white' : 'bg-white text-ink ring-ivory border border-line')}>{d.day}</span>
                           <div className="rounded-2xl border border-line bg-white">
                             <button type="button" className="flex w-full items-center justify-between gap-3 p-4 text-left" aria-expanded={isOpen} onClick={() => setOpenDays((o) => { const n = { ...o }; if (n[i]) delete n[i]; else n[i] = true; return n; })}>
                               <span><span className="block text-[12px] font-bold uppercase tracking-wider text-brand-ink">Day {d.day}</span><span className="block text-[16px] font-extrabold">{d.title}</span></span>

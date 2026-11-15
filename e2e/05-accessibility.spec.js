@@ -22,20 +22,10 @@ const VIEWPORTS = [
 // a known violation on one page never hides the same rule on another page, and a brand-new
 // violation (a different rule, or the same rule on a page not listed here) is never silenced.
 //
-// All current entries are `color-contrast` (serious): the brand palette fails WCAG AA by small
-// margins, driven by white text on the brand-orange CTA (3.05:1) which is a design decision for
-// the maintainers. Tracked in issue #75; fixes must use the tokens in
-// client/src/index.css. `/cities` and `/decide` are deliberately NOT listed — they pass today, so
-// a regression there fails the build. Remove each entry as its page is fixed. (The one other
-// violation first-run found, `label-content-name-mismatch` on the logo link, was a small bug and
-// is fixed in this PR — client/src/components/Logo.jsx — not allow-listed.)
-const CONTRAST_ISSUE = 'https://github.com/shekhar-narayan-mishra/Ghummoo/issues/75';
-const CONTRAST_PAGES = [
-  '/', '/india', '/places/jaipur', '/trips', '/trips/rishikesh-adventure-weekend',
-  '/compare?trips=rishikesh-adventure-weekend,nainital-lakes-weekend', '/partners', '/login',
-  '/me/trips', '/operator', '/operator/packages', '/operator/bookings', '/operator/insights', '/operator/studio',
-];
-const ALLOWLIST = CONTRAST_PAGES.map((path) => ({ rule: 'color-contrast', path, issue: CONTRAST_ISSUE }));
+// color-contrast violations from issue #75 have been resolved by introducing --color-action
+// (#C2410C, 5.18:1) for interactive elements with white text and --color-subtle (#6B6058) for
+// small secondary text. The allow-list is now empty.
+const ALLOWLIST = [];
 
 const metrics = { tags: TAGS, viewports: VIEWPORTS.map((v) => `${v.label} ${v.width}px`), allowlist: ALLOWLIST, violations: [] };
 

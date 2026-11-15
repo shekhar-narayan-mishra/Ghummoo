@@ -66,7 +66,7 @@ export default function StudioPage() {
           const current = (result ? 1 : 0) === i;
           return (
             <li key={t} aria-current={current ? 'step' : undefined} className={cx('flex items-center gap-2 rounded-2xl px-3 py-2.5 text-[13px] font-bold', current ? 'bg-ink text-white' : 'bg-white text-subtle ring-1 ring-line')}>
-              <span className={cx('grid size-6 shrink-0 place-items-center rounded-full text-xs', current ? 'bg-brand' : 'bg-sand text-ink')}>{i + 1}</span>{t}
+              <span className={cx('grid size-6 shrink-0 place-items-center rounded-full text-xs', current ? 'bg-action text-white' : 'bg-sand text-ink')}>{i + 1}</span>{t}
             </li>
           );
         })}

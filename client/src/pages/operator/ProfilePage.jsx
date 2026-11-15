@@ -49,7 +49,7 @@ export function LogoPicker({ value, onChange }) {
     <Field label="Logo or profile photo" hint="JPG, PNG or WebP up to 5 MB. You can also paste an image URL.">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="size-16 shrink-0 overflow-hidden rounded-2xl border border-line bg-sand">
-          {value ? <SafeImage src={value} alt="Logo preview" className="size-full" /> : <div className="grid size-full place-items-center text-muted"><Building2 className="size-6" /></div>}
+          {value ? <SafeImage src={value} alt="Logo preview" className="size-full" /> : <div className="grid size-full place-items-center text-subtle"><Building2 className="size-6" /></div>}
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row">
           <input ref={input} type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="hidden" onChange={(e) => upload(e.target.files?.[0])} />

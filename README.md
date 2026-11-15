@@ -109,7 +109,7 @@ Secrets are never built into the image. Put them in an untracked `.env` next to 
 | `SEED_ON_EMPTY` | `true` | Set by compose. |
 | `PORT` | `5050` | Set by compose. |
 
-Uploads are stored in `/app/server/uploads` (the `uploads` volume). The compose MongoDB is for local use and self-hosting, not a managed production database. Without compose, run the image with `MONGODB_URI` set; it does not include the embedded database.
+Uploads are stored in `/app/server/uploads` (the `uploads` volume) unless `UPLOAD_STORAGE=gridfs` is set, which keeps them in MongoDB. The compose MongoDB is for local use and self-hosting, not a managed production database. Without compose, run the image with `MONGODB_URI` set; it does not include the embedded database.
 
 ## Configuration
 
@@ -168,7 +168,7 @@ See [docs/ROADMAP.md](docs/ROADMAP.md). The next priorities are:
 
 - **No payment gateway.** Bookings are requests; organisers record payments made offline.
 - **No email:** no notifications, password reset or email verification.
-- **Uploaded photos are stored on local disk** and are lost on hosts with ephemeral filesystems.
+- **Uploaded photos are stored on local disk by default** and are lost on hosts with ephemeral filesystems. Set `UPLOAD_STORAGE=gridfs` (needs `MONGODB_URI`) to store them in MongoDB instead; see `server/.env.example`.
 - **Live AI quality is not measured.** The AI features are tested against a deterministic stub. A real provider has been tried manually, but there is no evaluation set of real organiser posts yet.
 - **Organiser verification** is a manual admin review, not a check against a government register.
 - **Rate limits are in memory**, per process.

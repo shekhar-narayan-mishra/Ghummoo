@@ -123,3 +123,88 @@ test('non-image content types are still refused before storage', async () => {
   assert.equal(res.status, 400);
   assert.equal(files().length, before);
 });
+
+// ---- Storage adapters: /uploads/<name> is served from the active adapter ----
+const fetchFile = (url) => fetch(`${base}${url}`);
+
+test('disk (default): an uploaded image is served at its URL with the same bytes', async () => {
+  const bytes = Buffer.concat([PNG, Buffer.alloc(1024, 3)]);
+  const { body } = await upload(bytes, 'image/png');
+  const res = await fetchFile(body.data.url);
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('content-type'), 'image/png');
+  assert.equal(res.headers.get('x-content-type-options'), 'nosniff');
+  assert.match(res.headers.get('cache-control'), /max-age=\d+/);
+  assert.ok(Buffer.from(await res.arrayBuffer()).equals(bytes));
+});
+
+test('unknown, malformed and traversal names are 404', async () => {
+  for (const name of ['nope.png', '..%2Fapp.js', '.hidden', '%2e%2e%2fpackage.json']) {
+    const res = await fetchFile(`/uploads/${name}`);
+    assert.equal(res.status, 404, name);
+    await res.arrayBuffer();
+  }
+});
+
+test('gridfs: upload keeps the same response shape and survives deleting the uploads folder', async () => {
+  process.env.UPLOAD_STORAGE = 'gridfs';
+  try {
+    const bytes = Buffer.concat([JPEG, Buffer.alloc(300 * 1024, 9)]);
+    const before = files().length;
+    const { status, body } = await upload(bytes, 'image/jpeg');
+    assert.equal(status, 201);
+    assert.deepEqual(Object.keys(body.data), ['url']);
+    assert.match(body.data.url, /^\/uploads\/[\w-]+\.jpg$/);
+    assert.equal(files().length, before, 'nothing was written to local disk');
+
+    fs.rmSync(uploadDir, { recursive: true, force: true });
+    const res = await fetchFile(body.data.url);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('content-type'), 'image/jpeg');
+    assert.equal(res.headers.get('x-content-type-options'), 'nosniff');
+    assert.ok(Buffer.from(await res.arrayBuffer()).equals(bytes), 'same bytes after the folder was removed');
+
+    assert.equal((await fetchFile('/uploads/nope.jpg')).status, 404);
+
+    // The signature check still runs in front of this adapter.
+    const bad = await upload(Buffer.from('<html></html>'), 'image/png');
+    assert.equal(bad.status, 400);
+  } finally {
+    delete process.env.UPLOAD_STORAGE;
+  }
+});
+
+test('gridfs: a photo still on local disk is served as a fallback during migration', async () => {
+  const name = 'legacy-photo.png';
+  fs.mkdirSync(uploadDir, { recursive: true });
+  fs.writeFileSync(path.join(uploadDir, name), PNG);
+  process.env.UPLOAD_STORAGE = 'gridfs';
+  try {
+    const res = await fetchFile(`/uploads/${name}`);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('content-type'), 'image/png');
+    assert.ok(Buffer.from(await res.arrayBuffer()).equals(PNG));
+  } finally {
+    delete process.env.UPLOAD_STORAGE;
+  }
+});
+
+test('adapters can remove a stored file, and an unknown UPLOAD_STORAGE is rejected', async () => {
+  const { getStorage } = require('../src/services/storage');
+  for (const mode of ['disk', 'gridfs']) {
+    process.env.UPLOAD_STORAGE = mode;
+    const storage = getStorage();
+    const filename = `rm-${mode}.png`;
+    await storage.save({ buffer: PNG, filename, contentType: 'image/png' });
+    // An open file can be removed: the stream already holds the file. Close it to free the handle.
+    const opened = await storage.open(filename);
+    assert.ok(opened);
+    opened.stream.destroy();
+    await storage.remove(filename);
+    assert.equal(await storage.open(filename), null);
+    await storage.remove(filename); // removing twice is not an error
+  }
+  process.env.UPLOAD_STORAGE = 'bogus';
+  assert.throws(() => getStorage(), /Unknown UPLOAD_STORAGE/);
+  delete process.env.UPLOAD_STORAGE;
+});

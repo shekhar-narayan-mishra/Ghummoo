@@ -43,4 +43,11 @@ const bookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// One open request per traveller per departure. This unique partial index is what makes the cap
+// race-free: of two concurrent requests, the database lets only one insert through.
+bookingSchema.index(
+  { user: 1, departure: 1 },
+  { unique: true, partialFilterExpression: { status: 'requested' }, name: 'one_open_request_per_user_departure' }
+);
+
 module.exports = mongoose.model('Booking', bookingSchema);

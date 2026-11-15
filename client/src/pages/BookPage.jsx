@@ -60,6 +60,7 @@ export default function BookPage() {
   const [agree, setAgree] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [refusal, setRefusal] = useState('');
 
   const firstBookable = useMemo(() => trip?.departures.find((d) => d.isBookable) || null, [trip]);
   const chosenDep = useMemo(() => trip?.departures.find((d) => d._id === departureId) || null, [trip, departureId]);
@@ -148,6 +149,7 @@ export default function BookPage() {
     if (submitting) return;
     if (!agree) return toast.error('Please confirm you have read the policies');
     setSubmitting(true);
+    setRefusal('');
     try {
       const booking = await api.post('/bookings', {
         departureId: dep._id, seats: effectiveSeats,
@@ -156,7 +158,8 @@ export default function BookPage() {
       });
       navigate(`/bookings/${booking._id}?new=1`, { replace: true });
     } catch (e) {
-      toast.error(e.message);
+      if (e.status === 409) setRefusal(e.message);
+      else toast.error(e.message);
       setSubmitting(false);
     }
   };
@@ -264,6 +267,10 @@ export default function BookPage() {
               </section>
               <Notice tone="brand" title="No payment is taken on Ghumo AI">Your seats are held while the organiser reviews your request. They will contact you to confirm and share payment details directly.</Notice>
             </>
+          )}
+
+          {refusal && (
+            <Notice tone="danger" title="We couldn't send this request" action={<Link to="/me/trips" className="shrink-0 text-sm font-bold underline">My trips</Link>}>{refusal}</Notice>
           )}
 
           <div className="flex items-center justify-between gap-3">

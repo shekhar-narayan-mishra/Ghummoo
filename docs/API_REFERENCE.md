@@ -532,7 +532,7 @@ The price per seat and the total are taken from the departure, never from the re
 - **201** `data`: the booking (`reference` such as `GHM-7K3P9Q`, `status: "requested"`, `seats`, `pricePerSeat`, `totalAmount`, `currency`, `travelers`, `contact`, `specialRequests`, `history`, ids of user, operator, package and departure).
 - **400** validation error, or `This trip is not accepting bookings` (package not published or operator not approved).
 - **404** `Departure not found`.
-- **409** `This departure is no longer accepting bookings`, or `Only N seat(s) left on this departure` (also when another booking took the seats first).
+- **409** `This departure is no longer accepting bookings`, or `Only N seat(s) left on this departure` (also when another booking took the seats first), or `You already have a request for this departure. You can cancel it from My trips and send a new one.` A traveller may have one open (`requested`) request per departure; it stops counting once confirmed, rejected or cancelled.
 
 ### `GET /api/bookings/mine`
 

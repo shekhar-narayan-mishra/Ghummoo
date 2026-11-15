@@ -9,6 +9,7 @@ const { isBookable } = require('../services/trips');
 const { rateLimit } = require('../middleware/rateLimit');
 
 const MAX_SEATS = 10;
+const openRequestExists = () => conflict('You already have a request for this departure. You can cancel it from My trips and send a new one.');
 // Per account, like the group report limiter: a review is written once per booking, so 10 a minute is generous.
 const reviewLimiter = rateLimit({ windowMs: 60000, max: Number(process.env.REVIEWS_PER_MIN) || 10, name: 'review', key: (req) => String(req.user._id) });
 
@@ -61,6 +62,10 @@ router.post('/', asyncHandler(async (req, res) => {
   if (!isBookable(departure)) throw conflict('This departure is no longer accepting bookings');
   if (departure.seatsAvailable < seats) throw conflict(`Only ${departure.seatsAvailable} seat(s) left on this departure`);
 
+  // At most one open request per traveller per departure, so one account can't tie up a departure.
+  // (The unique partial index on Booking is the race-free backstop for this check.)
+  if (await Booking.exists({ user: req.user._id, departure: departure._id, status: 'requested' })) throw openRequestExists();
+
   const held = await holdSeats(departure._id, seats);
   if (!held) {
     const fresh = await TripDeparture.findById(departure._id).lean();
@@ -86,6 +91,7 @@ router.post('/', asyncHandler(async (req, res) => {
     res.status(201).json({ success: true, data: booking });
   } catch (err) {
     await releaseSeats(departure._id, seats);
+    if (err.code === 11000 && err.keyPattern?.departure) throw openRequestExists();
     throw err;
   }
 }));

@@ -64,6 +64,16 @@ async function signedIn(email) {
   return c;
 }
 
+let accounts = 0;
+// A new traveller account: one traveller may hold only one open request per departure.
+async function newTraveller() {
+  accounts += 1;
+  const c = client();
+  const res = await c.post('/api/auth/register', { name: `Extra Traveller ${accounts}`, email: `extra${accounts}@example.com`, password: 'password123' });
+  assert.equal(res.status, 201, 'extra traveller can register');
+  return c;
+}
+
 async function book(traveller, departureId, seats = 2) {
   const res = await traveller.post('/api/bookings', { departureId, seats, contact, travelers: travellers(seats) });
   assert.equal(res.status, 201, 'booking request is created');
@@ -110,8 +120,8 @@ test('Cancel refuses an already cancelled booking with 409 and does not release 
   const traveller = await signedIn('traveller@ghumo.demo');
   const depId = freshDeparture();
   const startSeats = await seatsLeft(depId);
-  // A second held booking keeps seatsAvailable below capacity, so a double release is not hidden by the cap.
-  await book(traveller, depId, 2);
+  // A second held booking (another traveller's) keeps seatsAvailable below capacity, so a double release is not hidden by the cap.
+  await book(await newTraveller(), depId, 2);
   const id = await book(traveller, depId, 2);
   assert.equal((await traveller.post(`/api/bookings/${id}/cancel`)).status, 200);
   const afterFirst = await seatsLeft(depId);
@@ -156,8 +166,8 @@ test('Two concurrent cancel requests: exactly one succeeds and seats are release
   const traveller = await signedIn('traveller@ghumo.demo');
   const depId = freshDeparture();
   const startSeats = await seatsLeft(depId);
-  // Another booking holds seats, so a double release would show instead of being capped at capacity.
-  await book(traveller, depId, 2);
+  // Another traveller's booking holds seats, so a double release would show instead of being capped at capacity.
+  await book(await newTraveller(), depId, 2);
   const id = await book(traveller, depId, 3);
   assert.equal(await seatsLeft(depId), startSeats - 5);
 

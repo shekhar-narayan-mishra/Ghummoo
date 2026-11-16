@@ -13,7 +13,7 @@ Changes merged into `staging` since the last release. They reach `main` with the
 The first release published on GitHub. Everything merged since 0.2.0 (PRs #29 to #100).
 
 ### Security
-- In production, seeding no longer gives the demo traveller and demo organisers the password published in the README. Like the demo admin, each gets a random password unless `DEMO_PASSWORD` is set. An approved demo organiser can publish trips and read the contact details of travellers who book them, so a public password on a live site was a real risk. Deployments seeded earlier should reset these accounts with `npm run set-password`.
+- In production, seeding no longer gives the demo traveller and demo organisers the password published in the README. Like the demo admin, each gets a random password unless `DEMO_PASSWORD` is set. An approved demo organiser can publish trips and read the contact details of travellers who book them, so a public password on a live site was a real risk. Deployments seeded earlier should reset these accounts with `npm run set-password`. (#102)
 
 ### Added
 - One open booking request per traveller per departure (at most 10 seats held). A second request gets a 409 with a clear message on the booking page; the check is race-free (unique partial index), and confirmed bookings are unaffected. Request expiry is not part of this change. (#94, closes #16)

@@ -23,7 +23,7 @@ These are the maintainers' targets as a small team, not a guarantee.
 
 ## Supported versions
 
-Only the latest code on `main` is supported. There are no released versions yet.
+Ghumo is below 1.0. Security fixes go into the latest release and `main`; older releases are not patched, so upgrade to the latest release.
 
 ## Scope
 

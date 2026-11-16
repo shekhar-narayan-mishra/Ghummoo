@@ -1,6 +1,6 @@
 {
   "name": "ghumo-server",
-  "version": "2.0.0",
+  "version": "0.3.0",
   "description": "Ghumo AI API: group travel marketplace",
   "license": "AGPL-3.0-only",
   "main": "src/index.js",
@@ -18,17 +18,17 @@
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^18.0.9",
+    "dotenv": "^18.0.10",
     "express": "^4.22.3",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb-memory-server": "^11.3.0",
-    "mongoose": "^8.2.1",
+    "mongoose": "^8.24.9",
     "multer": "^2.5.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
-    "eslint": "^9.39.4",
+    "eslint": "^10.14.0",
     "globals": "^17.14.0",
     "nodemon": "^3.1.14"
   }

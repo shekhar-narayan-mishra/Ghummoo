@@ -18,7 +18,6 @@
 | 12 Issue roadmap | COMPLETED as drafts (30): [GITHUB_ISSUE_ROADMAP.md](GITHUB_ISSUE_ROADMAP.md). Publication REQUIRES APPROVAL |
 | 13–14 Contributor experience and GitHub configuration | COMPLETED as files. Settings REQUIRE MANUAL ACTION |
 | 15 Launch plan | PROPOSED: [OPEN_SOURCE_LAUNCH_PLAN.md](OPEN_SOURCE_LAUNCH_PLAN.md) |
-| 16 Anthropic application | COMPLETED (assessment: not eligible today): [ANTHROPIC_APPLICATION_ASSESSMENT.md](ANTHROPIC_APPLICATION_ASSESSMENT.md) |
 | 17 Manual action guide | COMPLETED: [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md) |
 | GitHub launch (8 November 2026) | **COMPLETED:** PR #1 merged (`3184b64`); `staging` created; security features on; rulesets on `main` and `staging`; labels created; 25 issues live (#2 to #26), 6 held. Still open: copyright agreement, DCO or CLA, GSAP, conduct email, organisation transfer, rotations |
 | Pre-release review | COMPLETED: [PRE_RELEASE_REVIEW.md](PRE_RELEASE_REVIEW.md), with diffs in [PRE_RELEASE_REVIEW_DIFFS.md](PRE_RELEASE_REVIEW_DIFFS.md) |
@@ -56,7 +55,7 @@
   - `OPEN_SOURCE_STRATEGY.md`, `PROPRIETARY_BOUNDARIES.md`, `OPEN_SOURCE_READINESS.md`, `OPEN_SOURCE_ARCHITECTURE.md`;
   - `LICENSING_RECOMMENDATION.md`, `ARCHITECTURE.md`, `LOCAL_SETUP.md`, `API_REFERENCE.md`, `DEVELOPMENT_GUIDE.md`, `TESTING_GUIDE.md`, `TESTING_AND_CI.md`, `DEPLOYMENT.md`, `ROADMAP.md`;
   - `BRANCHING_AND_RELEASE_WORKFLOW.md`, `GITHUB_ISSUE_ROADMAP.md`, `GITHUB_ISSUE_PUBLICATION_GUIDE.md`;
-  - `OPEN_SOURCE_LAUNCH_PLAN.md`, `ANTHROPIC_APPLICATION_ASSESSMENT.md`, `MANUAL_ACTIONS.md`, this file;
+  - `OPEN_SOURCE_LAUNCH_PLAN.md`, `MANUAL_ACTIONS.md`, this file;
   - `github-issues/{easy,medium,hard}/issue-NN.md` (14 + 13 + 3).
 
 ## Commands run (main ones)

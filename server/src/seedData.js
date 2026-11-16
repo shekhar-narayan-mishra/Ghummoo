@@ -28,6 +28,15 @@ function demoAdminPassword() {
   return require('crypto').randomBytes(24).toString('base64url');
 }
 
+// The same rule for the demo traveller and organisers. An approved demo organiser can publish
+// trips and read the contact details of anyone who books them, so in production these accounts
+// get the README password only when DEMO_PASSWORD is set explicitly; otherwise each gets a random
+// password that nobody knows. Use `npm run set-password` to sign in as one.
+function demoAccountPassword() {
+  if (process.env.NODE_ENV !== 'production' || process.env.DEMO_PASSWORD) return DEMO_PASSWORD;
+  return require('crypto').randomBytes(24).toString('base64url');
+}
+
 const day = (n) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + n); return d; };
 
 const OPERATORS = [
@@ -285,11 +294,15 @@ async function clearAll() {
 async function seed() {
   const users = {};
   users.admin = await User.create({ name: 'Ghumo Admin', email: 'admin@ghumo.demo', passwordHash: demoAdminPassword(), role: 'admin', isDemo: true });
-  users.traveler = await User.create({ name: 'Priya Sharma', email: 'traveller@ghumo.demo', passwordHash: DEMO_PASSWORD, role: 'traveler', phone: '+91 90000 00000', isDemo: true });
+  if (process.env.NODE_ENV === 'production' && !process.env.DEMO_PASSWORD) {
+    console.warn('[seed] The demo traveller and organiser accounts were given random passwords because this is production and '
+      + 'DEMO_PASSWORD is not set. To use one, run: npm run set-password --prefix server -- <email>');
+  }
+  users.traveler = await User.create({ name: 'Priya Sharma', email: 'traveller@ghumo.demo', passwordHash: demoAccountPassword(), role: 'traveler', phone: '+91 90000 00000', isDemo: true });
 
   const createdOps = await Promise.all(
     OPERATORS.map(async (o) => {
-      const u = await User.create({ name: o.owner, email: o.email, passwordHash: DEMO_PASSWORD, role: 'operator', phone: o.contactPhone, isDemo: true });
+      const u = await User.create({ name: o.owner, email: o.email, passwordHash: demoAccountPassword(), role: 'operator', phone: o.contactPhone, isDemo: true });
       const op = await Operator.create({
         owner: u._id, businessName: o.businessName, slug: o.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, ''),
         description: o.description, contactEmail: o.email, contactPhone: o.contactPhone, location: o.location,
@@ -347,4 +360,4 @@ async function seedIfEmpty() {
   return true;
 }
 
-module.exports = { seed, seedIfEmpty, clearAll, DEMO_PASSWORD, demoAdminPassword };
+module.exports = { seed, seedIfEmpty, clearAll, DEMO_PASSWORD, demoAdminPassword, demoAccountPassword };

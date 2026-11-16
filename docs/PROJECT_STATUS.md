@@ -115,8 +115,7 @@ To stop Dependabot reopening the two big framework majors until you're ready, ad
 | DCO or CLA | **Open** (§3), and **urgent** |
 | GSAP is not GPL-compatible | **Open** (L9). Issue draft medium/14 replaces it |
 | `vedansha07` as admin | Needs the repository moved into a GitHub organisation (MANUAL_ACTIONS G6) |
-| Code of Conduct contact | **Open:** `CONDUCT_CONTACT_EMAIL` is still a placeholder |
-| Two GitHub tokens pasted into a chat | **Revoke them** (M2) |
+| Code of Conduct contact | **Done:** private reports go through GitHub's private reporting form |
 
 ## 7. Work in progress
 
@@ -127,7 +126,7 @@ To stop Dependabot reopening the two big framework majors until you're ready, ad
 ## 8. Next actions, in order
 
 1. **DCO** (§3): merge the check, make it required, and ask #28 and #29 to sign off.
-2. **Revoke the two pasted tokens.** Rotate deployment secrets if anything is deployed.
+2. **Rotate shared secrets** (MANUAL_ACTIONS M2) if anything is deployed.
 3. **Ship the CodeQL fix:** `vedansha07` approves PR #40, then merge it.
 4. **Work through the PRs** (§4):
    - merge the green Dependabot updates;

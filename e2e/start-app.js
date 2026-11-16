@@ -16,7 +16,8 @@ const env = {
   // A fixed port so e2e/fixtures.js can reach this temporary database to add test-only records.
   EMBEDDED_DB_PORT: process.env.E2E_DB_PORT || '5197',
   JWT_SECRET: 'e2e-only-secret',
-  // Production seeding gives the demo admin a random password unless one is set (server/src/seedData.js).
+  // Production seeding gives every demo account a random password unless one is set (server/src/seedData.js).
+  DEMO_PASSWORD: 'GhumoDemo#2026',
   DEMO_ADMIN_PASSWORD: 'GhumoDemo#2026',
   CLIENT_URL: `http://127.0.0.1:${process.env.E2E_APP_PORT || '5198'}`,
   AI_PROVIDER: 'openai',

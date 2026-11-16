@@ -6,35 +6,49 @@ Contributions land in `staging` and reach `main` in a release. Each release name
 
 ## [Unreleased]
 
-Changes merged into `staging` since the last merge into `main`. They reach `main` with the next merge from `staging`.
+Changes merged into `staging` since the last release. They reach `main` with the next release.
+
+## [0.3.0] - 2026-11-16
+
+The first release published on GitHub. Everything merged since 0.2.0 (PRs #29 to #100).
+
+### Security
+- In production, seeding no longer gives the demo traveller and demo organisers the password published in the README. Like the demo admin, each gets a random password unless `DEMO_PASSWORD` is set. An approved demo organiser can publish trips and read the contact details of travellers who book them, so a public password on a live site was a real risk. Deployments seeded earlier should reset these accounts with `npm run set-password`. (#102)
 
 ### Added
-- One open booking request per traveller per departure (at most 10 seats held). A second request gets a 409 with a clear message on the booking page; the check is race-free (unique partial index), and confirmed bookings are unaffected. Request expiry is not part of this change. (#16)
-- Persistent photo storage behind a small adapter. `UPLOAD_STORAGE=gridfs` keeps uploaded photos in MongoDB (GridFS, no new dependency) so they survive redeploys; `disk` stays the default and behaves as before. `/uploads/<name>` URLs, the `POST /api/uploads` response and the type, size and signature checks are unchanged, and photos still on disk are served as a fallback while migrating. (#17)
-- An evaluation harness for AI Package Studio (`npm run eval:studio`, `server/eval/studio`). It reports per-field precision, recall and exact-match rate over a labelled corpus, and how often prices, capacities, durations and dates that aren't in the post appear, before and after grounding. CI runs it against the local stub with a synthetic sample and fails if an invented value survives grounding; a manual workflow runs it against a real provider. The real-post corpus waits on a data-consent decision. (#25)
-- Tests for the review flow: server tests for every review rule (`server/test/reviews.test.js`) and an e2e journey from a completed booking to the public trip page (`e2e/05-reviews.spec.js`), using a test-only completed-trip fixture that is never part of the seed.
+- One open booking request per traveller per departure (at most 10 seats held). A second request gets a 409 with a clear message on the booking page; the check is race-free (unique partial index), and confirmed bookings are unaffected. Request expiry is not part of this change. (#94, closes #16)
+- Persistent photo storage behind a small adapter. `UPLOAD_STORAGE=gridfs` keeps uploaded photos in MongoDB (GridFS, no new dependency) so they survive redeploys; `disk` stays the default and behaves as before. `/uploads/<name>` URLs, the `POST /api/uploads` response and the type, size and signature checks are unchanged, and photos still on disk are served as a fallback while migrating. (#93, closes #17)
+- An evaluation harness for AI Package Studio (`npm run eval:studio`, `server/eval/studio`). It reports per-field precision, recall and exact-match rate over a labelled corpus, and how often prices, capacities, durations and dates that aren't in the post appear, before and after grounding. CI runs it against the local stub with a synthetic sample and fails if an invented value survives grounding; a manual workflow runs it against a real provider. The real-post corpus waits on a data-consent decision. (#90, part of #25)
+- Tests for the review flow: server tests for every review rule (`server/test/reviews.test.js`) and an e2e journey from a completed booking to the public trip page (`e2e/05-reviews.spec.js`), using a test-only completed-trip fixture that is never part of the seed. (#86, closes #22)
 - Every response carries an `X-Request-Id`. The server writes one JSON log line per request (`time`, `level`, `requestId`, `method`, `path`, `status`, `durationMs`, `role`) and never logs query strings, bodies, cookies, IPs or personal data. 5xx responses include the `requestId`, so a user can quote it. `LOG_REQUESTS=false` turns the lines off. (#50)
 - Automated accessibility checks: axe-core (WCAG 2.1 A/AA) over the main public, traveller and organiser pages, at desktop and phone widths. Serious and critical violations fail CI; the known brand-colour contrast problem is tracked in #75. The logo link's accessible name is fixed. (#56)
 - ESLint for the server. `npm run lint` now lints the server and the client; independent sequential database writes run in parallel. (#71)
 - Owners can finish a contributor's PR in place. The `dco-maintainer-signoff` label lets an owner certify unsigned commits, so the contributor keeps the merged PR. (#79)
 - The PR review bot accepts `Closes #N` in the PR title or a commit message. (#74)
-- The PR review bot accepts `Refs #N` or `Part of #N` as a linked issue, for a PR that does only part of an issue, and notes that the issue stays open. Found while running a contributor PR end to end (#90).
+- The PR review bot accepts `Refs #N` or `Part of #N` as a linked issue, for a PR that does only part of an issue, and notes that the issue stays open. (#91)
 
 ### Fixed
 - Colour contrast meets WCAG 2.1 AA on every page the accessibility checks visit, and their allow-list is empty. Buttons, badges and other white-on-orange text use a deeper action orange (`--color-action`, 5.18:1). Success and warning pills, small secondary text, and labels on the tinted city panels are darker. The bright brand orange stays for decoration. (#95, closes #75)
-- A second review for the same booking now returns 409 "You have already reviewed this trip" instead of "That booking is already in use", including when two requests arrive at once.
+- AI Package Studio grounds departure dates and durations as well as prices and capacities: a date or duration that isn't in the organiser's text is cleared, not invented. (#87)
+- A second review for the same booking now returns 409 "You have already reviewed this trip" instead of "That booking is already in use", including when two requests arrive at once. (#86)
 - Phone and emergency-contact fields are validated and length-limited on the server and in the forms (sign-up, profile, booking contact, travellers). (#55)
 - Content reports are rate-limited (5 per user per minute), and the reported item must exist. A booking can be reported only by its traveller or its organiser. (#29)
 - React lint: the five `react-hooks/set-state-in-effect` warnings are fixed properly, and the rule is now an error. (#73)
+- React lint: the `react-refresh/only-export-components` warnings are fixed by moving shared helpers out of component files. (#88, closes #9)
 - The required DCO check runs when a PR is retargeted from `main` to `staging`; before, it waited forever. (#69)
 
 ### Changed
 - GitHub Actions run on Node 24, because GitHub removed Node 20 from its runners: `setup-node` 7, `cache` 6, `upload-artifact` 7, `gitleaks-action` 3, `github-script` 9 (pinned by commit). (#60, #62, #65, #66, #67)
-- Dependencies: helmet 8, dotenv 18 (loaded quietly), eslint 10 and `@eslint/js` 10 for the client, concurrently 10.0.7, and the client minor and patch group. (#38, #39, #61, #63, #64, #68)
+- Dependencies: helmet 8, dotenv 18 (loaded quietly), eslint 10 for the client and the server, `@eslint/js` 10 for the client, mongoose 8.24, concurrently 10.0.7, and the client minor and patch groups (axios, lucide-react, Vite, the React plugin). (#38, #39, #61, #63, #64, #68, #97, #99, #100)
 - `staging` needs no approval to merge (all required checks still apply); `main` still needs a code owner's approval. (#74)
+- The Code of Conduct has a private reporting route: GitHub's private reporting form, visible only to the maintainers.
+- Root, server and client packages share the release version (0.3.0).
+
+### Removed
+- The `/v01` design prototype. (#89, closes #20)
 
 ### Contributors
-@AnshS-GIT · @Imposon · @Manikanta-Achar · @sivaram-challa · @AyushCodes160 · @Lakshith7748
+@AnshS-GIT · @Imposon · @Manikanta-Achar · @sivaram-challa · @AyushCodes160 · @Lakshith7748 · @shubhanshu2103 · @BOXER78 · @vedansha07 · @Aniruddh-14 · @shekharmishra-work · @ashvin-salaryse · @ashvin2005 · @praggCode
 
 ## [0.2.0] - 2026-11-10
 
@@ -100,6 +114,7 @@ The V0.1 marketplace, plus a security audit, a licence and the open-source groun
 - **Ghumo AI marketplace** (`56ad883`): rebuilt from the earlier *Ghummoo* local-guide project into a group-travel marketplace with AI Package Studio.
 - **Ghummoo** (April 2026): the original local-guide booking project, preserved on `backup/ghummoo-legacy`.
 
-[Unreleased]: https://github.com/shekhar-narayan-mishra/Ghummoo/compare/v0.2.0...staging
+[Unreleased]: https://github.com/shekhar-narayan-mishra/Ghummoo/compare/v0.3.0...staging
+[0.3.0]: https://github.com/shekhar-narayan-mishra/Ghummoo/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/shekhar-narayan-mishra/Ghummoo/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/shekhar-narayan-mishra/Ghummoo/releases/tag/v0.1.0

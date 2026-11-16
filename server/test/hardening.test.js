@@ -140,6 +140,26 @@ test('Production seeding never gives the demo admin the password published in th
   }
 });
 
+test('Production seeding never gives the demo traveller or organisers the password published in the README', () => {
+  const { demoAccountPassword } = require('../src/seedData');
+  const saved = { NODE_ENV: process.env.NODE_ENV, DEMO_PASSWORD: process.env.DEMO_PASSWORD };
+  try {
+    delete process.env.DEMO_PASSWORD;
+    process.env.NODE_ENV = 'development';
+    assert.equal(demoAccountPassword(), DEMO_PASSWORD, 'local development keeps the documented demo password');
+    process.env.NODE_ENV = 'production';
+    const a = demoAccountPassword();
+    const b = demoAccountPassword();
+    assert.notEqual(a, DEMO_PASSWORD);
+    assert.notEqual(a, b, 'random for each account');
+    assert.ok(a.length >= 24);
+    process.env.DEMO_PASSWORD = DEMO_PASSWORD;
+    assert.equal(demoAccountPassword(), DEMO_PASSWORD, 'an explicitly set DEMO_PASSWORD is used, e.g. for a public demo');
+  } finally {
+    for (const [k, v] of Object.entries(saved)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+  }
+});
+
 test('AI Package Studio extraction is capped per organiser so one account cannot run up provider costs', async () => {
   const text = 'Manali Kasol trip, 5 days 4 nights, 7999 per person, Delhi to Delhi Volvo, 2 nights hotel';
   const op = client();

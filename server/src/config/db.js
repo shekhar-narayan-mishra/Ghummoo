@@ -36,6 +36,13 @@ async function waitForLockRelease(dbPath) {
   }
 }
 
+// In production the embedded database is opt-in. It isn't backed up, and on hosts with an
+// ephemeral disk (Render, Replit, containers) every redeploy silently replaces real bookings with
+// fresh demo data. A forgotten MONGODB_URI should be a clear error, not data loss.
+function embeddedAllowed(env = process.env) {
+  return env.NODE_ENV !== 'production' || env.ALLOW_EMBEDDED_DB === 'true';
+}
+
 // Connects to MONGODB_URI when set. Otherwise starts an embedded MongoDB (mongodb-memory-server)
 // that persists to server/.data so local development and demos work with zero setup.
 async function connectDB() {
@@ -44,6 +51,10 @@ async function connectDB() {
   let mode = 'external';
 
   if (!uri) {
+    if (!embeddedAllowed()) {
+      throw new Error('MONGODB_URI is not set. In production the embedded database is off because it is not backed up and '
+        + 'is lost on redeploy. Set MONGODB_URI, or set ALLOW_EMBEDDED_DB=true for a throwaway demo.');
+    }
     // Keep the downloaded mongod binary in server/.cache regardless of the working directory.
     process.env.MONGOMS_DOWNLOAD_DIR = process.env.MONGOMS_DOWNLOAD_DIR || path.join(__dirname, '..', '..', '.cache', 'mongodb-binaries');
     const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -79,4 +90,4 @@ async function disconnectDB() {
   if (memoryServer) await memoryServer.stop({ doCleanup: false });
 }
 
-module.exports = { connectDB, disconnectDB };
+module.exports = { connectDB, disconnectDB, embeddedAllowed };

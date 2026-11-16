@@ -8,6 +8,14 @@ Contributions land in `staging` and reach `main` in a release. Each release name
 
 Changes merged into `staging` since the last release. They reach `main` with the next release.
 
+### Security
+- On a production start, demo accounts that still accept the public README password get a random one, so deployments seeded before 0.3.0 are fixed by redeploying. Only accounts marked `isDemo` are touched; a deployment that sets `DEMO_PASSWORD` to the public value on purpose keeps it.
+- In production, a missing, example (`server/.env.example`) or shorter-than-32-character `JWT_SECRET` is replaced by a random secret with a warning, so sessions can't be forged with a known value.
+
+### Changed
+- In production, the embedded MongoDB is off unless `ALLOW_EMBEDDED_DB=true`. A forgotten `MONGODB_URI` now gives a clear 503 instead of silently running on a database that is lost on redeploy. **If a production deployment runs without `MONGODB_URI`, set one (or `ALLOW_EMBEDDED_DB=true`) before upgrading.**
+- `render.yaml` stores uploaded photos in MongoDB (`UPLOAD_STORAGE=gridfs`), because the free plan's disk is wiped on every deploy.
+
 ## [0.3.0] - 2026-11-16
 
 The first release published on GitHub. Everything merged since 0.2.0 (PRs #29 to #100).

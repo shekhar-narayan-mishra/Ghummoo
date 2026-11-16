@@ -101,7 +101,7 @@ Secrets are never built into the image. Put them in an untracked `.env` next to 
 
 | Variable | Default | Notes |
 | --- | --- | --- |
-| `JWT_SECRET` | random per start | Set it, or everyone is logged out on restart. |
+| `JWT_SECRET` | random per start | At least 32 random characters, or everyone is logged out on restart. |
 | `DEMO_PASSWORD` | random | Demo traveller and organisers. |
 | `DEMO_ADMIN_PASSWORD` | random | Demo admin. |
 | `AI_PROVIDER`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `AI_MODEL` | unset | AI Package Studio. |

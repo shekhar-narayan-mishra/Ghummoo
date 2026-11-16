@@ -23,7 +23,7 @@ const isAlive = (pid) => { try { process.kill(pid, 0); return true; } catch (e) 
 async function waitForLockRelease(dbPath) {
   const lockFile = path.join(dbPath, 'mongod.lock');
   for (let i = 0; i < 30; i += 1) {
-    let pid = 0;
+    let pid;
     try { pid = Number(fs.readFileSync(lockFile, 'utf8').trim()) || 0; } catch { return; }
     if (!pid || pid === process.pid || !isAlive(pid)) return;
     if (i === 0) console.log(`[db] waiting for the previous embedded database (pid ${pid}) to shut down…`);

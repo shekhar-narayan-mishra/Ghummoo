@@ -74,7 +74,7 @@ On the first start, the server downloads an embedded MongoDB binary (about 66 MB
 
 ### Demo accounts
 
-Locally, all demo accounts share the password **`GhumoDemo#2026`**. Override it with `DEMO_PASSWORD` before seeding.
+Locally, all demo accounts share the password **`GhumoDemo#2026`**. Override it with `DEMO_PASSWORD` before seeding. In production (`NODE_ENV=production`), every demo account gets a random password unless `DEMO_PASSWORD` is set, so the public password never works on a live site.
 
 | Role | Email |
 | --- | --- |
@@ -95,14 +95,14 @@ docker compose down          # stop; data and uploads are kept in volumes
 docker compose down -v       # stop and delete data and uploads
 ```
 
-The first start seeds demo data. The container runs with `NODE_ENV=production`, so the demo admin gets a random password unless `DEMO_ADMIN_PASSWORD` is set.
+The first start seeds demo data. The container runs with `NODE_ENV=production`, so the demo accounts get random passwords unless `DEMO_PASSWORD` (and, for the admin, `DEMO_ADMIN_PASSWORD`) is set.
 
 Secrets are never built into the image. Put them in an untracked `.env` next to `docker-compose.yml` (see `server/.env.example`):
 
 | Variable | Default | Notes |
 | --- | --- | --- |
 | `JWT_SECRET` | random per start | Set it, or everyone is logged out on restart. |
-| `DEMO_PASSWORD` | `GhumoDemo#2026` | Demo accounts. |
+| `DEMO_PASSWORD` | random | Demo traveller and organisers. |
 | `DEMO_ADMIN_PASSWORD` | random | Demo admin. |
 | `AI_PROVIDER`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `AI_MODEL` | unset | AI Package Studio. |
 | `MONGODB_URI` | `mongodb://mongo:27017/ghumo` | Set by compose. |

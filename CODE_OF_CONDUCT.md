@@ -9,7 +9,7 @@ In short:
 
 ## Reporting
 
-Report unacceptable behaviour privately to the maintainers at **CONDUCT_CONTACT_EMAIL**. This placeholder must be replaced with a real address before public launch; see `docs/MANUAL_ACTIONS.md`.
+Report unacceptable behaviour privately to the maintainers through GitHub's private reporting form: [open a private report](https://github.com/shekhar-narayan-mishra/Ghummoo/security/advisories/new) and start the title with **"Conduct:"**. Only the maintainers can see it. The form is GitHub's security-advisory form; the project uses it for conduct reports too, so that nobody has to raise a conduct problem in public. Please don't report conduct problems in public issues, pull requests or discussions.
 
 Reports are handled confidentially. Maintainers will respond as the Contributor Covenant's enforcement guidelines describe:
 1. correction;

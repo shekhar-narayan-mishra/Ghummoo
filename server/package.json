@@ -1,6 +1,6 @@
 {
   "name": "ghumo-server",
-  "version": "2.0.0",
+  "version": "0.3.0",
   "description": "Ghumo AI API: group travel marketplace",
   "license": "AGPL-3.0-only",
   "main": "src/index.js",

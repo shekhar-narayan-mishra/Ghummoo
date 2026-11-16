@@ -6,7 +6,7 @@
 
 > **Status, 8 November 2026:**
 > - Done: PR #1 merged into `main` with all checks green; `staging` created; Dependabot alerts and security updates, private vulnerability reporting and secret scanning are on; rulesets are active on `main` and `staging` with empty bypass lists; labels created; 25 issues published (#2 to #26).
-> - Still open: M1 and M2 (rotations and revoking the pasted tokens), M3 (copyright in writing), G6 (organisation transfer, if wanted), G7 (conduct email), DCO or CLA, and GSAP.
+> - Still open: M1 and M2 (securing existing deployments and rotating shared secrets), M3 (copyright in writing), G6 (organisation transfer, if wanted), DCO or CLA, and GSAP.
 
 ## Critical: before anything else is made public or shared
 
@@ -33,7 +33,7 @@
 - **NEXT STEP:** M2. If you have never deployed, skip M1.
 
 ### [ ] M2. Rotate any secret that was ever shared
-- **WHAT:** Revoke any GitHub personal access token that has ever been pasted into a chat or document. Rotate the Gemini or OpenAI key and the Atlas database password if they have ever been shared outside a secret store.
+- **WHAT:** Revoke any GitHub personal access token that has ever been shared outside GitHub. Rotate the Gemini or OpenAI key and the Atlas database password if they have ever been shared outside a secret store.
 - **WHY:** Git history is clean, but secrets shared elsewhere can't be recalled.
 - **WHERE:**
   - GitHub → your avatar → **Settings → Developer settings → Personal access tokens** (both "Fine-grained tokens" and "Tokens (classic)");
@@ -158,11 +158,12 @@
 - **SUCCESS CHECK:** `vedansha07` opens the repository's **Settings** tab and sees **Rules** and **Collaborators and teams**. Opening `.github/CODEOWNERS` on GitHub shows no "unknown owner" warning.
 - **NEXT STEP:** G7. Do G6 **before** G5 if you transfer, because the rulesets are easier to set up once, in the final location.
 
-### [ ] G7. Set the code-of-conduct contact
+### [x] G7. Set the code-of-conduct contact
 - **WHERE:** `CODE_OF_CONDUCT.md`, the line containing `CONDUCT_CONTACT_EMAIL`.
 - **HOW:** Replace the placeholder with an address both owners can read (a shared alias is best). Commit through a PR.
 - **INPUT:** The email address.
 - **SUCCESS CHECK:** `grep CONDUCT_CONTACT_EMAIL CODE_OF_CONDUCT.md` returns nothing.
+- **DONE (v0.3.0):** reports go through GitHub's private reporting form. Add a shared email next to it later if you want one.
 - **NEXT STEP:** G8.
 
 ### [x] G8. Labels, then issues
@@ -215,11 +216,6 @@
 ---
 
 ## Optional improvements
-
-### [ ] A1. Claude for Open Source application
-- **WHAT:** **Don't apply yet.** [ANTHROPIC_APPLICATION_ASSESSMENT.md](ANTHROPIC_APPLICATION_ASSESSMENT.md) shows no criterion is met today.
-- **WHEN:** Re-assess once a criterion is honestly met, for example 20 external contributors in 12 months, or real package adoption.
-- **WHERE:** https://claude.com/open-source-max. The terms are at https://www.anthropic.com/claude-for-oss-terms. You submit it yourself.
 
 ### [ ] A2. Publish the grounded-extraction package to npm
 - After hard/01 lands and the owners approve Apache-2.0 for it:

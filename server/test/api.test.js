@@ -189,8 +189,14 @@ test('T10: nobody can reserve more seats than available, even concurrently', asy
   const tooMany = await trav.post('/api/bookings', { departureId: depId, seats: 4, travelers: travellers(4), contact });
   assert.equal(tooMany.status, 409);
 
-  // 6 concurrent single-seat requests against 3 seats: exactly 3 succeed.
-  const results = await Promise.all(Array.from({ length: 6 }, () => trav.post('/api/bookings', { departureId: depId, seats: 1, travelers: travellers(1), contact })));
+  // 6 travellers send concurrent single-seat requests against 3 seats: exactly 3 succeed.
+  // (One traveller may hold only one open request per departure, so each request has its own account.)
+  const crowd = await Promise.all(Array.from({ length: 6 }, async (_, i) => {
+    const c = client();
+    await c.post('/api/auth/register', { name: `Crowd ${i}`, email: `crowd${i}@example.com`, password: 'password123' });
+    return c;
+  }));
+  const results = await Promise.all(crowd.map((c) => c.post('/api/bookings', { departureId: depId, seats: 1, travelers: travellers(1), contact })));
   const ok = results.filter((r) => r.status === 201);
   assert.equal(ok.length, 3, `expected 3 successes, got ${results.map((r) => r.status)}`);
   assert.ok(results.filter((r) => r.status !== 201).every((r) => r.status === 409));
@@ -204,7 +210,8 @@ test('T10: nobody can reserve more seats than available, even concurrently', asy
   assert.equal(after2.data.departures[0].seatsAvailable, 1);
 
   // Traveller cancellation releases seats too.
-  const can = await trav.post(`/api/bookings/${ok[1].data._id}/cancel`, {});
+  const canceller = crowd[results.indexOf(ok[1])];
+  const can = await canceller.post(`/api/bookings/${ok[1].data._id}/cancel`, {});
   assert.equal(can.data.status, 'cancelled');
   const after3 = await client().get(`/api/trips/${kedar.slug}`);
   assert.equal(after3.data.departures[0].seatsAvailable, 2);
@@ -313,4 +320,35 @@ test('Sign-in is protected against password guessing without blocking normal use
   assert.equal(blocked.status, 429, 'locked after 10 failures, even with the right password');
   // Other accounts are unaffected.
   assert.equal((await client().post('/api/auth/login', { email: 'traveller@ghumo.demo', password: DEMO_PASSWORD })).status, 200);
+});
+
+test('One traveller may hold only one open request per departure', async () => {
+  const trips = await client().get('/api/trips');
+  const slug = trips.data.items.find((t) => t.nextDeparture && t.nextDeparture.seatsAvailable >= 4)?.slug;
+  const detail = await client().get(`/api/trips/${slug}`);
+  const depId = detail.data.departures.find((d) => d.availability === 'available' && d.seatsAvailable >= 4)._id;
+  const seatsNow = async () => (await client().get(`/api/trips/${slug}`)).data.departures.find((d) => d._id === depId).seatsAvailable;
+  const startSeats = await seatsNow();
+  const send = (c) => c.post('/api/bookings', { departureId: depId, seats: 1, travelers: travellers(1), contact });
+
+  const a = client();
+  await a.post('/api/auth/register', { name: 'Cap A', email: 'cap-a@example.com', password: 'password123' });
+
+  // Two concurrent requests from one traveller: exactly one passes, and its seat is held once.
+  const both = await Promise.all([send(a), send(a)]);
+  assert.deepEqual(both.map((r) => r.status).sort(), [201, 409]);
+  const refused = both.find((r) => r.status === 409);
+  assert.match(refused.body.message, /already have a request for this departure/);
+  assert.equal(await seatsNow(), startSeats - 1, 'the refused request holds no seats');
+
+  // A later request is refused too, and another traveller is unaffected.
+  assert.equal((await send(a)).status, 409);
+  const b = client();
+  await b.post('/api/auth/register', { name: 'Cap B', email: 'cap-b@example.com', password: 'password123' });
+  assert.equal((await send(b)).status, 201);
+
+  // Cancelling the open request lets the traveller send a new one.
+  const first = both.find((r) => r.status === 201);
+  assert.equal((await a.post(`/api/bookings/${first.data._id}/cancel`, {})).status, 200);
+  assert.equal((await send(a)).status, 201);
 });

@@ -29,9 +29,10 @@ export function DataBadge({ trip, className, onImage }) {
   return null;
 }
 
-export function GuideLabel({ className, light }) {
+// `inherit` takes the surrounding text colour, for tinted panels where orange text falls below AA.
+export function GuideLabel({ className, light, inherit }) {
   return (
-    <span className={cx('inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em]', light ? 'text-white/85' : 'text-brand-ink', className)}>
+    <span className={cx('inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em]', light ? 'text-white/85' : inherit ? null : 'text-brand-ink', className)}>
       <BookOpen className="size-3.5" aria-hidden />Ghumo guide
     </span>
   );

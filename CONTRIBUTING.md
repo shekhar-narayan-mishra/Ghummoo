@@ -21,7 +21,7 @@ Thanks for helping. Ghumo AI is a marketplace for fixed-departure group trips in
    npm run lint && npm test && npm run build
    npm run test:e2e     # if your change can affect a browser journey
    ```
-8. **Open a PR against `staging`**, not `main`. Fill in the template and link the issue ("Closes #12").
+8. **Open a PR against `staging`**, not `main`. Fill in the template and link the issue: "Closes #12", or "Refs #12" when the PR does only part of it and the issue should stay open.
 9. **Respond to review.** CI must be green. A maintainer reviews within a few days. Push follow-up commits to the same branch; don't force-push after review has started unless asked.
 10. **Merge.** A maintainer squash-merges into `staging`. Changes reach `main` in the next release PR ([docs/BRANCHING_AND_RELEASE_WORKFLOW.md](docs/BRANCHING_AND_RELEASE_WORKFLOW.md)).
 
@@ -95,7 +95,7 @@ The **DCO sign-off** check (`.github/workflows/dco.yml`) runs on every pull requ
 ## The automated PR check
 
 When you open a PR, a bot comment summarises it within a minute and updates on every push. It checks:
-- the PR targets `staging` and links an issue (`Closes #12`);
+- the PR targets `staging` and links an issue (`Closes #12`, or `Refs #12` / `Part of #12` for part of an issue);
 - the template is filled in;
 - tests changed when application code changed;
 - which sensitive files changed (workflows, dependencies, auth, the user model);

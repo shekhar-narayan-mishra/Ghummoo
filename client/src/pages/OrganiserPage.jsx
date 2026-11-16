@@ -15,7 +15,7 @@ export default function OrganiserPage() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
       <div className="rounded-[32px] bg-sand p-6 sm:p-10">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          {op.logoUrl ? <SafeImage src={op.logoUrl} alt="" className="size-20 rounded-3xl" /> : <div className="grid size-20 shrink-0 place-items-center rounded-3xl bg-brand text-3xl font-extrabold text-white">{op.businessName[0]}</div>}
+          {op.logoUrl ? <SafeImage src={op.logoUrl} alt="" className="size-20 rounded-3xl" /> : <div className="grid size-20 shrink-0 place-items-center rounded-3xl bg-action text-3xl font-extrabold text-white">{op.businessName[0]}</div>}
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-3xl font-extrabold sm:text-4xl">{op.businessName}</h1>

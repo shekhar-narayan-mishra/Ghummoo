@@ -219,13 +219,21 @@ test('Booking integration: the journey uses the existing booking request, seats 
   // Validation and over-booking rules still apply.
   assert.equal((await t.post('/api/bookings', { departureId: dep._id, seats: 2, contact, travelers: travellers(1) })).status, 400, 'traveller count must match seats');
   assert.equal((await book(t, 11)).status, 400, 'max 10 seats per booking');
+  // One traveller may hold only one open request per departure, so others fill the rest.
+  const again = await book(t, 1);
+  assert.equal(again.status, 409, 'a second open request on the same departure is refused');
+  assert.match(again.body.message, /already have a request for this departure/);
   let left = capacity - 2;
-  while (left > 0) {
+  for (let i = 0; left > 0; i += 1) {
+    const other = client();
+    assert.equal((await other.post('/api/auth/register', { name: `Filler ${i}`, email: `filler${i}@example.com`, password: 'password123' })).status, 201);
     const n = Math.min(10, left);
-    assert.equal((await book(t, n)).status, 201);
+    assert.equal((await book(other, n)).status, 201);
     left -= n;
   }
-  assert.equal((await book(t, 1)).status, 409, 'cannot book a full departure');
+  const late = client();
+  await late.post('/api/auth/register', { name: 'Late Traveller', email: 'late@example.com', password: 'password123' });
+  assert.equal((await book(late, 1)).status, 409, 'cannot book a full departure');
 
   // Availability is derived from the real inventory everywhere the traveller looks.
   const full = (await pub.get('/api/trips/nainital-lakes-weekend')).data;

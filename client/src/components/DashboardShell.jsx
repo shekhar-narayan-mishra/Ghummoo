@@ -15,7 +15,7 @@ export default function DashboardShell({ nav, title, children, banner }) {
     <div className="min-h-screen bg-ivory lg:grid lg:grid-cols-[260px_1fr]">
       <aside className="sticky top-0 hidden h-screen flex-col border-r border-line bg-sand/70 px-4 py-6 lg:flex">
         <div className="px-2"><Logo /></div>
-        <p className="mt-6 px-3 text-[11px] font-extrabold uppercase tracking-widest text-muted">{title}</p>
+        <p className="mt-6 px-3 text-[11px] font-extrabold uppercase tracking-widest text-subtle">{title}</p>
         <nav className="mt-2 flex flex-col gap-1" aria-label={title}>
           {nav.map((n) => <NavLink key={n.to} to={n.to} end={n.end} className={link}><n.icon className="size-[18px]" aria-hidden />{n.label}</NavLink>)}
         </nav>

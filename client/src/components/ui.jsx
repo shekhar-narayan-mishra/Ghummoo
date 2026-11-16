@@ -8,7 +8,7 @@ export const cx = (...c) => c.filter(Boolean).join(' ');
 
 /* ---------------------------------- Button --------------------------------- */
 const BTN = {
-  primary: 'bg-brand text-white hover:bg-brand-hover shadow-[0_6px_16px_-8px_rgb(242_106_46/0.8)]',
+  primary: 'bg-action text-white hover:bg-action-hover shadow-[0_6px_16px_-8px_rgb(194_65_12/0.8)]',
   dark: 'bg-ink text-white hover:bg-black',
   secondary: 'bg-white text-ink border border-line hover:border-brand-soft hover:bg-peach/40',
   ghost: 'text-ink hover:bg-sand',
@@ -31,7 +31,7 @@ export const Button = forwardRef(function Button({ variant = 'primary', size = '
 });
 
 /* ---------------------------------- Inputs --------------------------------- */
-const fieldBase = 'w-full rounded-xl border border-line bg-white px-3.5 text-[15px] text-ink placeholder:text-muted/80 transition focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 disabled:bg-sand disabled:text-muted';
+const fieldBase = 'w-full rounded-xl border border-line bg-white px-3.5 text-[15px] text-ink placeholder:text-subtle/80 transition focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 disabled:bg-sand disabled:text-subtle';
 
 export function Field({ label, hint, error, required, children, className, htmlFor }) {
   return (
@@ -52,7 +52,7 @@ export const Input = forwardRef(function Input({ label, hint, error, required, c
   return (
     <Field label={label} hint={hint} error={error} required={required} className={className} htmlFor={rest.id || id}>
       <div className="relative">
-        {Icon && <Icon className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted" aria-hidden />}
+        {Icon && <Icon className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-subtle" aria-hidden />}
         <input ref={ref} id={rest.id || id} required={required} aria-invalid={error ? true : undefined} className={cx(fieldBase, 'h-11', Icon && 'pl-10', error && 'border-danger', inputClassName)} {...rest} />
       </div>
     </Field>

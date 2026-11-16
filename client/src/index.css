@@ -7,6 +7,8 @@
   --color-brand-hover: #DC571F;
   --color-brand-ink: #B4461A;   /* orange text on light surfaces, AA contrast */
   --color-brand-soft: #F5A477;
+  --color-action: #C2410C;      /* interactive elements with white text, 5.18:1 WCAG AA */
+  --color-action-hover: #9A3412; /* hover state, 7.31:1 WCAG AA */
   --color-peach: #FFE5D2;
   --color-ivory: #FFF7EF;
   --color-sand: #F9F0E8;
@@ -14,9 +16,9 @@
   --color-muted: #81766D;
   --color-subtle: #6B6058;      /* secondary text at small sizes, AA on ivory */
   --color-line: #EDE1D6;
-  --color-success: #3D7A55;
+  --color-success: #367050;      /* 5.00:1 on success-bg, AA for small pill text */
   --color-success-bg: #E5F0E7;
-  --color-warning: #94650F;
+  --color-warning: #8A5E0E;      /* 4.99:1 on warning-bg */
   --color-warning-bg: #FBEFD6;
   --color-danger: #A8443A;
   --color-danger-bg: #F8E3DF;

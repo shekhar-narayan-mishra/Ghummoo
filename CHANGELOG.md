@@ -9,6 +9,8 @@ Contributions land in `staging` and reach `main` in a release. Each release name
 Changes merged into `staging` since the last merge into `main`. They reach `main` with the next merge from `staging`.
 
 ### Added
+- One open booking request per traveller per departure (at most 10 seats held). A second request gets a 409 with a clear message on the booking page; the check is race-free (unique partial index), and confirmed bookings are unaffected. Request expiry is not part of this change. (#16)
+- Persistent photo storage behind a small adapter. `UPLOAD_STORAGE=gridfs` keeps uploaded photos in MongoDB (GridFS, no new dependency) so they survive redeploys; `disk` stays the default and behaves as before. `/uploads/<name>` URLs, the `POST /api/uploads` response and the type, size and signature checks are unchanged, and photos still on disk are served as a fallback while migrating. (#17)
 - An evaluation harness for AI Package Studio (`npm run eval:studio`, `server/eval/studio`). It reports per-field precision, recall and exact-match rate over a labelled corpus, and how often prices, capacities, durations and dates that aren't in the post appear, before and after grounding. CI runs it against the local stub with a synthetic sample and fails if an invented value survives grounding; a manual workflow runs it against a real provider. The real-post corpus waits on a data-consent decision. (#25)
 - Tests for the review flow: server tests for every review rule (`server/test/reviews.test.js`) and an e2e journey from a completed booking to the public trip page (`e2e/05-reviews.spec.js`), using a test-only completed-trip fixture that is never part of the seed.
 - Every response carries an `X-Request-Id`. The server writes one JSON log line per request (`time`, `level`, `requestId`, `method`, `path`, `status`, `durationMs`, `role`) and never logs query strings, bodies, cookies, IPs or personal data. 5xx responses include the `requestId`, so a user can quote it. `LOG_REQUESTS=false` turns the lines off. (#50)
@@ -16,8 +18,10 @@ Changes merged into `staging` since the last merge into `main`. They reach `main
 - ESLint for the server. `npm run lint` now lints the server and the client; independent sequential database writes run in parallel. (#71)
 - Owners can finish a contributor's PR in place. The `dco-maintainer-signoff` label lets an owner certify unsigned commits, so the contributor keeps the merged PR. (#79)
 - The PR review bot accepts `Closes #N` in the PR title or a commit message. (#74)
+- The PR review bot accepts `Refs #N` or `Part of #N` as a linked issue, for a PR that does only part of an issue, and notes that the issue stays open. Found while running a contributor PR end to end (#90).
 
 ### Fixed
+- Colour contrast meets WCAG 2.1 AA on every page the accessibility checks visit, and their allow-list is empty. Buttons, badges and other white-on-orange text use a deeper action orange (`--color-action`, 5.18:1). Success and warning pills, small secondary text, and labels on the tinted city panels are darker. The bright brand orange stays for decoration. (#95, closes #75)
 - A second review for the same booking now returns 409 "You have already reviewed this trip" instead of "That booking is already in use", including when two requests arrive at once.
 - Phone and emergency-contact fields are validated and length-limited on the server and in the forms (sign-up, profile, booking contact, travellers). (#55)
 - Content reports are rate-limited (5 per user per minute), and the reported item must exist. A booking can be reported only by its traveller or its organiser. (#29)

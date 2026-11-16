@@ -67,6 +67,10 @@ async function connectDB() {
 
   await mongoose.connect(uri, { serverSelectionTimeoutMS: 10000 });
   console.log(`[db] connected (${mode}) → ${mongoose.connection.name}`);
+  // Build the booking indexes now, so the one-open-request-per-departure rule is enforced from the
+  // first request. A database that already holds duplicate open requests can't build the unique
+  // index: warn instead of refusing to start (the route-level check still applies).
+  try { await require('../models').Booking.init(); } catch (err) { console.warn(`[db] booking indexes not built: ${err.message}`); }
   return { mode };
 }
 

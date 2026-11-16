@@ -37,7 +37,7 @@ export default function BookingProgress({ booking, className }) {
             const done = i <= current;
             return (
               <li key={s.key} aria-current={i === current ? 'step' : undefined} className={cx('flex gap-3 rounded-2xl p-3 sm:flex-col sm:gap-2', i === current ? 'bg-peach/60' : 'bg-sand/60')}>
-                <span className={cx('grid size-8 shrink-0 place-items-center rounded-full', done ? 'bg-brand text-white' : 'bg-white text-subtle ring-1 ring-line')}>
+                <span className={cx('grid size-8 shrink-0 place-items-center rounded-full', done ? 'bg-action text-white' : 'bg-white text-subtle ring-1 ring-line')}>
                   {done ? <Check className="size-4" aria-hidden /> : <Circle className="size-3" aria-hidden />}
                 </span>
                 <span>

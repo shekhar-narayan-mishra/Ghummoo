@@ -38,6 +38,8 @@ const HOTSPOTS = [
 const CODE = /^(server\/src|client\/src)\/.+\.(js|jsx|mjs|cjs)$/;
 const TESTS = /^(server\/test|client\/test|e2e)\//;
 const ISSUE_LINK = /\b(close[sd]?|fix(e[sd])?|resolve[sd]?)\b[\s:]*(#\d+|https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/issues\/\d+)/i;
+// A reference without closing: for a PR that does part of an issue ("Refs #25", "Part of #25").
+const ISSUE_REF = /\b(refs?|references|part\s+of)\b[\s:]*(#\d+|https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/issues\/\d+)/i;
 const LARGE = 500;
 
 // Removes HTML comments the way GitHub hides them when rendering: repeatedly, until none is
@@ -92,12 +94,17 @@ function analyse({ pr, files, commits = [], repoFullName }) {
   // 2. Linked issue (maintainers and release PRs are exempt)
   // A closing reference counts in the description, the title or any commit message: contributors
   // often write "(closes #21)" in the title or "Closes #2" in the commit.
-  const sources = [pr.body, pr.title, ...commits.map((c) => c && c.commit && c.commit.message)];
-  const linksIssue = sources.some((text) => ISSUE_LINK.test(stripComments(text)));
-  if (!release && !maintainer && !linksIssue) {
-    errors.push('No linked issue. Add a line such as **`Closes #12`** to the description, the title or a commit message. Every contribution should start from an issue (see CONTRIBUTING.md).');
-  } else if (!release && maintainer && !linksIssue) {
+  // "Refs #N" or "Part of #N" also links a PR that does only part of an issue; it gets a note,
+  // because merging it won't close the issue.
+  const sources = [pr.body, pr.title, ...commits.map((c) => c && c.commit && c.commit.message)].map(stripComments);
+  const closesIssue = sources.some((text) => ISSUE_LINK.test(text));
+  const refersToIssue = !closesIssue && sources.some((text) => ISSUE_REF.test(text));
+  if (!release && !maintainer && !closesIssue && !refersToIssue) {
+    errors.push('No linked issue. Add a line such as **`Closes #12`** to the description, the title or a commit message, or **`Refs #12`** if this PR does only part of the issue. Every contribution should start from an issue (see CONTRIBUTING.md).');
+  } else if (!release && maintainer && !closesIssue && !refersToIssue) {
     notes.push('No linked issue (fine for maintainer changes).');
+  } else if (!release && refersToIssue) {
+    notes.push('Refers to an issue without closing it (`Refs #N` or `Part of #N`), so merging this PR leaves the issue open. If it completes the issue, write `Closes #N` instead.');
   }
 
   // 3. Template filled in

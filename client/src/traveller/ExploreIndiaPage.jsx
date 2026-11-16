@@ -75,12 +75,12 @@ function CityStory({ city }) {
           <p className="mt-3 text-xs font-semibold" style={{ color: pal.ink }}>Original illustration · {city.theme.name}</p>
         </div>
         <div style={{ color: pal.ink }}>
-          <GuideLabel />
+          <GuideLabel inherit />
           <h2 id={`city-${city.slug}-h`} className="mt-2 text-4xl font-extrabold leading-none sm:text-6xl">{city.name}</h2>
           <p className="mt-2 text-[15px] font-bold opacity-80">{city.state} · {city.theme.name}</p>
           <p className="mt-5 text-[17px] leading-relaxed">{city.intro}</p>
           <div data-reveal-group className="mt-8">
-            <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] opacity-70">Landmarks</h3>
+            <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] opacity-80">Landmarks</h3>
             <ul className="mt-3 grid gap-2 sm:grid-cols-2">
               {city.landmarks.map((m) => (
                 <li key={m.slug} data-reveal className="flex gap-3 rounded-2xl bg-white/80 p-3.5 text-ink">
@@ -91,16 +91,16 @@ function CityStory({ city }) {
             </ul>
           </div>
           <div data-reveal-group className="mt-8">
-            <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] opacity-70">Often visited with {city.name}</h3>
+            <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] opacity-80">Often visited with {city.name}</h3>
             <ul className="mt-3 flex flex-wrap gap-2">
               {city.nearby.map((n) => (
                 <li key={n.slug} data-reveal><Link to={paths.place(n.slug)} className="inline-flex h-10 items-center gap-1.5 rounded-full bg-white px-4 text-sm font-extrabold text-ink ring-1 ring-black/5 hover:ring-brand"><MapPin className="size-3.5" style={{ color: pal.primary }} aria-hidden />{n.name}</Link></li>
               ))}
             </ul>
-            <p className="mt-2 text-xs font-semibold opacity-70">Grouped by how often trips combine them, not by distance.</p>
+            <p className="mt-2 text-xs font-semibold opacity-80">Grouped by how often trips combine them, not by distance.</p>
           </div>
           <div id={`city-${city.slug}-trips`} data-reveal-group className="mt-10">
-            <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] opacity-70">Trips</h3>
+            <h3 className="text-xs font-extrabold uppercase tracking-[0.16em] opacity-80">Trips</h3>
             {trips.length
               ? <div className="mt-3 grid gap-4 sm:grid-cols-2">{trips.map((t) => <div key={t._id} data-reveal><TripCard trip={t} /></div>)}</div>
               : <p data-reveal className="mt-3 rounded-2xl bg-white/80 p-4 text-sm font-semibold text-ink">No organiser lists a trip here yet.</p>}

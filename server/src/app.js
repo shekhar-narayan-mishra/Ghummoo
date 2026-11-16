@@ -32,9 +32,8 @@ app.use(cors({ origin: (origin, cb) => cb(null, !origin || allowed.includes(orig
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 
-const uploadDir = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads');
-fs.mkdirSync(uploadDir, { recursive: true });
-app.use('/uploads', express.static(uploadDir, { maxAge: '7d' }));
+// Uploaded photos come from the active storage adapter (UPLOAD_STORAGE=disk|gridfs).
+app.use('/uploads', require('./routes/files'));
 
 // Health reports database readiness so hosts and humans can see why the API isn't serving.
 // In production the reason (host names, raw driver errors) stays in the server logs, not in public responses.

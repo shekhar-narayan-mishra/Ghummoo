@@ -69,7 +69,7 @@ export function AIInput({ label, placeholder, suggestions = [], max = 300, busy,
           className="min-h-[52px] flex-1 resize-none bg-transparent px-2 py-1.5 text-[15px] font-medium placeholder:text-subtle focus:outline-none"
         />
         <button type="button" onClick={() => send()} disabled={!text.trim() || busy}
-          className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-brand px-4 text-sm font-extrabold text-white transition hover:bg-brand-hover disabled:opacity-50">
+          className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-action px-4 text-sm font-extrabold text-white transition hover:bg-action-hover disabled:opacity-50">
           {buttonLabel}<ArrowUp className="size-4" aria-hidden />
         </button>
       </div>

@@ -73,7 +73,7 @@ export function CompareTray() {
         </ul>
         <button type="button" onClick={clear} className="hidden shrink-0 rounded-full px-3 py-2 text-xs font-bold text-white/75 hover:text-white sm:block">Clear</button>
         {items.length >= 2
-          ? <Link to={href} className="shrink-0 rounded-full bg-brand px-4 py-2 text-sm font-extrabold text-white hover:bg-brand-hover">Compare {items.length}</Link>
+          ? <Link to={href} className="shrink-0 rounded-full bg-action px-4 py-2 text-sm font-extrabold text-white hover:bg-action-hover">Compare {items.length}</Link>
           : <span className="shrink-0 rounded-full bg-white/10 px-3 py-2 text-xs font-bold text-white/80">Pick 1 more</span>}
       </div>
     </div>

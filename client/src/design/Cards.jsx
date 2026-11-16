@@ -18,7 +18,7 @@ export function SaveToggle({ trip, className, onImage }) {
       type="button"
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); saved.toggle(trip); }}
       aria-pressed={on}
-      className={cx('grid size-9 shrink-0 place-items-center rounded-full transition', on ? 'bg-brand text-white' : onImage ? 'bg-white/90 text-ink hover:bg-white' : 'bg-white text-ink ring-1 ring-line hover:ring-brand-soft', className)}
+      className={cx('grid size-9 shrink-0 place-items-center rounded-full transition', on ? 'bg-action text-white' : onImage ? 'bg-white/90 text-ink hover:bg-white' : 'bg-white text-ink ring-1 ring-line hover:ring-brand-soft', className)}
     >
       <Heart className={cx('size-4', on && 'fill-current')} aria-hidden />
       <span className="sr-only">{on ? `Remove ${trip.title} from saved trips` : `Save ${trip.title}`}</span>

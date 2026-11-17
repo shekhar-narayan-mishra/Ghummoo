@@ -14,7 +14,9 @@ const IMG = {
   goa: img('1512343879784-a960bf40e7f2'), kerala: img('1506461883276-594a12b11cf3'), nainital: img('1610715936287-6c2ad208cdbf'),
 };
 
-const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'GhumoDemo#2026';
+// The password published in README.md for local development.
+const PUBLIC_DEMO_PASSWORD = 'GhumoDemo#2026';
+const DEMO_PASSWORD = process.env.DEMO_PASSWORD || PUBLIC_DEMO_PASSWORD;
 
 // The demo admin can approve organisers and read every booking, including real travellers'
 // contact details once real people use a deployment. So in production it never gets the
@@ -291,6 +293,31 @@ async function clearAll() {
   await Promise.all([User, Operator, OperatorVerification, TripPackage, TripDeparture, Booking, PaymentRecord, TripAnnouncement, Review, Report].map((M) => M.deleteMany({})));
 }
 
+// Before v0.3.0, production seeding gave the demo traveller and organisers (and, before 8 November
+// 2026, the admin) the README password. On every production start this finds demo accounts that
+// still accept it and gives each a random password, unless the deployment chose the public password
+// on purpose (DEMO_PASSWORD, or DEMO_ADMIN_PASSWORD for the admin, set to it). Only accounts marked
+// isDemo are touched, and only their password. Returns the emails that were changed.
+async function rotatePublicDemoPasswords() {
+  if (process.env.NODE_ENV !== 'production') return [];
+  const demos = await User.find({ isDemo: true }).select('+passwordHash');
+  const rotated = [];
+  // A deployment that sets DEMO_PASSWORD (or DEMO_ADMIN_PASSWORD) to the public value is a public demo.
+  const chosenPublic = (user) => (user.role === 'admin' ? (process.env.DEMO_ADMIN_PASSWORD || process.env.DEMO_PASSWORD) : process.env.DEMO_PASSWORD) === PUBLIC_DEMO_PASSWORD;
+  await Promise.all(demos.filter((user) => !chosenPublic(user)).map(async (user) => {
+    if (!(await user.comparePassword(PUBLIC_DEMO_PASSWORD))) return;
+    user.passwordHash = require('crypto').randomBytes(24).toString('base64url');
+    await user.save();
+    rotated.push(user.email);
+  }));
+  rotated.sort();
+  if (rotated.length) {
+    console.warn(`[seed] Replaced the public README password on ${rotated.length} demo account(s): ${rotated.join(', ')}. `
+      + 'To use one, run: npm run set-password --prefix server -- <email>. Rotate JWT_SECRET to end sessions that are already signed in.');
+  }
+  return rotated;
+}
+
 async function seed() {
   const users = {};
   users.admin = await User.create({ name: 'Ghumo Admin', email: 'admin@ghumo.demo', passwordHash: demoAdminPassword(), role: 'admin', isDemo: true });
@@ -360,4 +387,4 @@ async function seedIfEmpty() {
   return true;
 }
 
-module.exports = { seed, seedIfEmpty, clearAll, DEMO_PASSWORD, demoAdminPassword, demoAccountPassword };
+module.exports = { seed, seedIfEmpty, clearAll, DEMO_PASSWORD, PUBLIC_DEMO_PASSWORD, demoAdminPassword, demoAccountPassword, rotatePublicDemoPasswords };

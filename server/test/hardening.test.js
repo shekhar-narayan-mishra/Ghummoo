@@ -160,6 +160,69 @@ test('Production seeding never gives the demo traveller or organisers the passwo
   }
 });
 
+test('In production a missing, example or short JWT_SECRET is replaced by a random one', () => {
+  const { resolveJwtSecret, EXAMPLE_JWT_SECRET } = require('../src/config/secrets');
+  const strong = 'x'.repeat(48);
+  assert.deepEqual(resolveJwtSecret({ NODE_ENV: 'production', JWT_SECRET: strong }), { secret: strong, warning: null });
+  for (const JWT_SECRET of [undefined, '', EXAMPLE_JWT_SECRET, 'too-short-secret']) {
+    const { secret, warning } = resolveJwtSecret({ NODE_ENV: 'production', JWT_SECRET });
+    assert.notEqual(secret, JWT_SECRET);
+    assert.equal(secret.length, 64);
+    assert.match(warning, /WARNING: JWT_SECRET/);
+  }
+  assert.equal(resolveJwtSecret({ NODE_ENV: 'development', JWT_SECRET: 'short' }).secret, 'short', 'development keeps a short secret');
+  assert.match(resolveJwtSecret({}).warning, /development secret/);
+});
+
+test('In production the embedded database is used only when ALLOW_EMBEDDED_DB=true', () => {
+  const { embeddedAllowed } = require('../src/config/db');
+  assert.equal(embeddedAllowed({}), true);
+  assert.equal(embeddedAllowed({ NODE_ENV: 'development' }), true);
+  assert.equal(embeddedAllowed({ NODE_ENV: 'production' }), false);
+  assert.equal(embeddedAllowed({ NODE_ENV: 'production', ALLOW_EMBEDDED_DB: 'false' }), false);
+  assert.equal(embeddedAllowed({ NODE_ENV: 'production', ALLOW_EMBEDDED_DB: 'true' }), true);
+});
+
+test('Production start replaces the public README password on demo accounts that still accept it', async () => {
+  const { User } = require('../src/models');
+  const { rotatePublicDemoPasswords, PUBLIC_DEMO_PASSWORD } = require('../src/seedData');
+  const saved = { NODE_ENV: process.env.NODE_ENV, DEMO_PASSWORD: process.env.DEMO_PASSWORD, DEMO_ADMIN_PASSWORD: process.env.DEMO_ADMIN_PASSWORD };
+  const realUser = await User.create({ name: 'Real Person', email: 'real.person@example.com', passwordHash: PUBLIC_DEMO_PASSWORD, role: 'traveler' });
+  const warn = console.warn;
+  console.warn = () => {};
+  let rotated = [];
+  try {
+    delete process.env.DEMO_PASSWORD;
+    delete process.env.DEMO_ADMIN_PASSWORD;
+    process.env.NODE_ENV = 'development';
+    assert.deepEqual(await rotatePublicDemoPasswords(), [], 'never outside production');
+
+    process.env.NODE_ENV = 'production';
+    process.env.DEMO_PASSWORD = PUBLIC_DEMO_PASSWORD;
+    assert.deepEqual(await rotatePublicDemoPasswords(), [], 'a deployment that chose the public password keeps it');
+
+    delete process.env.DEMO_PASSWORD;
+    rotated = await rotatePublicDemoPasswords();
+    assert.ok(rotated.includes('traveller@ghumo.demo'));
+    assert.ok(rotated.includes('operator@ghumo.demo'));
+    assert.ok(rotated.includes('admin@ghumo.demo'));
+    assert.ok(!rotated.includes('real.person@example.com'), 'accounts that are not demo accounts are never touched');
+    assert.equal((await client().login('traveller@ghumo.demo')).status, 401, 'the public password no longer works');
+    assert.equal((await client().post('/api/auth/login', { email: 'real.person@example.com', password: PUBLIC_DEMO_PASSWORD })).status, 200);
+    assert.deepEqual(await rotatePublicDemoPasswords(), [], 'idempotent');
+  } finally {
+    console.warn = warn;
+    for (const [k, v] of Object.entries(saved)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+    // Give the rotated accounts their test password back for the tests that follow.
+    await Promise.all(rotated.map(async (email) => {
+      const user = await User.findOne({ email });
+      user.passwordHash = DEMO_PASSWORD;
+      await user.save();
+    }));
+    await User.deleteOne({ _id: realUser._id });
+  }
+});
+
 test('AI Package Studio extraction is capped per organiser so one account cannot run up provider costs', async () => {
   const text = 'Manali Kasol trip, 5 days 4 nights, 7999 per person, Delhi to Delhi Volvo, 2 nights hotel';
   const op = client();

@@ -17,8 +17,11 @@
 The repo includes a `.replit` file.
 
 1. Import the GitHub repo into Replit (Node.js).
-2. In **Secrets**, add `JWT_SECRET` (long random string) and, recommended, `MONGODB_URI` plus
-   `SEED_ON_EMPTY=true`. Add an AI key to enable AI Package Studio.
+2. In **Secrets**, add `JWT_SECRET` (at least 32 random characters), `MONGODB_URI`,
+   `SEED_ON_EMPTY=true` and `UPLOAD_STORAGE=gridfs`. Add an AI key to enable AI Package Studio.
+   With `NODE_ENV=production` the embedded database is off: without `MONGODB_URI` the API
+   answers 503. For a throwaway demo only, set `ALLOW_EMBEDDED_DB=true`
+   (data is lost on redeploy).
 3. Press **Run** (`npm run replit` = setup → build → start) or **Deploy**
    (build: `npm run setup && npm run build`, run: `npm start`).
 
@@ -36,7 +39,8 @@ static-site rewrite rules to configure.
 
 1. Render dashboard → **New → Blueprint** → select this repo.
 2. Fill in `MONGODB_URI` (MongoDB Atlas, with Network Access allowing `0.0.0.0/0`) and, for AI
-   Package Studio, `OPENAI_API_KEY` (your Gemini key). `JWT_SECRET` is generated for you.
+   Package Studio, `OPENAI_API_KEY` (your Gemini key). `JWT_SECRET` is generated for you, and
+   `UPLOAD_STORAGE=gridfs` keeps uploaded photos in MongoDB across deploys.
 3. Deploy. The demo data loads automatically into the empty database.
 
 Or configure a web service manually: build `npm run setup && npm run build`, start `npm start`,

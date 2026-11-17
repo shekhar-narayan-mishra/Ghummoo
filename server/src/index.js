@@ -1,16 +1,16 @@
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), quiet: true });
-const crypto = require('crypto');
 const { connectDB, disconnectDB } = require('./config/db');
-const { seedIfEmpty } = require('./seedData');
+const { resolveJwtSecret } = require('./config/secrets');
+const { seedIfEmpty, rotatePublicDemoPasswords } = require('./seedData');
 const { runFoundation } = require('./migrations/v0_1');
 
-if (!process.env.JWT_SECRET) {
-  // Never crash-loop on a missing secret: hosts like Render keep restarting a crashed app and
-  // every request just hangs. Use a random per-process secret and say so loudly instead.
-  process.env.JWT_SECRET = crypto.randomBytes(32).toString('hex');
-  console.warn(process.env.NODE_ENV === 'production'
-    ? '[auth] WARNING: JWT_SECRET is not set. Using a random secret, so everyone is logged out on each restart. Set JWT_SECRET.'
-    : '[auth] JWT_SECRET not set; using a random development secret.');
+// Never crash-loop on a bad secret: hosts like Render keep restarting a crashed app and every
+// request just hangs. A missing, example or (in production) short secret is replaced by a random
+// per-process one, with a loud warning.
+{
+  const { secret, warning } = resolveJwtSecret();
+  process.env.JWT_SECRET = secret;
+  if (warning) console.warn(warning);
 }
 
 const app = require('./app');
@@ -45,6 +45,9 @@ async function connectWithRetry() {
         // eslint-disable-next-line no-await-in-loop -- sequential seed check after connection
         await seedIfEmpty();
       }
+      // Deployments seeded before v0.3.0 gave demo accounts the README password; replace it.
+      // eslint-disable-next-line no-await-in-loop -- sequential step after database connection
+      await rotatePublicDemoPasswords();
       // V0.1 content directory + package links + confirmed-seat counters (idempotent, non-destructive).
       if (process.env.AUTO_MIGRATE !== 'false') {
         // eslint-disable-next-line no-await-in-loop -- sequential migration after database connection

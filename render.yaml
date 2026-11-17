@@ -22,6 +22,9 @@ services:
       # Loads the demo trips into an empty database on first boot.
       - key: SEED_ON_EMPTY
         value: "true"
+      # Keeps uploaded photos in MongoDB (GridFS): the free plan's disk is wiped on every deploy.
+      - key: UPLOAD_STORAGE
+        value: gridfs
       # AI Package Studio via Google Gemini's OpenAI-compatible API.
       - key: AI_PROVIDER
         value: openai
